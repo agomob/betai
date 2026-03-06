@@ -820,27 +820,23 @@ Réponds UNIQUEMENT en JSON valide sans texte ni backticks:
     "num":1,"match":"PSG vs Monaco","league":"Ligue 1","home":"PSG","away":"Monaco",
     "bet_type":"result","bet_label":"RÉSULTAT","bet_value":"Victoire PSG",
     "probability":72,"cote":1.45,"confidence":"high",
-    "reason":"Forme PSG WWWDW, ML 72% domicile, Monaco sans Golovin",
+    "reason":"Forme WWWDW, ML 72%, sans Golovin",
     "tag_type":"result",
     "is_value_bet":true,"value_edge":8.5,
     "reliability_score":82,"reliability_label":"Très fiable",
     "is_trap":false,"trap_reason":null,
-    "real_data":{
-      "form_home":"WWWDW","form_away":"DWLWL",
-      "h2h":"4V-2N-1D","avg_goals":"2.6",
-      "rank_home":"1er","rank_away":"3ème",
-      "ml_home":72,"ml_draw":18,"ml_away":10,
-      "injuries":"Golovin (Monaco)"
-    }
+    "real_data":{"form_home":"WWWDW","form_away":"DWLWL","h2h":"4V-2N-1D","rank_home":"1er","rank_away":"3ème","ml_home":72,"ml_draw":18,"ml_away":10}
   }],
   "summary":{"total":${selCount},"avg_prob":68,"total_cote":4.20,"high_conf":4,"value_bets":2}
-}`;
+}
+
+IMPORTANT: Sois concis dans les "reason" (max 15 mots). Le JSON doit être compact, sans espaces inutiles.`;
 
   try{
     const res=await fetch("https://api.anthropic.com/v1/messages",{
       method:"POST",
       headers:{"Content-Type":"application/json","x-api-key":claudeKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
-      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:6000,messages:[{role:"user",content:prompt}]})
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:16000,messages:[{role:"user",content:prompt}]})
     });
     clearInterval(aiT);aiSteps.forEach((_,i)=>sDone(i));
     if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error?.message||`Erreur API ${res.status}`);}
