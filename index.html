@@ -1164,32 +1164,64 @@ ${valInstr}
 ${relInstr}
 ${trapInstr}
 
-TYPES DE PARIS DISPONIBLES:
+TYPES DE PARIS — DÉFINITION ET CRITÈRES DE SÉLECTION:
+
+IMPORTANT: Chaque type de pari nécessite des critères de sélection DIFFÉRENTS.
+Ne sélectionne PAS les mêmes matchs pour des types différents.
+Pour chaque type, choisis les matchs où ce pari spécifique est le plus pertinent.
+
+=== RÉSULTATS (sélectionne : équipes avec forme dominante, écart de niveau clair) ===
 - result: Victoire 1 / Nul / Victoire 2
-- double: Double chance 1X ou X2
-- double12: Double chance 12 (aucun nul)
-- dnb: Draw No Bet
-- htft: HT/FT ex "1/1" ou "N/2"
+- double: Double chance 1X ou X2 (équipe favorie mais résultat incertain)
+- double12: Double chance 12 — aucun nul (2 équipes offensives, matchs ouverts)
+- dnb: Draw No Bet (favori clair mais nul non exclu)
+- htft: HT/FT ex "1/1" (équipes qui démarrent fort ou lentement)
 - asian: Handicap asiatique ex "PSG -1.0"
 - euro_hdc: Handicap européen ex "Bayern -1"
-- cleansheet: Victoire + aucun but encaissé
-- goals: Plus/Moins buts ex "Plus de 2.5 buts"
-- btts: BTTS OUI ou NON
-- btts_goals: BTTS + Over/Under ex "BTTS OUI + Plus de 2.5"
-- goals_ht: Buts 1ère MT ex "Plus de 0.5 buts MT1"
-- goals_st: Buts 2ème MT ex "Plus de 1.5 buts MT2"
-- first_goal: Première équipe à marquer
-- corners: Corners ex "Plus de 9.5 corners"
-- corners_ht: Corners 1ère MT
-- cards: Cartons ex "Plus de 3.5 cartons"
-- fouls: Fautes ex "Plus de 19.5 fautes"
-- winbtts: Victoire + Les 2 marquent ex "PSG Victoire + BTTS OUI"
-- double_btts: Double chance + BTTS ex "1X + BTTS OUI" ou "12 + BTTS OUI"
-- result_goals: Résultat + buts ex "PSG Victoire + Plus de 2.5 buts"
+- cleansheet: Victoire + aucun but encaissé (défense très solide, attaque modeste en face)
 
-RÈGLES:
+=== BUTS (sélectionne : selon la moyenne de buts des 2 équipes, pas la force) ===
+- goals: Plus/Moins buts — CRITÈRES: moyenne buts/match des 2 équipes combinée
+  → Over: équipes qui marquent ET prennent des buts (moyennes élevées)
+  → Under: équipes défensives, matchs fermés, enjeux importants
+- btts: BTTS OUI/NON — CRITÈRES: les 2 équipes marquent-elles ET encaissent-elles?
+  → OUI: les 2 attaques marquent souvent, les 2 défenses sont poreuses
+  → NON: au moins une des 2 équipes a une défense solide ou ne marque pas souvent
+- btts_goals: BTTS + Over/Under ex "BTTS OUI + Plus de 2.5"
+- goals_ht: Buts 1ère MT — CRITÈRES: équipes qui démarrent fort, qui pressent haut
+- goals_st: Buts 2ème MT — CRITÈRES: équipes qui accélèrent en 2ème période, remontadas
+- first_goal: Première équipe à marquer — CRITÈRES: équipe qui presse le plus en début
+
+=== STATS (sélectionne : critères physiques et tactiques, pas la force des équipes) ===
+- corners: Corners total — CRITÈRES: équipes qui jouent LARGE, font beaucoup de centres, style offensif avec débordements. Ne pas choisir une équipe juste parce qu'elle est forte.
+- corners_ht: Corners 1ère MT — CRITÈRES: équipes qui pressent haut en début de match
+- cards: Cartons — CRITÈRES: rencontres physiques, rivaux, arbitres stricts, équipes qui font des fautes. NE PAS choisir les mêmes matchs que pour les buts ou résultats.
+- fouls: Fautes — CRITÈRES: équipes défensives, matchs tendus, rivaux régionaux
+
+=== COMBINÉS (sélectionne : cumul des critères de chaque composante) ===
+- winbtts: Victoire + Les 2 marquent — CRITÈRES: équipe dominante ET défense poreuse des deux côtés
+- double_btts: Double chance + BTTS — CRITÈRES: match ouvert avec buts des 2 côtés ex "1X + BTTS OUI" ou "12 + BTTS OUI"
+- result_goals: Résultat + buts — CRITÈRES: résultat probable confirmé par tendance de buts ex "PSG Victoire + Plus de 2.5 buts"
+
+RÈGLE FONDAMENTALE — DIVERSITÉ DES MATCHS:
+Si plusieurs types sont actifs, tu DOIS sélectionner des matchs DIFFÉRENTS pour chaque type autant que possible.
+Exemple avec 75 matchs disponibles et 3 types actifs (corners, cards, btts) :
+- corners → choisis les 5 matchs avec le plus de centres/débordements attendus
+- cards → choisis les 5 matchs les plus physiques/derbies (différents des corners !)
+- btts → choisis les 5 matchs où les 2 équipes marquent ET encaissent souvent
+→ Ces 3 groupes doivent être DISTINCTS. Ne répète pas les mêmes matchs.
+
+EXCEPTION — UN MATCH PEUT APPARAÎTRE DANS PLUSIEURS TYPES SI :
+Sa probabilité pour ce type est STRICTEMENT SUPÉRIEURE OU ÉGALE à la meilleure alternative disponible.
+Exemple : PSG vs Monaco peut apparaître en "corners" ET en "btts" uniquement si :
+- Pour corners : probabilité PSG vs Monaco ≥ probabilité du meilleur autre match corners disponible
+- Pour btts : probabilité PSG vs Monaco ≥ probabilité du meilleur autre match btts disponible
+→ Si un match moins connu a une meilleure probabilité pour ce type, choisis le match moins connu.
+→ Un match très connu (PSG, Real Madrid, Bayern...) ne doit PAS être favorisé par défaut.
+
+AUTRES RÈGLES:
 - Cote estimée = (1/probabilité) × 1.08
-- Sois concis dans "reason" (max 15 mots)
+- Sois concis dans "reason" (max 15 mots, mentionne le critère spécifique du type de pari)
 - JSON compact sans espaces superflus
 
 Réponds UNIQUEMENT avec ce JSON valide, sans texte autour, sans backticks:
