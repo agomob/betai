@@ -95,6 +95,11 @@ textarea::placeholder{color:var(--muted);}
 .mode.on.safe{background:rgba(0,245,160,.07);border-color:rgba(0,245,160,.3);color:var(--green);}
 .mode.on.bal{background:rgba(77,184,255,.07);border-color:rgba(77,184,255,.3);color:var(--blue);}
 .mode.on.agg{background:rgba(255,140,66,.07);border-color:rgba(255,140,66,.3);color:var(--orange);}
+.mode.on.smart{background:rgba(200,100,255,.1);border-color:rgba(200,100,255,.4);color:var(--purple);}
+.smart-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(200,100,255,.12);border:1px solid rgba(200,100,255,.35);border-radius:5px;padding:2px 7px;font-size:7.5px;font-weight:700;letter-spacing:1px;color:var(--purple);}
+.smart-threshold{display:none;margin-top:7px;background:rgba(200,100,255,.05);border:1px solid rgba(200,100,255,.15);border-radius:8px;padding:9px 11px;}
+.smart-threshold.show{display:block;}
+.smart-threshold .slabel{font-size:8.5px;margin-bottom:5px;}
 
 /* Features */
 .feats{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
@@ -487,10 +492,19 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
   <!-- Mode -->
   <div>
     <div class="slabel">Mode de jeu</div>
-    <div class="modes">
+    <div class="modes" style="grid-template-columns:1fr 1fr 1fr 1fr;">
       <button class="mode safe on" data-m="safe" onclick="setMode(this)"><span class="mode-icon">🛡️</span>Sécurisé</button>
       <button class="mode bal" data-m="balanced" onclick="setMode(this)"><span class="mode-icon">⚖️</span>Équilibré</button>
       <button class="mode agg" data-m="aggressive" onclick="setMode(this)"><span class="mode-icon">🔥</span>Agressif</button>
+      <button class="mode smart" data-m="smart" onclick="setMode(this)"><span class="mode-icon">🧠</span>Intelligent</button>
+    </div>
+    <div class="smart-threshold" id="smartThreshold">
+      <div class="slabel">🎯 Seuil Sélection Intelligente</div>
+      <div class="thresh-row">
+        <div class="thresh-val" id="smartVal">80%</div>
+        <input type="range" id="smartSlider" min="70" max="95" value="80" oninput="document.getElementById('smartVal').textContent=this.value+'%'">
+      </div>
+      <div style="font-size:8.5px;color:var(--muted);margin-top:4px;">Une seule option par match · Minimum requis · Si égalité → meilleure cote</div>
     </div>
   </div>
 
@@ -725,9 +739,19 @@ function setMode(btn) {
   document.querySelectorAll('.mode').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
   curMode = btn.dataset.m;
-  const v = { safe:'60', balanced:'55', aggressive:'50' }[curMode];
-  $('threshSlider').value = v;
-  $('threshVal').textContent = v + '%';
+  if (curMode === 'smart') {
+    $('smartThreshold').classList.add('show');
+    // Disable the regular threshold slider when smart mode is on
+    $('threshSlider').disabled = true;
+    $('threshSlider').style.opacity = '0.3';
+  } else {
+    $('smartThreshold').classList.remove('show');
+    $('threshSlider').disabled = false;
+    $('threshSlider').style.opacity = '1';
+    const v = { safe:'60', balanced:'55', aggressive:'50' }[curMode];
+    $('threshSlider').value = v;
+    $('threshVal').textContent = v + '%';
+  }
 }
 
 function showTab(tab, btn) {
@@ -995,7 +1019,7 @@ async function generate() {
   if (!matches.length) return;
 
   // Read config
-  const thresh   = $('threshSlider').value;
+  const thresh   = curMode === 'smart' ? $('smartSlider').value : $('threshSlider').value;
   const optList  = [...activeOpts].join(', ');
   const hasFD    = !!$('apiFD').value.trim();
   const hasBZ    = !!$('apiBZ').value.trim();
@@ -1004,7 +1028,13 @@ async function generate() {
   const wantRel  = activeFeats.has('rel');
   const wantTrap = activeFeats.has('trap');
   const wantBest = activeFeats.has('best');
-  const modeDesc = { safe:'Sécurité max, probabilités élevées', balanced:'Équilibre probabilité/valeur', aggressive:'Meilleures opportunités, plus de risque' }[curMode];
+  const smartMinProb = curMode === 'smart' ? parseInt($('smartSlider').value) : null;
+  const modeDesc = {
+    safe: 'Sécurité max, probabilités élevées',
+    balanced: 'Équilibre probabilité/valeur',
+    aggressive: 'Meilleures opportunités, plus de risque',
+    smart: `Sélection intelligente — 1 seule option par match, minimum ${smartMinProb}% requis`
+  }[curMode];
 
   $('genBtn').disabled = true;
   usedSrc = { fd:false, bz:false, af:false };
@@ -1117,6 +1147,31 @@ async function generate() {
   const srcList = [usedSrc.fd ? 'Football-Data' : null, usedSrc.af ? 'API-Football' : null, usedSrc.bz ? 'Bzzoiro ML' : null].filter(Boolean).join(', ') || 'connaissances générales';
 
   // Build instruction blocks
+  // Smart mode instruction
+  const smartInstr = curMode === 'smart' ? `
+TICKET COMPLET TOUTES OPTIONS — MODE ACTIF (RÈGLES ABSOLUES):
+
+Seuil minimum obligatoire : ${smartMinProb}%
+
+OBJECTIF : Générer UN SEUL TICKET contenant TOUTES les options valides de TOUS les matchs.
+→ Pour chaque match, tu analyses CHAQUE type de pari autorisé (${optList}).
+→ Tu inclus dans le ticket TOUTES les options dont la probabilité est >= ${smartMinProb}%.
+→ Un même match peut donc apparaître PLUSIEURS FOIS dans le ticket avec des types différents.
+   Exemple : "PSG vs Monaco" peut donner 3 lignes : DC 1X (85%), BTTS OUI (82%), Plus 2.5 buts (81%)
+→ Si une option est sous ${smartMinProb}% pour un match → elle est exclue, point.
+→ Si AUCUNE option d'un match ne dépasse ${smartMinProb}% → ce match n'apparaît pas du tout.
+
+ALGORITHME (à appliquer pour chaque match × chaque type autorisé) :
+1. Estime la probabilité de chaque type de pari pour ce match.
+2. Si probabilité >= ${smartMinProb}% → INCLURE dans le ticket.
+3. Si probabilité < ${smartMinProb}% → EXCLURE.
+4. Pas de limite de nombre de sélections — inclus TOUT ce qui passe le seuil.
+
+DANS "reason" : liste toutes les options analysées avec leur probabilité, puis confirme pourquoi cette option est retenue.
+Exemple reason : "DC 1X 86%✓, Résultat 71%✗, BTTS 83%✓, Over2.5 78%✗ — retenu car >= ${smartMinProb}%"
+
+IMPORTANT : Le ticket peut contenir 5 lignes comme 40 lignes selon les matchs. C'est voulu.` : '';
+
   const bestInstr = wantBest ? `
 BEST PICK MODE — ACTIF:
 Types autorisés (UNIQUEMENT ces types, ne propose rien d'autre) : ${optList}
@@ -1163,6 +1218,7 @@ ${bestInstr}
 ${valInstr}
 ${relInstr}
 ${trapInstr}
+${smartInstr}
 
 TYPES DE PARIS — DÉFINITION ET CRITÈRES DE SÉLECTION:
 
@@ -1313,7 +1369,7 @@ function renderTicket(data, totalMatches) {
   const highC = data.ticket.filter(t => t.confidence === 'high').length;
   const valCt = data.ticket.filter(t => t.is_value_bet).length;
   const trapCt = data.ticket.filter(t => t.is_trap).length;
-  const mL = { safe:'🛡️ Sécurisé', balanced:'⚖️ Équilibré', aggressive:'🔥 Agressif' }[curMode];
+  const mL = { safe:'🛡️ Sécurisé', balanced:'⚖️ Équilibré', aggressive:'🔥 Agressif', smart:'🧠 Intelligent' }[curMode];
 
   $('sumBar').innerHTML = `
     <span class="spill g">⚡ <span class="sv">${data.ticket.length}</span> sélections</span>
