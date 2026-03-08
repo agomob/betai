@@ -1118,20 +1118,12 @@ async function generate() {
 
   // Build instruction blocks
   const bestInstr = wantBest ? `
-BEST PICK MODE — ACTIF (PRIORITÉ ABSOLUE):
-Pour chaque match, tu DOIS évaluer TOUS ces types de paris et choisir LE MEILLEUR :
-1. Résultat (1/N/2) — quelle proba de victoire/nul ?
-2. Double chance 1X, X2, 12 — lequel est le plus solide ?
-3. Plus/Moins buts — tendance offensive/défensive des 2 équipes ?
-4. BTTS OUI/NON — les 2 défenses sont-elles poreuses ou solides ?
-5. Win + BTTS — équipe dominante qui prend des buts ?
-6. Double chance + BTTS — pari combiné très solide ?
-7. Résultat + buts — confirment-ils la même chose ?
-8. Corners — équipes qui jouent en largeur ?
-9. Cartons — match physique ou derby ?
-10. Draw No Bet — si victoire probable mais nul possible ?
-→ Compare toutes les probas, choisis UNE SEULE option : la plus probable et la plus cohérente avec les données.
-→ Dans "reason" explique pourquoi cette option est meilleure que les autres.` : '';
+BEST PICK MODE — ACTIF:
+Types autorisés (UNIQUEMENT ces types, ne propose rien d'autre) : ${optList}
+Pour chaque match, évalue CHAQUE type autorisé ci-dessus et estime sa probabilité.
+→ Choisis UNE SEULE option parmi les types autorisés : celle avec la probabilité la plus haute.
+→ NE PROPOSE JAMAIS un type qui n'est pas dans la liste ci-dessus.
+→ Dans "reason", explique en 1 phrase pourquoi cette option est la meilleure parmi les types autorisés.` : '';
 
   const valInstr = wantVal ? `
 VALUE BET:
@@ -1162,7 +1154,8 @@ MATCHS:
 ${matches.map((m, i) => `${i+1}. ${m}`).join('\n')}
 
 CONFIGURATION:
-- Mode Best Pick: ${wantBest ? 'ACTIVÉ — évalue TOUS les paris et choisis le meilleur' : 'DÉSACTIVÉ — utilise ces types: ' + optList}
+- Types de paris autorisés: ${optList}
+- Mode Best Pick: ${wantBest ? 'ACTIVÉ — compare ces types entre eux et choisis le MEILLEUR, sans jamais sortir de cette liste' : 'DÉSACTIVÉ — propose un pari pour chaque type de la liste'}
 - Sélections: ${selCount}
 - Seuil minimum: ${thresh}%
 - Mode: ${curMode} — ${modeDesc}
