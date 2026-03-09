@@ -101,6 +101,140 @@ textarea::placeholder{color:var(--muted);}
 .smart-threshold.show{display:block;}
 .smart-threshold .slabel{font-size:8.5px;margin-bottom:5px;}
 
+/* ── Import Analyser ── */
+.import-panel{background:rgba(240,180,0,.04);border:1px solid rgba(240,180,0,.18);border-radius:10px;padding:10px 12px;margin-bottom:8px;}
+.import-panel textarea{width:100%;box-sizing:border-box;background:rgba(0,0,0,.3);border:1px solid rgba(240,180,0,.2);border-radius:7px;color:var(--fg);font-size:9px;padding:7px 9px;resize:vertical;min-height:90px;font-family:monospace;}
+.import-panel textarea::placeholder{color:var(--muted);}
+.import-panel textarea:focus{outline:none;border-color:rgba(240,180,0,.5);}
+.import-actions{display:flex;gap:5px;margin-top:6px;align-items:center;}
+.import-hint{font-size:7.5px;color:var(--muted);margin-top:4px;line-height:1.4;}
+#tabImport .ticket-hd{margin-bottom:8px;}
+.analysis-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:9px 11px;margin-bottom:7px;transition:border-color .2s;}
+.analysis-card.best{border-color:rgba(240,180,0,.45);background:rgba(240,180,0,.05);}
+.analysis-card.good{border-color:rgba(0,229,150,.3);background:rgba(0,229,150,.03);}
+.analysis-card.bad{border-color:rgba(255,82,82,.25);background:rgba(255,82,82,.03);}
+.ac-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;}
+.ac-combo{font-size:9.5px;font-weight:700;color:var(--fg);line-height:1.4;}
+.ac-score{font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;}
+.ac-score.best{background:rgba(240,180,0,.15);color:#f0b400;}
+.ac-score.good{background:rgba(0,229,150,.12);color:var(--green);}
+.ac-score.bad{background:rgba(255,82,82,.12);color:var(--orange);}
+.ac-picks{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;}
+.ac-pick{font-size:8px;padding:2px 7px;border-radius:4px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);}
+.ac-pick.retained{border-color:rgba(0,229,150,.4);color:var(--green);background:rgba(0,229,150,.07);}
+.ac-pick.rejected{border-color:rgba(255,82,82,.3);color:var(--orange);text-decoration:line-through;opacity:.7;}
+.ac-analysis{font-size:8.5px;color:var(--muted);line-height:1.5;}
+.ac-prob-bar{height:4px;border-radius:2px;background:rgba(255,255,255,.07);margin-top:5px;}
+.ac-prob-fill{height:4px;border-radius:2px;transition:width .5s;}
+.ac-footer{display:flex;gap:8px;margin-top:6px;align-items:center;}
+.ac-badge{font-size:7.5px;padding:2px 6px;border-radius:4px;}
+
+
+/* ── Score exact ── */
+.sc-panel{background:rgba(77,184,255,.04);border:1px solid rgba(77,184,255,.15);border-radius:8px;padding:7px 10px;margin-bottom:7px;}
+.sc-lbl{font-size:7.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);margin-bottom:4px;}
+.sc-scores{display:flex;flex-wrap:wrap;gap:4px;}
+.sc-score{font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px;background:rgba(77,184,255,.1);border:1px solid rgba(77,184,255,.2);color:var(--blue);}
+.sc-score.top{background:rgba(0,245,160,.12);border-color:rgba(0,245,160,.3);color:var(--green);}
+
+/* ── xG panel ── */
+.xg-panel{background:rgba(200,100,255,.04);border:1px solid rgba(200,100,255,.15);border-radius:8px;padding:7px 10px;margin-bottom:7px;}
+.xg-lbl{font-size:7.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--purple);margin-bottom:5px;}
+.xg-row{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.xg-team{font-size:9px;color:var(--muted2);}
+.xg-val{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--purple);letter-spacing:1px;}
+.xg-vs{font-size:9px;color:var(--muted);font-weight:700;}
+
+/* ── Kelly & EV ── */
+.kelly-panel{background:rgba(0,229,204,.04);border:1px solid rgba(0,229,204,.15);border-radius:8px;padding:7px 10px;margin-bottom:7px;}
+.kelly-lbl{font-size:7.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:4px;}
+.kelly-row{display:flex;gap:12px;}
+.kelly-item{display:flex;flex-direction:column;gap:1px;}
+.kelly-item-lbl{font-size:7.5px;color:var(--muted);}
+.kelly-item-val{font-family:'Bebas Neue',sans-serif;font-size:19px;color:var(--teal);letter-spacing:1px;}
+.kelly-item-val.neg{color:var(--red);}
+.kelly-item-val.pos{color:var(--green);}
+
+/* ── Dropping odds badge ── */
+.drop-badge{display:inline-flex;align-items:center;gap:3px;background:rgba(0,245,160,.1);border:1px solid rgba(0,245,160,.3);border-radius:5px;padding:2px 6px;font-size:7.5px;font-weight:700;letter-spacing:1px;color:var(--green);}
+
+/* ── Performance Tracker tab ── */
+#tabPerf .ticket-hd{margin-bottom:12px;}
+.perf-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+.perf-kpi{background:var(--card);border:1px solid var(--b1);border-radius:11px;padding:12px 14px;text-align:center;}
+.perf-kpi-val{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;line-height:1;}
+.perf-kpi-lbl{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:3px;}
+.perf-kpi.kpi-green .perf-kpi-val{color:var(--green);}
+.perf-kpi.kpi-gold  .perf-kpi-val{color:var(--gold);}
+.perf-kpi.kpi-red   .perf-kpi-val{color:var(--red);}
+.perf-kpi.kpi-blue  .perf-kpi-val{color:var(--blue);}
+.perf-picks{display:flex;flex-direction:column;gap:6px;}
+.pp-row{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--b1);border-radius:9px;padding:8px 11px;transition:.2s;}
+.pp-row:hover{border-color:var(--b2);}
+.pp-match{flex:1;font-size:11px;font-weight:600;color:var(--text);}
+.pp-bet{font-size:9px;color:var(--muted2);margin-top:1px;}
+.pp-prob{font-size:9px;font-weight:700;color:var(--muted2);white-space:nowrap;}
+.pp-cote{font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--gold);letter-spacing:1px;min-width:34px;text-align:center;}
+.pp-actions{display:flex;gap:4px;}
+.pp-btn{border:none;border-radius:6px;padding:4px 9px;font-size:9px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:.15s;}
+.pp-btn.win{background:rgba(0,245,160,.15);color:var(--green);border:1px solid rgba(0,245,160,.3);}
+.pp-btn.win:hover{background:rgba(0,245,160,.28);}
+.pp-btn.loss{background:rgba(255,82,82,.12);color:var(--red);border:1px solid rgba(255,82,82,.25);}
+.pp-btn.loss:hover{background:rgba(255,82,82,.25);}
+.pp-btn.skip{background:rgba(255,255,255,.04);color:var(--muted);border:1px solid var(--b1);}
+.pp-status{font-size:8.5px;font-weight:700;padding:3px 8px;border-radius:5px;white-space:nowrap;}
+.pp-status.won{background:rgba(0,245,160,.12);color:var(--green);}
+.pp-status.lost{background:rgba(255,82,82,.1);color:var(--red);}
+.pp-status.pending{background:rgba(255,255,255,.04);color:var(--muted);}
+.roi-chart{background:var(--card);border:1px solid var(--b1);border-radius:11px;padding:14px;margin-bottom:14px;}
+.roi-chart-lbl{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted2);margin-bottom:10px;}
+.roi-bar-wrap{display:flex;flex-direction:column;gap:5px;}
+.roi-type-row{display:flex;align-items:center;gap:8px;}
+.roi-type-lbl{font-size:9px;color:var(--muted2);min-width:90px;}
+.roi-type-bar{flex:1;height:6px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;}
+.roi-type-fill{height:100%;border-radius:3px;transition:width 1s ease;}
+.roi-type-val{font-size:9px;font-weight:700;min-width:36px;text-align:right;}
+
+/* ── Chat assistant ── */
+#tabChat .ticket-hd{margin-bottom:10px;}
+.chat-area{display:flex;flex-direction:column;gap:10px;min-height:300px;max-height:55vh;overflow-y:auto;margin-bottom:10px;padding-right:4px;}
+.chat-msg{max-width:88%;padding:9px 13px;border-radius:11px;font-size:11px;line-height:1.6;}
+.chat-msg.user{align-self:flex-end;background:rgba(0,245,160,.12);border:1px solid rgba(0,245,160,.25);color:var(--text);}
+.chat-msg.ai{align-self:flex-start;background:var(--card);border:1px solid var(--b1);color:var(--text);}
+.chat-msg.ai .chat-thinking{font-size:8.5px;color:var(--muted);font-style:italic;margin-bottom:4px;}
+.chat-input-row{display:flex;gap:6px;}
+.chat-input{flex:1;background:var(--card2);border:1px solid var(--b1);border-radius:9px;color:var(--text);font-family:'Outfit',sans-serif;font-size:11px;padding:9px 12px;outline:none;transition:.2s;}
+.chat-input:focus{border-color:rgba(0,245,160,.35);}
+.chat-send{background:linear-gradient(135deg,var(--green2),var(--green));border:none;border-radius:9px;padding:9px 15px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#07080d;cursor:pointer;transition:.18s;}
+.chat-send:hover{opacity:.88;}
+.chat-send:disabled{opacity:.35;cursor:not-allowed;}
+.chat-quick{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.chat-q{background:var(--card);border:1px solid var(--b1);border-radius:7px;padding:4px 10px;font-size:9px;font-weight:600;color:var(--muted2);cursor:pointer;transition:.15s;}
+.chat-q:hover{color:var(--green);border-color:rgba(0,245,160,.3);}
+
+/* ── League Browser ── */
+.league-browser{margin-top:8px;}
+.league-browser-toggle{width:100%;background:var(--card);border:1px solid var(--b1);border-radius:8px;padding:6px 10px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;color:var(--muted2);transition:.18s;display:flex;align-items:center;justify-content:space-between;text-transform:uppercase;letter-spacing:1px;}
+.league-browser-toggle:hover{border-color:rgba(0,245,160,.3);color:var(--green);}
+.league-browser-toggle .arrow{transition:.2s;font-size:10px;}
+.league-browser-toggle.open .arrow{transform:rotate(180deg);}
+.league-panel{display:none;margin-top:6px;border:1px solid var(--b1);border-radius:10px;overflow:hidden;}
+.league-panel.open{display:block;}
+.league-continent{border-bottom:1px solid var(--b1);}
+.league-continent:last-child{border-bottom:none;}
+.league-continent-hd{padding:6px 10px;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:.15s;}
+.league-continent-hd:hover{background:rgba(255,255,255,.03);}
+.lc-europe{color:#4db8ff;background:rgba(77,184,255,.04);}
+.lc-afrique{color:#00f5a0;background:rgba(0,245,160,.04);}
+.lc-amerique{color:#f0c040;background:rgba(240,192,64,.04);}
+.lc-asie{color:#c864ff;background:rgba(200,100,255,.04);}
+.lc-coupe{color:#ff8c42;background:rgba(255,140,66,.04);}
+.league-list{display:none;flex-wrap:wrap;gap:4px;padding:6px 8px 8px;}
+.league-list.open{display:flex;}
+.lbtn{background:var(--card2);border:1px solid var(--b1);border-radius:6px;padding:3px 8px;font-size:8.5px;font-weight:600;color:var(--muted2);cursor:pointer;transition:.15s;white-space:nowrap;}
+.lbtn:hover{border-color:rgba(0,245,160,.35);color:var(--green);background:rgba(0,245,160,.06);}
+.lbtn.hot{border-color:rgba(240,192,64,.3);color:var(--gold);}
+.lbtn.africa{border-color:rgba(0,245,160,.25);color:var(--green);}
 /* Features */
 .feats{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
 .feat{background:var(--card);border:1px solid var(--b1);border-radius:8px;padding:7px 9px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:9px;font-weight:600;color:var(--muted2);transition:.18s;display:flex;align-items:center;gap:5px;}
@@ -414,13 +548,146 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
       <button class="abtn" id="btnToday" onclick="autoFetch('today')">📅 Aujourd'hui</button>
       <button class="abtn" id="btnWeekend" onclick="autoFetch('weekend')">📆 Week-end</button>
       <button class="abtn" id="btnTop5" onclick="autoFetch('top5')">🏆 Top 5 ligues</button>
+      <button class="abtn" onclick="autoFetch('afrique')">🌍 Afrique</button>
+      <button class="abtn" onclick="autoFetch('coupes')">🏆 Coupes</button>
     </div>
     <div class="search-row">
-      <input type="text" id="customSearch" class="sinput" placeholder="Ligue 1, Bundesliga, UCL..." onkeydown="if(event.key==='Enter')autoFetch('custom')">
+      <input type="text" id="customSearch" class="sinput" placeholder="Ligue 1, CHAN, CAN, Saudi..." onkeydown="if(event.key==='Enter')autoFetch('custom')">
       <button class="sgo" onclick="autoFetch('custom')">🔍 Chercher</button>
     </div>
+
+    <!-- League Browser -->
+    <div class="league-browser">
+      <button class="league-browser-toggle" id="lbToggle" onclick="toggleLeagueBrowser()">
+        🌐 Toutes les ligues disponibles <span class="arrow">▼</span>
+      </button>
+      <div class="league-panel" id="leaguePanel">
+
+        <!-- Europe -->
+        <div class="league-continent">
+          <div class="league-continent-hd lc-europe" onclick="toggleContinent('europe')">
+            🇪🇺 EUROPE <span id="arr-europe">▶</span>
+          </div>
+          <div class="league-list" id="lc-europe">
+            <span class="lbtn hot" onclick="selectLeague('Premier League')">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League</span>
+            <span class="lbtn hot" onclick="selectLeague('Ligue 1')">🇫🇷 Ligue 1</span>
+            <span class="lbtn hot" onclick="selectLeague('La Liga')">🇪🇸 La Liga</span>
+            <span class="lbtn hot" onclick="selectLeague('Bundesliga')">🇩🇪 Bundesliga</span>
+            <span class="lbtn hot" onclick="selectLeague('Serie A')">🇮🇹 Serie A</span>
+            <span class="lbtn" onclick="selectLeague('Ligue 2')">🇫🇷 Ligue 2</span>
+            <span class="lbtn" onclick="selectLeague('Championship')">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Championship</span>
+            <span class="lbtn" onclick="selectLeague('Liga 2 Espagne')">🇪🇸 Liga 2</span>
+            <span class="lbtn" onclick="selectLeague('Serie B Italie')">🇮🇹 Serie B</span>
+            <span class="lbtn" onclick="selectLeague('2. Bundesliga')">🇩🇪 2. Bundesliga</span>
+            <span class="lbtn" onclick="selectLeague('Eredivisie')">🇳🇱 Eredivisie</span>
+            <span class="lbtn" onclick="selectLeague('Primeira Liga Portugal')">🇵🇹 Primeira Liga</span>
+            <span class="lbtn" onclick="selectLeague('Super Lig Turquie')">🇹🇷 Super Lig</span>
+            <span class="lbtn" onclick="selectLeague('Pro League Belgique')">🇧🇪 Pro League</span>
+            <span class="lbtn" onclick="selectLeague('Scottish Premiership')">󠁧󠁢󠁳󠁣󠁴󠁿 Scotland Prem.</span>
+            <span class="lbtn" onclick="selectLeague('Ligue nationale Suisse')">🇨🇭 Super League CH</span>
+            <span class="lbtn" onclick="selectLeague('Premier Liga Russie')">🇷🇺 Premier Liga</span>
+            <span class="lbtn" onclick="selectLeague('Ekstraklasa Pologne')">🇵🇱 Ekstraklasa</span>
+            <span class="lbtn" onclick="selectLeague('Allsvenskan Suède')">🇸🇪 Allsvenskan</span>
+            <span class="lbtn" onclick="selectLeague('Liga NOS Grèce')">🇬🇷 Super League GR</span>
+            <span class="lbtn" onclick="selectLeague('Serie A Ukraine')">🇺🇦 UPL Ukraine</span>
+            <span class="lbtn" onclick="selectLeague('Austrian Bundesliga')">🇦🇹 Bundesliga AUT</span>
+            <span class="lbtn" onclick="selectLeague('Danish Superliga')">🇩🇰 Superliga DEN</span>
+            <span class="lbtn" onclick="selectLeague('Czech Liga')">🇨🇿 Czech Liga</span>
+          </div>
+        </div>
+
+        <!-- Afrique -->
+        <div class="league-continent">
+          <div class="league-continent-hd lc-afrique" onclick="toggleContinent('afrique')">
+            🌍 AFRIQUE <span id="arr-afrique">▶</span>
+          </div>
+          <div class="league-list" id="lc-afrique">
+            <span class="lbtn africa hot" onclick="selectLeague('CHAN 2024')">🌍 CHAN</span>
+            <span class="lbtn africa hot" onclick="selectLeague('CAN Coupe Afrique des Nations')">🏆 CAN</span>
+            <span class="lbtn africa hot" onclick="selectLeague('CAF Champions League')">⭐ CAF CL</span>
+            <span class="lbtn africa hot" onclick="selectLeague('CAF Confederation Cup')">🏅 CAF CC</span>
+            <span class="lbtn africa" onclick="selectLeague('MTN Ligue 1 Côte d Ivoire')">🇨🇮 Ligue 1 CI</span>
+            <span class="lbtn africa" onclick="selectLeague('Ligue 1 Sénégal')">🇸🇳 Ligue 1 SEN</span>
+            <span class="lbtn africa" onclick="selectLeague('Premier League Nigeria NPFL')">🇳🇬 NPFL Nigeria</span>
+            <span class="lbtn africa" onclick="selectLeague('Ghana Premier League')">🇬🇭 GPL Ghana</span>
+            <span class="lbtn africa" onclick="selectLeague('Premier League Cameroun')">🇨🇲 MTN Elite Cam.</span>
+            <span class="lbtn africa" onclick="selectLeague('Botola Pro Maroc')">🇲🇦 Botola Maroc</span>
+            <span class="lbtn africa" onclick="selectLeague('Egyptian Premier League')">🇪🇬 EPL Égypte</span>
+            <span class="lbtn africa" onclick="selectLeague('Premier League Afrique du Sud')">🇿🇦 PSL Afr. du Sud</span>
+            <span class="lbtn africa" onclick="selectLeague('Tanzania Premier League')">🇹🇿 TPL Tanzanie</span>
+            <span class="lbtn africa" onclick="selectLeague('Ugandan Premier League')">🇺🇬 UPL Ouganda</span>
+            <span class="lbtn africa" onclick="selectLeague('Zimbabwe Premier Soccer League')">🇿🇼 PSL Zimbabwe</span>
+            <span class="lbtn africa" onclick="selectLeague('Ligue 1 Mali')">🇲🇱 Ligue 1 Mali</span>
+            <span class="lbtn africa" onclick="selectLeague('Ligue 1 Burkina Faso')">🇧🇫 Ligue 1 BF</span>
+            <span class="lbtn africa" onclick="selectLeague('Tunisian Ligue 1')">🇹🇳 Ligue 1 TUN</span>
+            <span class="lbtn africa" onclick="selectLeague('Algerian Ligue Professionnelle 1')">🇩🇿 Ligue Pro DZ</span>
+          </div>
+        </div>
+
+        <!-- Coupes & Compétitions Internationales -->
+        <div class="league-continent">
+          <div class="league-continent-hd lc-coupe" onclick="toggleContinent('coupe')">
+            🏆 COUPES INTERNATIONALES <span id="arr-coupe">▶</span>
+          </div>
+          <div class="league-list" id="lc-coupe">
+            <span class="lbtn hot" onclick="selectLeague('UEFA Champions League')">⭐ Champions League</span>
+            <span class="lbtn hot" onclick="selectLeague('UEFA Europa League')">🟠 Europa League</span>
+            <span class="lbtn" onclick="selectLeague('UEFA Conference League')">🟢 Conference League</span>
+            <span class="lbtn" onclick="selectLeague('UEFA Nations League')">🇪🇺 Nations League</span>
+            <span class="lbtn" onclick="selectLeague('FIFA Club World Cup')">🌍 Club World Cup</span>
+            <span class="lbtn" onclick="selectLeague('Coupe du Monde FIFA')">🏆 Coupe du Monde</span>
+            <span class="lbtn" onclick="selectLeague('Euro 2024 UEFA')">🇪🇺 EURO</span>
+            <span class="lbtn" onclick="selectLeague('Copa del Rey Espagne')">🇪🇸 Copa del Rey</span>
+            <span class="lbtn" onclick="selectLeague('FA Cup Angleterre')">🏴󠁧󠁢󠁥󠁮󠁧󠁿 FA Cup</span>
+            <span class="lbtn" onclick="selectLeague('Coupe de France')">🇫🇷 Coupe de France</span>
+            <span class="lbtn" onclick="selectLeague('DFB Pokal Allemagne')">🇩🇪 DFB Pokal</span>
+            <span class="lbtn" onclick="selectLeague('Coppa Italia')">🇮🇹 Coppa Italia</span>
+            <span class="lbtn" onclick="selectLeague('EFL Cup Carabao Cup')">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Carabao Cup</span>
+          </div>
+        </div>
+
+        <!-- Amériques -->
+        <div class="league-continent">
+          <div class="league-continent-hd lc-amerique" onclick="toggleContinent('amerique')">
+            🌎 AMÉRIQUES <span id="arr-amerique">▶</span>
+          </div>
+          <div class="league-list" id="lc-amerique">
+            <span class="lbtn hot" onclick="selectLeague('Copa Libertadores')">🏆 Copa Libertadores</span>
+            <span class="lbtn hot" onclick="selectLeague('Copa Sudamericana')">🥈 Copa Sudamericana</span>
+            <span class="lbtn" onclick="selectLeague('Copa America')">🌎 Copa América</span>
+            <span class="lbtn" onclick="selectLeague('MLS Major League Soccer')">🇺🇸 MLS</span>
+            <span class="lbtn" onclick="selectLeague('Brasileirao Serie A')">🇧🇷 Brasileirão</span>
+            <span class="lbtn" onclick="selectLeague('Liga MX Mexique')">🇲🇽 Liga MX</span>
+            <span class="lbtn" onclick="selectLeague('Argentine Primera Division')">🇦🇷 Liga Argentina</span>
+            <span class="lbtn" onclick="selectLeague('Liga 1 Pérou')">🇵🇪 Liga 1 Pérou</span>
+            <span class="lbtn" onclick="selectLeague('Colombie Primera A')">🇨🇴 Liga Colombia</span>
+            <span class="lbtn" onclick="selectLeague('Campeonato Chileno')">🇨🇱 Liga Chile</span>
+          </div>
+        </div>
+
+        <!-- Asie & Moyen-Orient -->
+        <div class="league-continent">
+          <div class="league-continent-hd lc-asie" onclick="toggleContinent('asie')">
+            🌏 ASIE & MOYEN-ORIENT <span id="arr-asie">▶</span>
+          </div>
+          <div class="league-list" id="lc-asie">
+            <span class="lbtn hot" onclick="selectLeague('Saudi Pro League Arabie Saoudite')">🇸🇦 Saudi Pro League</span>
+            <span class="lbtn hot" onclick="selectLeague('AFC Champions League')">🌏 AFC Champions</span>
+            <span class="lbtn" onclick="selectLeague('J-League Japon')">🇯🇵 J-League</span>
+            <span class="lbtn" onclick="selectLeague('K-League Corée du Sud')">🇰🇷 K-League</span>
+            <span class="lbtn" onclick="selectLeague('Chinese Super League')">🇨🇳 Super League CN</span>
+            <span class="lbtn" onclick="selectLeague('Indian Super League')">🇮🇳 ISL Inde</span>
+            <span class="lbtn" onclick="selectLeague('UAE Pro League')">🇦🇪 UAE Pro League</span>
+            <span class="lbtn" onclick="selectLeague('Qatar Stars League')">🇶🇦 Qatar Stars</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- End League Browser -->
+
     <div class="astatus" id="autoStatus"></div>
-    <textarea id="matchInput" placeholder="Un match par ligne :&#10;&#10;PSG vs Monaco&#10;Ligue 1: Lyon vs Marseille&#10;UCL: Liverpool vs PSG"></textarea>
+    <textarea id="matchInput" placeholder="Un match par ligne :&#10;&#10;PSG vs Monaco&#10;Ligue 1: Lyon vs Marseille&#10;CAF CL: Espérance vs TP Mazembe"></textarea>
     <div class="suggs" id="suggRow"></div>
   </div>
 
@@ -451,6 +718,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
         <button class="opt" data-t="goals_st" onclick="togOpt(this)">⏱️ Buts 2ème mi-temps</button>
         <button class="opt" data-t="first_goal" onclick="togOpt(this)">🥇 1ère équipe à marquer</button>
         <button class="opt" data-t="btts_goals" onclick="togOpt(this)">🎯⚽ BTTS + Over/Under</button>
+      </div>
+    </div>
+
+    <div class="bet-section">
+      <div class="bet-section-lbl">🎯 Score exact</div>
+      <div class="opts">
+        <button class="opt" data-t="correct_score" onclick="togOpt(this)" style="grid-column:span 2">🎯 Score exact (1-0, 2-1, 0-0…)</button>
+        <button class="opt" data-t="score_ht" onclick="togOpt(this)">⏱️ Score mi-temps</button>
+        <button class="opt" data-t="both_halves" onclick="togOpt(this)">📊 Les 2 MT buts</button>
       </div>
     </div>
 
@@ -556,6 +832,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
   </div>
 
   <button class="gen-btn" id="genBtn" onclick="generate()">⚡ GÉNÉRER LE TICKET</button>
+<button class="gen-btn" style="margin-top:5px;background:rgba(240,180,0,.08);border-color:rgba(240,180,0,.3);color:#f0b400" onclick="openImportTab()">📥 ANALYSER MES COMBIS</button>
 
 </div>
 
@@ -565,6 +842,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
   <div class="tabs" id="tabsBar" style="display:none">
     <button class="tab on" id="tabBtnTicket" onclick="showTab('ticket',this)">🎫 Ticket actuel</button>
     <button class="tab" id="tabBtnHist" onclick="showTab('hist',this)">📋 Historique <span class="tab-ct" id="histCt">0</span></button>
+    <button class="tab" id="tabBtnImport" onclick="showTab('import',this)">📥 Analyser mes combis</button>
+    <button class="tab" id="tabBtnPerf" onclick="showTab('perf',this)">📈 Performances</button>
+    <button class="tab" id="tabBtnChat" onclick="showTab('chat',this)">💬 Assistant</button>
   </div>
 
   <!-- Empty -->
@@ -608,6 +888,97 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
     </div>
     <div class="sum-bar" id="sumBar"></div>
     <div class="grid" id="matchGrid"></div>
+  </div>
+
+  <!-- Import Analyser tab -->
+  <div id="tabImport" style="display:none">
+    <div class="ticket-hd">
+      <div>
+        <div class="ticket-title">📥 ANALYSER MES <em>COMBIS</em></div>
+        <div class="ticket-date" id="importDate">Importez vos combinaisons — Claude garde les meilleures</div>
+      </div>
+      <div class="ticket-acts">
+        <button class="act" onclick="clearImport()">🗑️ Effacer</button>
+        <button class="act pri" id="analyseBtn" onclick="analyseImport()">🔍 Analyser</button>
+      </div>
+    </div>
+    <div class="import-panel">
+      <div class="slabel" style="color:#f0b400;margin-bottom:5px">📋 COLLEZ VOS COMBINAISONS</div>
+      <textarea id="importBox" placeholder="Collez ici vos combinaisons, une par ligne ou séparées par virgule. Formats acceptés :
+
+PSG victoire, Over 2.5, BTTS OUI
+Real Madrid 1X + Barcelone victoire
+Lyon vs Marseille — BTTS OUI + Over 2.5
+Arsenal win, Chelsea btts yes, Man City -1 asian
+
+Vous pouvez aussi coller un ticket existant ou une liste de paris."></textarea>
+      <div class="import-hint">💡 Format libre — Claude comprend le langage naturel. Séparez les combis par ligne. Chaque ligne = une combinaison à évaluer.</div>
+      <div class="import-actions">
+        <div class="slabel" style="margin:0">Seuil de rétention :</div>
+        <div class="thresh-val" id="importThreshVal">70%</div>
+        <input type="range" id="importThresh" min="55" max="90" value="70" oninput="document.getElementById('importThreshVal').textContent=this.value+'%'" style="flex:1">
+        <select id="importMode" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:5px;color:var(--fg);font-size:8.5px;padding:3px 6px;">
+          <option value="filter">Filtrer les mauvaises</option>
+          <option value="score">Scorer toutes</option>
+          <option value="improve">Améliorer les combis</option>
+        </select>
+      </div>
+    </div>
+    <div id="importResult"></div>
+  </div>
+
+  <!-- Performance Tracker tab -->
+  <div id="tabPerf" style="display:none">
+    <div class="ticket-hd">
+      <div>
+        <div class="ticket-title">📈 MES <em>PERFORMANCES</em></div>
+        <div class="ticket-date" id="perfDate">Marquez vos picks comme gagnants ou perdants pour suivre votre ROI</div>
+      </div>
+      <div class="ticket-acts">
+        <button class="act" onclick="resetPerf()">🗑️ Reset</button>
+        <button class="act" onclick="exportPerf()">📤 Exporter</button>
+      </div>
+    </div>
+    <div class="perf-grid" id="perfKpis">
+      <div class="perf-kpi kpi-green"><div class="perf-kpi-val" id="kpiWR">—</div><div class="perf-kpi-lbl">Taux de réussite</div></div>
+      <div class="perf-kpi kpi-gold"><div class="perf-kpi-val" id="kpiROI">—</div><div class="perf-kpi-lbl">ROI</div></div>
+      <div class="perf-kpi kpi-blue"><div class="perf-kpi-val" id="kpiTotal">0</div><div class="perf-kpi-lbl">Paris trackés</div></div>
+      <div class="perf-kpi kpi-red"><div class="perf-kpi-val" id="kpiStreak">—</div><div class="perf-kpi-lbl">Série en cours</div></div>
+    </div>
+    <div class="roi-chart" id="roiChart" style="display:none">
+      <div class="roi-chart-lbl">ROI par type de pari</div>
+      <div class="roi-bar-wrap" id="roiBars"></div>
+    </div>
+    <div class="perf-picks" id="perfList">
+      <div style="text-align:center;padding:30px;color:var(--muted);font-size:11px">Générez un ticket puis revenez ici pour tracker vos résultats ✅</div>
+    </div>
+  </div>
+
+  <!-- Chat Assistant tab -->
+  <div id="tabChat" style="display:none">
+    <div class="ticket-hd">
+      <div>
+        <div class="ticket-title">💬 <em>ASSISTANT</em></div>
+        <div class="ticket-date">Posez vos questions sur les matchs, les cotes ou les stratégies</div>
+      </div>
+      <div class="ticket-acts">
+        <button class="act" onclick="clearChat()">🗑️ Effacer</button>
+      </div>
+    </div>
+    <div class="chat-quick">
+      <span class="chat-q" onclick="sendChatQ(this)">🔍 Analyse PSG ce soir</span>
+      <span class="chat-q" onclick="sendChatQ(this)">📊 Meilleur type de pari Ligue 1</span>
+      <span class="chat-q" onclick="sendChatQ(this)">💰 Value bet ce week-end</span>
+      <span class="chat-q" onclick="sendChatQ(this)">🎯 Dropping odds aujourd'hui</span>
+      <span class="chat-q" onclick="sendChatQ(this)">📈 Stratégie Kelly Criterion</span>
+    </div>
+    <div class="chat-area" id="chatArea">
+      <div class="chat-msg ai"><div class="chat-thinking">BetAI Assistant</div>Bonjour ! Je peux analyser n'importe quel match, vous donner des stats en temps réel, détecter les value bets, expliquer le Kelly Criterion… Que voulez-vous savoir ?</div>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" id="chatInput" class="chat-input" placeholder="Ex: Analyse Real Madrid vs Barcelona ce soir…" onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="chat-send" id="chatSend" onclick="sendChat()">ENVOYER</button>
+    </div>
   </div>
 
   <!-- History tab -->
@@ -660,6 +1031,7 @@ const $ = id => document.getElementById(id);
 
 let selCount = 10;
 let curMode  = 'safe';
+let _lastMatches = [];  // tracks last generated picks to force rotation
 let curTicket = null;
 let usedSrc  = { fd:false, bz:false, af:false };
 let hist     = sGetJSON('betai_hist', []);
@@ -735,6 +1107,35 @@ function chgCount(d) {
   $('countVal').textContent = selCount;
 }
 
+
+// ═══════════════════════════════════════════
+//  LEAGUE BROWSER
+// ═══════════════════════════════════════════
+function toggleLeagueBrowser() {
+  const panel = $('leaguePanel');
+  const toggle = $('lbToggle');
+  const isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open', !isOpen);
+  toggle.classList.toggle('open', !isOpen);
+}
+
+function toggleContinent(id) {
+  const list = $('lc-' + id);
+  const arr  = $('arr-' + id);
+  const isOpen = list.classList.contains('open');
+  list.classList.toggle('open', !isOpen);
+  if (arr) arr.textContent = isOpen ? '▶' : '▼';
+}
+
+function selectLeague(league) {
+  // Set search input and trigger autoFetch custom
+  $('customSearch').value = league;
+  autoFetch('custom');
+  // Close browser after selection
+  $('leaguePanel').classList.remove('open');
+  $('lbToggle').classList.remove('open');
+}
+
 function setMode(btn) {
   document.querySelectorAll('.mode').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
@@ -759,7 +1160,11 @@ function showTab(tab, btn) {
   btn.classList.add('on');
   $('tabTicket').style.display = tab === 'ticket' ? 'block' : 'none';
   $('tabHist').style.display   = tab === 'hist'   ? 'block' : 'none';
+  $('tabImport').style.display = tab === 'import' ? 'block' : 'none';
+  $('tabPerf').style.display   = tab === 'perf'   ? 'block' : 'none';
+  $('tabChat').style.display   = tab === 'chat'   ? 'block' : 'none';
   if (tab === 'hist') renderHist();
+  if (tab === 'perf') renderPerf();
 }
 
 function setPhase(txt, cls) {
@@ -797,9 +1202,11 @@ async function autoFetch(mode) {
   if (mode === 'custom' && !customVal) { alert('✏️ Tapez un championnat ou une compétition !'); return; }
 
   const prompts = {
-    today: `Recherche les matchs de football d'aujourd'hui ${dateFR} (${dateISO}) dans ces ligues : Ligue 1, Premier League, La Liga, Bundesliga, Serie A, Champions League, Europa League, Ligue 2, Eredivisie, Primeira Liga. Retourne UNIQUEMENT ce JSON sans texte ni backticks : {"matches":["Ligue 1: PSG vs Monaco","Premier League: Arsenal vs Chelsea"]} — Format strict: "Nom Ligue: Equipe1 vs Equipe2" — max 25 matchs confirmés uniquement`,
-    weekend: `Recherche les matchs de football du week-end ${satFR} et ${sunFR} dans les 5 grands championnats européens + UCL + UEL. Retourne UNIQUEMENT ce JSON sans texte ni backticks : {"matches":["Ligue 1: PSG vs Monaco"]} — Format strict: "Nom Ligue: Equipe1 vs Equipe2" — max 30 matchs`,
+    today: `Recherche les matchs de football d'aujourd'hui ${dateFR} (${dateISO}) dans ces ligues : Ligue 1, Premier League, La Liga, Bundesliga, Serie A, Champions League, Europa League, Ligue 2, Eredivisie, Primeira Liga, CAF Champions League, MTN Ligue 1 CI, NPFL Nigeria, Saudi Pro League. Retourne UNIQUEMENT ce JSON sans texte ni backticks : {"matches":["Ligue 1: PSG vs Monaco","Premier League: Arsenal vs Chelsea"]} — Format strict: "Nom Ligue: Equipe1 vs Equipe2" — max 30 matchs confirmés uniquement`,
+    weekend: `Recherche les matchs de football du week-end ${satFR} et ${sunFR} dans les 5 grands championnats européens + UCL + UEL + CAF Champions League + Saudi Pro League. Retourne UNIQUEMENT ce JSON sans texte ni backticks : {"matches":["Ligue 1: PSG vs Monaco"]} — Format strict: "Nom Ligue: Equipe1 vs Equipe2" — max 35 matchs`,
     top5: `Recherche les prochains matchs des Top 5 championnats européens (Ligue 1, Premier League, La Liga, Bundesliga, Serie A) + Champions League et Europa League cette semaine. Retourne UNIQUEMENT ce JSON sans texte ni backticks : {"matches":["Ligue 1: PSG vs Monaco"]} — Format: "Nom Ligue: Equipe1 vs Equipe2" — max 25 matchs`,
+    afrique: `Recherche les prochains matchs de football africains cette semaine dans ces compétitions : CAF Champions League, CAF Confederation Cup, CHAN, CAN, MTN Ligue 1 Côte d'Ivoire, Ligue 1 Sénégal, NPFL Nigeria, Ghana Premier League, Botola Maroc, Egyptian Premier League, Premier League Cameroun, PSL Afrique du Sud. Retourne UNIQUEMENT ce JSON sans texte ni backticks : {"matches":["CAF CL: Espérance vs TP Mazembe"]} — Format: "Nom Ligue: Equipe1 vs Equipe2" — max 25 matchs`,
+    coupes: `Recherche les prochains matchs des coupes et compétitions internationales cette semaine : UEFA Champions League, UEFA Europa League, UEFA Conference League, Copa Libertadores, Copa Sudamericana, FA Cup, Coupe de France, Copa del Rey, DFB Pokal, Coppa Italia, Carabao Cup, AFC Champions League. Retourne UNIQUEMENT ce JSON sans texte ni backticks : {"matches":["UCL: PSG vs Bayern"]} — Format: "Nom Compétition: Equipe1 vs Equipe2" — max 25 matchs`,
     custom: `Recherche les prochains matchs de football pour : "${customVal}". Retourne UNIQUEMENT ce JSON sans texte ni backticks : {"matches":["${customVal}: Equipe1 vs Equipe2"]} — Format: "Nom competition: Equipe1 vs Equipe2" — max 20 matchs confirmés`
   };
 
@@ -875,7 +1282,17 @@ const FD = 'https://api.football-data.org/v4';
 const FD_LEAGUES = {
   'ligue 1':61,'ligue1':61,'premier league':2,'pl':2,'la liga':140,'laliga':140,
   'bundesliga':78,'serie a':135,'champions league':2001,'ucl':2001,
-  'europa league':2146,'uel':2146,'eredivisie':88,'primeira liga':94,'ligue 2':62
+  'europa league':2146,'uel':2146,'eredivisie':88,'primeira liga':94,'ligue 2':62,
+  'championship':40,'liga 2':141,'serie b':135,'2. bundesliga':79,
+  'super lig':203,'pro league':144,'scottish':179,'super league':207,
+  'premier liga':235,'ekstraklasa':106,'allsvenskan':113,'danish superliga':119,
+  'brasileirao':71,'liga mx':262,'mls':253,'copa libertadores':13,
+  'copa sudamericana':14,'copa america':9,'primera division':128,
+  'saudi pro league':307,'j-league':98,'k-league':292,'chinese super league':169,
+  'caf champions league':20,'caf confederation':21,'can':33,'chan':34,
+  'conference league':2148,'nations league':5,'fa cup':45,'coupe de france':66,
+  'copa del rey':143,'dfb pokal':81,'coppa italia':137,'carabao cup':41,
+  'afc champions':17,'club world cup':15
 };
 const TEAM_LEAGUE = {
   'psg':61,'paris saint':61,'monaco':61,'lyon':61,'marseille':61,'lens':61,'lille':61,
@@ -1043,6 +1460,9 @@ async function generate() {
   $('emptyArea').style.display = 'none';
   $('tabTicket').style.display = 'none';
   $('tabHist').style.display   = 'none';
+  $('tabImport').style.display = 'none';
+  $('tabPerf').style.display   = 'none';
+  $('tabChat').style.display   = 'none';
   $('tabsBar').style.display   = 'none';
   $('errBox').classList.remove('show');
   $('loadArea').classList.add('show');
@@ -1149,7 +1569,7 @@ async function generate() {
   // Build instruction blocks
   // Smart mode instruction
   const smartInstr = curMode === 'smart' ? `
-TICKET COMPLET TOUTES OPTIONS — MODE ACTIF (RÈGLES ABSOLUES):
+TICKET COMPLET TOUTES OPTIONS ≥ ${smartMinProb}% — MODE ACTIF (RÈGLES ABSOLUES):
 
 Seuil minimum obligatoire : ${smartMinProb}%
 
@@ -1161,11 +1581,16 @@ OBJECTIF : Générer UN SEUL TICKET contenant TOUTES les options valides de TOUS
 → Si une option est sous ${smartMinProb}% pour un match → elle est exclue, point.
 → Si AUCUNE option d'un match ne dépasse ${smartMinProb}% → ce match n'apparaît pas du tout.
 
-ALGORITHME (à appliquer pour chaque match × chaque type autorisé) :
-1. Estime la probabilité de chaque type de pari pour ce match.
-2. Si probabilité >= ${smartMinProb}% → INCLURE dans le ticket.
-3. Si probabilité < ${smartMinProb}% → EXCLURE.
-4. Pas de limite de nombre de sélections — inclus TOUT ce qui passe le seuil.
+ALGORITHME STRICT (applique pour chaque match × chaque type autorisé) :
+1. Recherche les stats réelles du match via web search si nécessaire.
+2. Calcule la probabilité avec le modèle en 4 étapes ci-dessus.
+3. Si probabilité CALCULÉE >= ${smartMinProb}% → INCLURE.
+4. Si probabilité CALCULÉE < ${smartMinProb}% → EXCLURE ABSOLUMENT.
+5. INTERDICTION d'arrondir vers le haut pour atteindre ${smartMinProb}% (ex: 77% ne devient pas 80%).
+6. Si tu n'as pas de données → probabilité max 65% → EXCLURE si seuil > 65%.
+
+VALIDATION FINALE: Relis chaque pick et confirme: "J'ai des données réelles qui justifient ${smartMinProb}%+".
+Si tu doutes → EXCLURE. Un ticket avec 5 picks solides vaut mieux que 15 picks douteux.
 
 DANS "reason" : liste toutes les options analysées avec leur probabilité, puis confirme pourquoi cette option est retenue.
 Exemple reason : "DC 1X 86%✓, Résultat 71%✗, BTTS 83%✓, Over2.5 78%✗ — retenu car >= ${smartMinProb}%"
@@ -1201,16 +1626,40 @@ FILTRE ANTI-PIÈGE:
 - Détecte: équipe après Coupe importante, déjà qualifiée/reléguée, derby local, rotation probable
 - Inclus is_trap (bool) et trap_reason (string ou null)` : '';
 
-  const prompt = `Tu es un expert en pronostics football.
-Sources utilisées: ${srcList}
-${dataCtx}
+  // Build rotation blacklist from last ticket
+  const _rotBlacklist = _lastMatches.length > 0
+    ? `
+⛔ ROTATION OBLIGATOIRE — Ces équipes/matchs ont déjà été proposés lors de la génération précédente. TU DOIS choisir des matchs DIFFÉRENTS sauf si leur probabilité est ≥5% supérieure aux alternatives:
+${_lastMatches.map(m => `  - ${m}`).join('\n')}
+`
+    : '';
 
-MATCHS:
+  const prompt = `Tu es un DATA SCIENTIST spécialisé en football betting avec 15 ans d'expérience.
+Tu utilises UNIQUEMENT des données statistiques objectives. JAMAIS d'intuition ou de réputation.
+
+🔍 RECHERCHE WEB — UTILISE LE WEB SEARCH AVANT DE RÉPONDRE:
+Pour les matchs listés ci-dessous, effectue des recherches web pour trouver:
+- Forme récente des équipes (5 derniers matchs)
+- Statistiques de buts (moyenne buts marqués/encaissés)
+- Blessés et absences importantes
+- Classement actuel dans leur championnat
+- Head-to-head récent (H2H)
+- xG (Expected Goals) des derniers matchs : requête "[equipe] xG stats 2025" ou sur understat.com
+- Dropping odds / line movement : requête "[match] odds movement dropping 2025" — une cote qui baisse = signal sharp money
+Exemples de requêtes: "[Equipe A] [Equipe B] stats 2025", "[Equipe] form last 5 matches", "[Match] injuries lineup", "[Equipe] xG 2025"
+IMPORTANT: Base tes probabilités sur les vraies stats trouvées. xG est plus prédictif que les résultats bruts.
+${_rotBlacklist}
+
+━━━ DONNÉES DISPONIBLES: ${srcList}
+${dataCtx}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+MATCHS À ANALYSER:
 ${matches.map((m, i) => `${i+1}. ${m}`).join('\n')}
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 CONFIGURATION:
-- Types de paris autorisés: ${optList}
-- Mode Best Pick: ${wantBest ? 'ACTIVÉ — compare ces types entre eux et choisis le MEILLEUR, sans jamais sortir de cette liste' : 'DÉSACTIVÉ — propose un pari pour chaque type de la liste'}
+- Types autorisés: ${optList}
 - Sélections: ${selCount}
 - Seuil minimum: ${thresh}%
 - Mode: ${curMode} — ${modeDesc}
@@ -1220,68 +1669,106 @@ ${relInstr}
 ${trapInstr}
 ${smartInstr}
 
-TYPES DE PARIS — DÉFINITION ET CRITÈRES DE SÉLECTION:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MODÈLE DE CALCUL DES PROBABILITÉS (APPLIQUE LE POUR CHAQUE PARI):
 
-IMPORTANT: Chaque type de pari nécessite des critères de sélection DIFFÉRENTS.
-Ne sélectionne PAS les mêmes matchs pour des types différents.
-Pour chaque type, choisis les matchs où ce pari spécifique est le plus pertinent.
+ÉTAPE 1 — BASE RATE (40% du score)
+→ Compte sur 5 derniers matchs de chaque équipe combien de fois ce type de pari s'est vérifié
+→ Exemple Over 2.5 : équipe A a joué Over 4/5 matchs, équipe B 3/5 matchs → base = (0.8+0.6)/2 = 0.70
 
-=== RÉSULTATS (sélectionne : équipes avec forme dominante, écart de niveau clair) ===
-- result: Victoire 1 / Nul / Victoire 2
-- double: Double chance 1X ou X2 (équipe favorie mais résultat incertain)
-- double12: Double chance 12 — aucun nul (2 équipes offensives, matchs ouverts)
-- dnb: Draw No Bet (favori clair mais nul non exclu)
-- htft: HT/FT ex "1/1" (équipes qui démarrent fort ou lentement)
-- asian: Handicap asiatique ex "PSG -1.0"
-- euro_hdc: Handicap européen ex "Bayern -1"
-- cleansheet: Victoire + aucun but encaissé (défense très solide, attaque modeste en face)
+ÉTAPE 2 — FORME RÉCENTE (30% du score)
+→ W=3pts, D=1pt, L=0pt sur 5 matchs → score/15 converti en facteur 0.3 à 1.0
+→ Domicile/extérieur : facteur +4% domicile (si données séparées, utilise-les)
+→ Séries : 3+ victoires = +5% ; 3+ défaites = -8%
 
-=== BUTS (sélectionne : selon la moyenne de buts des 2 équipes, pas la force) ===
-- goals: Plus/Moins buts — CRITÈRES: moyenne buts/match des 2 équipes combinée
-  → Over: équipes qui marquent ET prennent des buts (moyennes élevées)
-  → Under: équipes défensives, matchs fermés, enjeux importants
-- btts: BTTS OUI/NON — CRITÈRES: les 2 équipes marquent-elles ET encaissent-elles?
-  → OUI: les 2 attaques marquent souvent, les 2 défenses sont poreuses
-  → NON: au moins une des 2 équipes a une défense solide ou ne marque pas souvent
-- btts_goals: BTTS + Over/Under ex "BTTS OUI + Plus de 2.5"
-- goals_ht: Buts 1ère MT — CRITÈRES: équipes qui démarrent fort, qui pressent haut
-- goals_st: Buts 2ème MT — CRITÈRES: équipes qui accélèrent en 2ème période, remontadas
-- first_goal: Première équipe à marquer — CRITÈRES: équipe qui presse le plus en début
+ÉTAPE 3 — CONTEXTE (20% du score)
+→ H2H 5 dernières confrontations directes si disponible
+→ Match enjeu (finale/relégation/derby) : réduis l'écart de 5%
+→ Blessé clé (attaquant titulaire) : -8% sur buts/victoire de cette équipe
 
-=== STATS (sélectionne : critères physiques et tactiques, pas la force des équipes) ===
-- corners: Corners total — CRITÈRES: équipes qui jouent LARGE, font beaucoup de centres, style offensif avec débordements. Ne pas choisir une équipe juste parce qu'elle est forte.
-- corners_ht: Corners 1ère MT — CRITÈRES: équipes qui pressent haut en début de match
-- cards: Cartons — CRITÈRES: rencontres physiques, rivaux, arbitres stricts, équipes qui font des fautes. NE PAS choisir les mêmes matchs que pour les buts ou résultats.
-- fouls: Fautes — CRITÈRES: équipes défensives, matchs tendus, rivaux régionaux
+ÉTAPE 4 — CALIBRATION RÉALISTE (10% — OBLIGATOIRE)
+→ Plafond absolu : 87% max (le football reste imprévisible)
+→ Plancher absolu : 13% min
+→ Biais correction : -3% sur toute proba > 74%
 
-=== COMBINÉS (sélectionne : cumul des critères de chaque composante) ===
-- winbtts: Victoire + Les 2 marquent — CRITÈRES: équipe dominante ET défense poreuse des deux côtés
-- double_btts: Double chance + BTTS — CRITÈRES: match ouvert avec buts des 2 côtés ex "1X + BTTS OUI" ou "12 + BTTS OUI"
-- result_goals: Résultat + buts — CRITÈRES: résultat probable confirmé par tendance de buts ex "PSG Victoire + Plus de 2.5 buts"
+COTE ESTIMÉE (calibration réaliste bookmaker):
+→ Formule: (1 / probabilité) × marge_bookmaker
+→ Marge selon le type de marché:
+  - result/double/dnb: × 1.06  (marché principal, marge faible)
+  - goals/btts: × 1.08         (marché secondaire)
+  - corners/cards/fouls: × 1.12 (marché exotique, marge plus élevée)
+  - combinés (winbtts etc): × 1.10
+→ Arrondi au 0.05 le plus proche (comme les vrais bookmakers)
+→ Exemples réalistes:
+  proba 78% result  → 1/0.78 × 1.06 = 1.36
+  proba 65% btts    → 1/0.65 × 1.08 = 1.66
+  proba 55% corners → 1/0.55 × 1.12 = 2.04
+  proba 82% double  → 1/0.82 × 1.06 = 1.29
 
-RÈGLE FONDAMENTALE — DIVERSITÉ DES MATCHS:
-Si plusieurs types sont actifs, tu DOIS sélectionner des matchs DIFFÉRENTS pour chaque type autant que possible.
-Exemple avec 75 matchs disponibles et 3 types actifs (corners, cards, btts) :
-- corners → choisis les 5 matchs avec le plus de centres/débordements attendus
-- cards → choisis les 5 matchs les plus physiques/derbies (différents des corners !)
-- btts → choisis les 5 matchs où les 2 équipes marquent ET encaissent souvent
-→ Ces 3 groupes doivent être DISTINCTS. Ne répète pas les mêmes matchs.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CRITÈRES PAR TYPE:
 
-EXCEPTION — UN MATCH PEUT APPARAÎTRE DANS PLUSIEURS TYPES SI :
-Sa probabilité pour ce type est STRICTEMENT SUPÉRIEURE OU ÉGALE à la meilleure alternative disponible.
-Exemple : PSG vs Monaco peut apparaître en "corners" ET en "btts" uniquement si :
-- Pour corners : probabilité PSG vs Monaco ≥ probabilité du meilleur autre match corners disponible
-- Pour btts : probabilité PSG vs Monaco ≥ probabilité du meilleur autre match btts disponible
-→ Si un match moins connu a une meilleure probabilité pour ce type, choisis le match moins connu.
-→ Un match très connu (PSG, Real Madrid, Bayern...) ne doit PAS être favorisé par défaut.
+RÉSULTATS:
+- result: Écart forme ≥4pts/5matchs OU classement ≥5 places d'écart → seulement si données confirment
+- double: 1X si domicile en forme + visiteur instable ; X2 si outsider solide joue bien dehors
+- double12: 2 équipes offensives (>1.5 buts/match chacune), moins de 30% de nuls en H2H
+- dnb: Favori 55-70% de victoire mais risque nul réel (enjeu, derby)
+- htft: Équipe avec >55% buts inscrits avant 45' ; ou mauvais démarreur connu
+- asian: -0.5 si victoire >63% ; -1.0 si victoire >72%
+- cleansheet: Défense ≤0.9 but/match ET adversaire ≤1.1 but inscrit/match
 
-AUTRES RÈGLES:
-- Cote estimée = (1/probabilité) × 1.08
-- Sois concis dans "reason" (max 15 mots, mentionne le critère spécifique du type de pari)
-- JSON compact sans espaces superflus
+BUTS:
+- goals: Over si moy combinée des 2 équipes ≥2.8 buts/match ; Under si ≤2.0
+- btts OUI: Les 2 équipes ont marqué dans ≥3/5 ET concédé dans ≥3/5 derniers matchs
+- btts NON: ≥1 équipe a fait ≥3 clean sheets sur 5 derniers matchs
+- goals_ht: >40% des buts de l'équipe inscrits avant 45'
+- goals_st: >50% des buts de l'équipe inscrits après 45' ou ≥2 remontadas récentes
+- first_goal: Équipe qui ouvre le score dans >55% de ses matchs
+
+STATS:
+- corners: Les 2 équipes font >5.5 corners/match en moyenne
+- cards: Match ≥2.2 cartons/match en moyenne, ou derby/rivalité connue
+- fouls: ≥12 fautes/match, équipes défensives basses ou rivaux
+
+SCORE EXACT (high-risk/high-reward):
+- correct_score: Utilise le modèle de Poisson sur les xG pour calculer la distribution des scores
+  → Formule: P(0 buts dom) = e^(-xG_dom), P(1 but dom) = xG_dom × e^(-xG_dom), etc.
+  → Retourne les 3 scores les plus probables dans correct_scores[]
+  → bet_value = score le plus probable, ex "1-0 PSG"
+  → Probabilité individuelle d'un score exact: typiquement 12-22%
+- score_ht: Score à la mi-temps — utilise xG/2 comme approximation
+- both_halves: Les 2 équipes marquent dans chaque mi-temps — critère: xG ≥ 1.2 dans les 2 mi-temps
+
+COMBINÉS: Cumul strict des deux critères composants
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RÈGLES ANTI-BIAIS ABSOLUES:
+
+[1] JAMAIS favoriser une grande équipe (PSG/Real/Bayern) sans données objectives qui le justifient
+[2] Si tu n'as pas de données sur un match → probabilité 52-62% MAX, indique "données limitées" dans reason
+[3] Priorité aux matchs avec DONNÉES RÉELLES sur les matchs connus sans données
+[4] Diversité ligues : répartis les picks entre plusieurs championnats
+[5] Matchs différents par type autant que possible (sauf si proba objectivement meilleure sur même match)
+
+CHAMP "reason" (max 20 mots — OBLIGATOIRE: inclure les chiffres):
+→ Format: "[stat clé chiffrée], [2ème stat], [facteur contextuel]"
+→ Exemples:
+  ✓ "4/5 BTTS, moy 3.1 buts/match, défense concède 1.8/match"
+  ✓ "Forme 13/15pts, classement +7 places, H2H 4V/1N/0D"
+  ✗ "Bonne forme, équipe offensive" — INTERDIT sans chiffres
+
+CHAMPS ADDITIONNELS OBLIGATOIRES DANS CHAQUE PICK:
+
+"xg_home": Expected Goals domicile (float, ex: 1.8) — cherche via web search "[equipe] xG stats"
+"xg_away": Expected Goals extérieur (float, ex: 0.9)
+"dropping_odds": true si tu détectes une baisse de cote récente (signal sharp money) — cherche "[match] odds movement 2025"
+"dropping_note": explication si dropping_odds est true (ex: "Cote PSG passée de 1.65 à 1.42 en 24h")
+"kelly_pct": Mise recommandée selon Kelly Criterion = ((prob/100 * cote) - 1) / (cote - 1) * 100, arrondi 1 décimale. Max 15%.
+"ev": Expected Value = (prob/100 * (cote-1)) - (1 - prob/100), arrondi 2 décimales. Positif = value bet.
+"correct_scores": si bet_type est "correct_score", liste des 3 scores les plus probables avec probabilité ex: [{"score":"1-0","prob":18},{"score":"2-1","prob":14},{"score":"1-1","prob":12}]
 
 Réponds UNIQUEMENT avec ce JSON valide, sans texte autour, sans backticks:
-{"ticket":[{"num":1,"match":"PSG vs Monaco","league":"Ligue 1","home":"PSG","away":"Monaco","bet_type":"result","bet_label":"RÉSULTAT","bet_value":"Victoire PSG","probability":72,"cote":1.45,"confidence":"high","reason":"Forme WWWDW, ML 72%, Monaco sans Golovin","tag_type":"result","is_value_bet":false,"value_edge":0,"reliability_score":82,"reliability_label":"Très fiable","is_trap":false,"trap_reason":null,"real_data":{"form_home":"WWWDW","form_away":"DWLWL","h2h":"4V-2N-1D","rank_home":"1er","rank_away":"3ème","ml_home":72,"ml_draw":18,"ml_away":10,"injuries":null}}],"summary":{"total":1,"avg_prob":72,"total_cote":1.45,"high_conf":1,"value_bets":0}}`;
+{"ticket":[{"num":1,"match":"PSG vs Monaco","league":"Ligue 1","home":"PSG","away":"Monaco","bet_type":"result","bet_label":"RÉSULTAT","bet_value":"Victoire PSG","probability":72,"cote":1.45,"confidence":"high","reason":"Forme 13/15pts, classement +8, Monaco 2/5W extérieur","tag_type":"result","is_value_bet":false,"value_edge":0,"reliability_score":82,"reliability_label":"Très fiable","is_trap":false,"trap_reason":null,"xg_home":1.82,"xg_away":0.91,"dropping_odds":false,"dropping_note":null,"kelly_pct":8.2,"ev":0.04,"correct_scores":null,"real_data":{"form_home":"WWWDW","form_away":"DWLWL","h2h":"4V-2N-1D","rank_home":"1er","rank_away":"3ème","ml_home":72,"ml_draw":18,"ml_away":10,"injuries":null}}],"summary":{"total":1,"avg_prob":72,"total_cote":1.45,"high_conf":1,"value_bets":0}}`
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -1295,27 +1782,69 @@ Réponds UNIQUEMENT avec ce JSON valide, sans texte autour, sans backticks:
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 16000,
+        tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 8 }],
         messages: [{ role: 'user', content: prompt }]
       })
     });
-
-    clearInterval(aiTimer);
-    aiSteps.forEach((_, i) => sDone(i));
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error?.message || `Erreur API ${res.status}`);
     }
 
-    const data = await res.json();
-    const txt  = data.content.map(c => c.text || '').join('');
+    // ── Agentic loop: let Claude search the web for real stats ──
+    let data = await res.json();
+    let messages = [{ role: 'user', content: prompt }];
+    let loopCount = 0;
+    const maxLoops = 6;
+
+    while (data.stop_reason === 'tool_use' && loopCount < maxLoops) {
+      loopCount++;
+      const toolUseBlocks = data.content.filter(b => b.type === 'tool_use');
+      messages.push({ role: 'assistant', content: data.content });
+
+      const toolResults = toolUseBlocks.map(tb => ({
+        type: 'tool_result',
+        tool_use_id: tb.id,
+        content: tb.type === 'tool_use' && tb.name === 'web_search'
+          ? (tb.output || '[résultat recherche web]')
+          : '[résultat]'
+      }));
+      messages.push({ role: 'user', content: toolResults });
+
+      const loopRes = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': claudeKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 16000,
+          tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 8 }],
+          messages
+        })
+      });
+      if (!loopRes.ok) break;
+      data = await loopRes.json();
+    }
+
+    clearInterval(aiTimer);
+    aiSteps.forEach((_, i) => sDone(i));
+
+    const txt = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
     if (!txt) throw new Error('Réponse vide de l\'API Claude.');
 
     const result = JSON.parse(txt.replace(/```json|```/g, '').trim());
     if (!result.ticket?.length) throw new Error('Ticket vide retourné par Claude.');
 
     curTicket = result;
+    // Save matches to rotation blacklist
+    _lastMatches = [...new Set(result.ticket.map(t => t.match))];
     saveHist(result, matches);
+    addTicketToPerf(result.ticket);   // Auto-track in perf tracker
     renderTicket(result, matches.length);
 
   } catch(e) {
@@ -1342,7 +1871,8 @@ const tagMap  = {
   corners:'t-corners', corners_ht:'t-corners',
   cards:'t-cards', fouls:'t-cards',
   htft:'t-other', asian:'t-other', euro_hdc:'t-other', cleansheet:'t-result',
-  winbtts:'t-combo', double_btts:'t-combo', result_goals:'t-combo'
+  winbtts:'t-combo', double_btts:'t-combo', result_goals:'t-combo',
+  correct_score:'t-btts', score_ht:'t-btts', both_halves:'t-goals'
 };
 
 function renderTicket(data, totalMatches) {
@@ -1350,6 +1880,7 @@ function renderTicket(data, totalMatches) {
   $('tabsBar').style.display = 'flex';
   $('tabTicket').style.display = 'block';
   $('tabHist').style.display   = 'none';
+  ['tabHist','tabImport','tabPerf','tabChat'].forEach(id => $(id).style.display = 'none');
   document.querySelectorAll('.tab').forEach((b, i) => b.classList.toggle('on', i === 0));
 
   const now = new Date();
@@ -1361,6 +1892,7 @@ function renderTicket(data, totalMatches) {
   if (usedSrc.fd) srcsHTML += '<span class="su su-fd">📊 Football-Data</span>';
   if (usedSrc.bz) srcsHTML += '<span class="su su-bz">🤖 ML Bzzoiro</span>';
   if (usedSrc.af) srcsHTML += '<span class="su su-af">🏟️ API-Football</span>';
+  srcsHTML += '<span class="su" style="background:rgba(99,200,100,.08);border-color:rgba(99,200,100,.3);color:#3a8a3a">🌐 Web Search</span>';
   $('srcsUsed').innerHTML = srcsHTML;
 
   const s = data.summary;
@@ -1380,6 +1912,8 @@ function renderTicket(data, totalMatches) {
     ${trapCt > 0 ? `<span class="spill rp">🚨 <span class="sv">${trapCt}</span> piège${trapCt>1?'s':''}</span>` : ''}
     <span class="spill">${mL}</span>
     ${activeFeats.has('best') ? '<span class="spill" style="background:rgba(200,100,255,.06);border-color:rgba(200,100,255,.2)">🎯 <span class="sv" style="color:var(--purple)">Best Pick</span></span>' : ''}
+    ${data.ticket.filter(t=>t.dropping_odds).length > 0 ? `<span class="spill" style="background:rgba(0,245,160,.06);border-color:rgba(0,245,160,.2)">📉 <span class="sv" style="color:var(--green)">${data.ticket.filter(t=>t.dropping_odds).length} Dropping</span></span>` : ''}
+    ${data.ticket.filter(t=>(t.ev||0)>0).length > 0 ? `<span class="spill" style="background:rgba(0,229,204,.06);border-color:rgba(0,229,204,.2)">📐 <span class="sv" style="color:var(--teal)">${data.ticket.filter(t=>(t.ev||0)>0).length} EV+</span></span>` : ''}
   `;
 
   $('matchGrid').innerHTML = data.ticket.map((t, i) => {
@@ -1434,9 +1968,43 @@ function renderTicket(data, totalMatches) {
         <div class="val-row">
           <div class="val-item"><div class="val-item-lbl">Cote est.</div><div class="val-item-val">×${t.cote||'?'}</div></div>
           <div class="val-item"><div class="val-item-lbl">Edge</div><div class="val-edge">+${(t.value_edge||0).toFixed(1)}%</div></div>
-          <div class="val-item"><div class="val-item-lbl">Intérêt</div><div class="val-item-val" style="color:var(--green)">⭐ FORT</div></div>
+          <div class="val-item"><div class="val-item-lbl">EV</div><div class="val-item-val" style="color:${(t.ev||0)>0?'var(--green)':'var(--red)'}">+${((t.ev||0)*100).toFixed(1)}%</div></div>
         </div>
       </div>` : '';
+
+    // xG panel
+    const xgPanel = (t.xg_home != null && t.xg_away != null) ? `
+      <div class="xg-panel">
+        <div class="xg-lbl">⚡ xG — EXPECTED GOALS</div>
+        <div class="xg-row">
+          <div style="text-align:center"><div class="xg-team">${t.home}</div><div class="xg-val">${(+t.xg_home).toFixed(2)}</div></div>
+          <div class="xg-vs">xG</div>
+          <div style="text-align:center"><div class="xg-val">${(+t.xg_away).toFixed(2)}</div><div class="xg-team">${t.away}</div></div>
+        </div>
+      </div>` : '';
+
+    // Kelly / EV panel
+    const kellyPanel = (t.kelly_pct != null) ? `
+      <div class="kelly-panel">
+        <div class="kelly-lbl">📐 Kelly Criterion & EV</div>
+        <div class="kelly-row">
+          <div class="kelly-item"><div class="kelly-item-lbl">Mise recommandée</div><div class="kelly-item-val ${(t.kelly_pct||0)>0?'pos':'neg'}">${Math.max(0,+(t.kelly_pct||0)).toFixed(1)}%</div></div>
+          <div class="kelly-item"><div class="kelly-item-lbl">Expected Value</div><div class="kelly-item-val ${(t.ev||0)>0?'pos':'neg'}">${((t.ev||0)*100).toFixed(1)}%</div></div>
+          <div class="kelly-item"><div class="kelly-item-lbl">Cote break-even</div><div class="kelly-item-val">${t.probability>0?(100/t.probability).toFixed(2):'—'}</div></div>
+        </div>
+      </div>` : '';
+
+    // Correct score panel
+    const csPanel = (t.correct_scores && t.correct_scores.length) ? `
+      <div class="sc-panel">
+        <div class="sc-lbl">🎯 Distribution des scores (Poisson/xG)</div>
+        <div class="sc-scores">
+          ${t.correct_scores.map((s,idx) => `<span class="sc-score${idx===0?' top':''}">${s.score} · ${s.prob}%</span>`).join('')}
+        </div>
+      </div>` : '';
+
+    // Dropping odds badge
+    const dropBadge = t.dropping_odds ? `<span class="drop-badge">📉 DROPPING ${t.dropping_note?'— '+t.dropping_note:''}</span>` : '';
 
     return `<div class="mc ${t.is_value_bet?'value-mc':''} ${t.is_trap?'trap-mc':''}" style="animation-delay:${i*.04}s">
       <div class="stripe ${cc}"></div>
@@ -1451,7 +2019,8 @@ function renderTicket(data, totalMatches) {
         <div class="mc-team away">${t.away}</div>
       </div>
       <hr class="mc-div">
-      ${trapWarn}${mlPanel}${stPanel}${injPanel}${valPanel}
+      ${trapWarn}${xgPanel}${mlPanel}${stPanel}${injPanel}${valPanel}${kellyPanel}${csPanel}
+      ${t.dropping_odds ? dropBadge+'<br>' : ''}
       <span class="mc-tag ${tc}">${t.bet_label}</span>
       <div class="mc-bet">${t.bet_value}</div>
       ${t.cote ? `<div class="mc-cote"><span class="mc-cote-lbl">COTE EST.</span>${t.cote}</div>` : ''}
@@ -1473,6 +2042,199 @@ function renderTicket(data, totalMatches) {
 // ═══════════════════════════════════════════
 //  BOOKMAKER MODAL
 // ═══════════════════════════════════════════
+
+// ═══════════════════════════════════════════
+//  IMPORT ANALYSER
+// ═══════════════════════════════════════════
+function openImportTab() {
+  $('emptyArea').style.display = 'none';
+  $('tabsBar').style.display = 'flex';
+  ['tabTicket','tabHist','tabImport','tabPerf','tabChat'].forEach(id => $( id).style.display = 'none');
+  $('tabImport').style.display = 'block';
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+  $('tabBtnImport').classList.add('on');
+}
+
+function clearImport() {
+  $('importBox').value = '';
+  $('importResult').innerHTML = '';
+  $('importDate').textContent = 'Importez vos combinaisons — Claude garde les meilleures';
+}
+
+async function analyseImport() {
+  const raw = $('importBox').value.trim();
+  if (!raw) { alert('Collez vos combinaisons dans le champ texte.'); return; }
+
+  const claudeKey = sGet('claudeKey');
+  if (!claudeKey) { alert('Clé API Anthropic manquante — vérifiez les paramètres.'); return; }
+
+  const thresh = $('importThresh').value;
+  const mode   = $('importMode').value;
+  const btn    = $('analyseBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Analyse...';
+  $('importResult').innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:9px">🔍 Claude analyse vos combinaisons avec recherche web...</div>';
+  $('importDate').textContent = 'Analyse en cours...';
+
+  const modeInstr = {
+    filter:  `Filtre et garde uniquement les combinaisons avec probabilité globale ≥ ${thresh}%. Explique pourquoi tu rejettes les autres.`,
+    score:   `Score TOUTES les combinaisons de 0 à 100. Classe-les du meilleur au moins bon. Ne rejette rien, tout doit être scoré.`,
+    improve: `Pour chaque combinaison faible (< ${thresh}%), propose une version améliorée qui atteint le seuil. Garde intactes les bonnes combis.`
+  }[mode];
+
+  const prompt = `Tu es un expert data scientist en paris sportifs football.
+
+L'utilisateur te soumet ses combinaisons de paris à analyser.
+
+MODE D'ANALYSE: ${modeInstr}
+
+COMBINAISONS À ANALYSER:
+${raw}
+
+INSTRUCTIONS:
+1. Utilise le web search pour vérifier les stats réelles des équipes mentionnées (forme, blessés, cotes réelles)
+2. Pour chaque combinaison, calcule une probabilité globale = produit des probabilités individuelles
+3. Identifie les picks forts (prob ≥ ${thresh}%) et les picks faibles (prob < ${thresh}%)
+4. Donne un score global de confiance de 0 à 100 pour chaque combinaison
+5. Explique en 1-2 phrases pourquoi tu retiens ou rejettes chaque pick
+
+Réponds UNIQUEMENT en JSON valide sans backticks:
+{
+  "combos": [
+    {
+      "id": 1,
+      "original": "texte original de la combi",
+      "verdict": "retained"|"rejected"|"improved",
+      "score": 78,
+      "global_prob": 0.61,
+      "picks": [
+        {
+          "match": "PSG vs Monaco",
+          "bet": "Victoire PSG",
+          "prob": 72,
+          "status": "strong"|"weak"|"risky",
+          "reason": "Forme 4W/1D, -7pts Monaco au classement"
+        }
+      ],
+      "analysis": "Combinaison solide : PSG en grande forme, Over 2.5 confirmé par stats (2.8 buts/match moy)",
+      "improved_version": null,
+      "cote_estimated": 2.45
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "retained": 2,
+    "rejected": 1,
+    "best_combo_id": 1
+  }
+}`;
+
+  try {
+    // First call with web search
+    let messages = [{ role: 'user', content: prompt }];
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': claudeKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 8000,
+        tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 6 }],
+        messages
+      })
+    });
+    if (!res.ok) throw new Error(`Erreur API ${res.status}`);
+
+    let data = await res.json();
+    let loops = 0;
+    while (data.stop_reason === 'tool_use' && loops < 5) {
+      loops++;
+      const toolBlocks = data.content.filter(b => b.type === 'tool_use');
+      messages.push({ role: 'assistant', content: data.content });
+      messages.push({ role: 'user', content: toolBlocks.map(tb => ({ type: 'tool_result', tool_use_id: tb.id, content: tb.output || '' })) });
+      const r2 = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
+        body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:8000, tools:[{type:'web_search_20250305',name:'web_search',max_uses:6}], messages })
+      });
+      if (!r2.ok) break;
+      data = await r2.json();
+    }
+
+    const txt = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+    const result = JSON.parse(txt.replace(/```json|```/g, '').trim());
+    renderImportResult(result, mode, thresh);
+
+  } catch(e) {
+    $('importResult').innerHTML = `<div class="errbox show">⚠️ Erreur : ${e.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔍 Analyser';
+  }
+}
+
+function renderImportResult(data, mode, thresh) {
+  const s = data.summary || {};
+  $('importDate').textContent = `${s.total || data.combos.length} combinaison(s) analysée(s) · ${s.retained || 0} retenue(s) · ${s.rejected || 0} rejetée(s)`;
+
+  let html = '';
+
+  // Summary bar
+  const retained = data.combos.filter(c => c.verdict === 'retained').length;
+  const improved = data.combos.filter(c => c.verdict === 'improved').length;
+  const rejected = data.combos.filter(c => c.verdict === 'rejected').length;
+  html += `<div class="sum-bar" style="margin-bottom:10px">
+    <span class="spill"><span class="sl">📥 Total</span><span class="sv">${data.combos.length}</span></span>
+    <span class="spill" style="background:rgba(0,229,150,.08);border-color:rgba(0,229,150,.2)"><span class="sl">✅ Retenues</span><span class="sv" style="color:var(--green)">${retained}</span></span>
+    ${improved > 0 ? `<span class="spill" style="background:rgba(240,180,0,.08);border-color:rgba(240,180,0,.2)"><span class="sl">🔧 Améliorées</span><span class="sv" style="color:#f0b400">${improved}</span></span>` : ''}
+    <span class="spill" style="background:rgba(255,82,82,.08);border-color:rgba(255,82,82,.2)"><span class="sl">❌ Rejetées</span><span class="sv" style="color:var(--orange)">${rejected}</span></span>
+    <span class="spill"><span class="sl">🌐 Web Search</span><span class="sv" style="color:var(--green)">✓</span></span>
+  </div>`;
+
+  // Sort: best first
+  const sorted = [...data.combos].sort((a, b) => b.score - a.score);
+
+  for (const c of sorted) {
+    const isBest = c.id === (data.summary?.best_combo_id);
+    const cls = c.verdict === 'retained' ? 'good' : c.verdict === 'improved' ? 'best' : 'bad';
+    const scoreClass = c.verdict === 'retained' ? 'good' : c.verdict === 'improved' ? 'best' : 'bad';
+    const verdictIcon = c.verdict === 'retained' ? '✅' : c.verdict === 'improved' ? '🔧' : '❌';
+    const verdictLbl  = c.verdict === 'retained' ? 'RETENUE' : c.verdict === 'improved' ? 'AMÉLIORÉE' : 'REJETÉE';
+    const probPct = Math.round((c.global_prob || 0) * 100);
+    const barColor = c.score >= 70 ? '#00e596' : c.score >= 50 ? '#f0b400' : '#ff5252';
+
+    const picksHtml = (c.picks || []).map(pk => {
+      const pCls = pk.status === 'strong' ? 'retained' : pk.status === 'weak' ? 'rejected' : '';
+      return `<span class="ac-pick ${pCls}" title="${pk.reason || ''}">${pk.match ? pk.match.split(' vs ')[0]+' — ' : ''}${pk.bet} (${pk.prob}%)</span>`;
+    }).join('');
+
+    html += `<div class="analysis-card ${cls}">
+      <div class="ac-header">
+        <div class="ac-combo">${verdictIcon} ${c.original}</div>
+        <div style="display:flex;gap:5px;align-items:center">
+          ${c.cote_estimated ? `<span class="ac-badge" style="background:rgba(240,180,0,.1);color:#f0b400;border:1px solid rgba(240,180,0,.2)">~${c.cote_estimated}x</span>` : ''}
+          <span class="ac-score ${scoreClass}">${verdictLbl} · ${c.score}/100</span>
+        </div>
+      </div>
+      ${picksHtml ? `<div class="ac-picks">${picksHtml}</div>` : ''}
+      <div class="ac-analysis">${c.analysis || ''}</div>
+      ${c.improved_version ? `<div class="ac-analysis" style="color:var(--green);margin-top:4px">🔧 Version améliorée : <strong>${c.improved_version}</strong></div>` : ''}
+      <div class="ac-prob-bar"><div class="ac-prob-fill" style="width:${c.score}%;background:${barColor}"></div></div>
+      <div class="ac-footer">
+        <span style="font-size:7.5px;color:var(--muted)">Prob. globale : ${probPct}%</span>
+        <span style="font-size:7.5px;color:var(--muted)">Score : ${c.score}/100</span>
+        ${isBest ? '<span class="ac-badge" style="background:rgba(240,180,0,.15);color:#f0b400;border:1px solid rgba(240,180,0,.3)">⭐ MEILLEURE COMBI</span>' : ''}
+      </div>
+    </div>`;
+  }
+
+  $('importResult').innerHTML = html;
+}
+
 function showModal() {
   if (!curTicket) return;
   const t = curTicket;
@@ -1526,6 +2288,223 @@ function copyTicket() {
 // ═══════════════════════════════════════════
 //  HISTORY
 // ═══════════════════════════════════════════
+
+// ═══════════════════════════════════════════
+//  PERFORMANCE TRACKER
+// ═══════════════════════════════════════════
+let perfData = sGetJSON('betai_perf', []);
+
+function savePerfData() { sSetJSON('betai_perf', perfData); }
+
+// Auto-add picks from latest ticket as pending
+function addTicketToPerf(ticket) {
+  ticket.forEach(t => {
+    const id = `${t.match}_${t.bet_type}_${Date.now()}`;
+    perfData.unshift({
+      id, match: t.match, league: t.league||'', bet: t.bet_value,
+      bet_type: t.bet_type, prob: t.probability, cote: t.cote||1,
+      ev: t.ev||0, kelly: t.kelly_pct||0,
+      date: new Date().toLocaleDateString('fr-FR'), status: 'pending'
+    });
+  });
+  if (perfData.length > 200) perfData = perfData.slice(0, 200);
+  savePerfData();
+}
+
+function setPerfStatus(id, status) {
+  const pick = perfData.find(p => p.id === id);
+  if (pick) { pick.status = status; savePerfData(); renderPerf(); }
+}
+
+function resetPerf() {
+  if (!confirm('Effacer tout le suivi de performance ?')) return;
+  perfData = []; savePerfData(); renderPerf();
+}
+
+function exportPerf() {
+  const won  = perfData.filter(p => p.status === 'won');
+  const lost = perfData.filter(p => p.status === 'lost');
+  const rows = ['Match,Paris,Prob%,Cote,EV,Kelly%,Date,Résultat',
+    ...perfData.map(p => `"${p.match}","${p.bet}",${p.prob},${p.cote},${(p.ev*100).toFixed(1)},${p.kelly},${p.date},${p.status}`)
+  ].join('\n');
+  const blob = new Blob([rows], { type:'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'betai_performance.csv';
+  a.click();
+}
+
+function calcPerfStats() {
+  const done = perfData.filter(p => p.status !== 'pending');
+  const won  = perfData.filter(p => p.status === 'won');
+  const lost = perfData.filter(p => p.status === 'lost');
+  if (!done.length) return { wr:'—', roi:'—', total: perfData.length, streak:'—', byType:{} };
+
+  const wr   = Math.round(won.length / done.length * 100);
+  // ROI = sum of returns - bets placed (assuming unit stake)
+  let profit = 0;
+  done.forEach(p => { profit += p.status === 'won' ? (p.cote - 1) : -1; });
+  const roi  = (profit / done.length * 100).toFixed(1);
+
+  // Streak
+  let streak = 0, streakType = '';
+  for (const p of perfData) {
+    if (p.status === 'pending') continue;
+    if (!streak) { streak = 1; streakType = p.status; continue; }
+    if (p.status === streakType) streak++;
+    else break;
+  }
+  const streakStr = streak > 1 ? `${streak}${streakType==='won'?'W':'L'}` : (streakType==='won'?'1W':'1L');
+
+  // ROI by type
+  const byType = {};
+  done.forEach(p => {
+    if (!byType[p.bet_type]) byType[p.bet_type] = { w:0, l:0, profit:0 };
+    byType[p.bet_type][p.status==='won'?'w':'l']++;
+    byType[p.bet_type].profit += p.status==='won' ? (p.cote-1) : -1;
+  });
+
+  return { wr, roi, total: perfData.length, streak: streakStr, byType };
+}
+
+function renderPerf() {
+  const s = calcPerfStats();
+  $('kpiWR').textContent    = s.wr === '—' ? '—' : s.wr + '%';
+  $('kpiROI').textContent   = s.roi === '—' ? '—' : (s.roi > 0 ? '+' : '') + s.roi + '%';
+  $('kpiTotal').textContent = s.total;
+  $('kpiStreak').textContent = s.streak;
+
+  // ROI by type chart
+  const rc = $('roiBars');
+  const types = Object.entries(s.byType).sort((a,b) => b[1].profit - a[1].profit);
+  if (types.length) {
+    $('roiChart').style.display = 'block';
+    const maxP = Math.max(...types.map(([,v]) => Math.abs(v.profit)), 0.1);
+    rc.innerHTML = types.slice(0,8).map(([t,v]) => {
+      const roi  = ((v.profit / (v.w+v.l)) * 100).toFixed(0);
+      const pct  = Math.min(Math.abs(v.profit) / maxP * 100, 100);
+      const col  = v.profit >= 0 ? 'var(--green)' : 'var(--red)';
+      const lbl  = { result:'Résultat', double:'Double', goals:'Buts', btts:'BTTS',
+                     corners:'Corners', cards:'Cartons', winbtts:'Win+BTTS',
+                     correct_score:'Score exact', asian:'Handicap' }[t] || t;
+      return `<div class="roi-type-row">
+        <div class="roi-type-lbl">${lbl}</div>
+        <div class="roi-type-bar"><div class="roi-type-fill" style="width:${pct}%;background:${col}"></div></div>
+        <div class="roi-type-val" style="color:${col}">${roi>0?'+':''}${roi}%</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Picks list
+  const el = $('perfList');
+  if (!perfData.length) {
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:11px">Générez un ticket pour commencer le suivi ✅</div>';
+    return;
+  }
+  el.innerHTML = perfData.slice(0, 50).map(p => {
+    const statusHtml = p.status !== 'pending'
+      ? `<span class="pp-status ${p.status==='won'?'won':'lost'}">${p.status==='won'?'✅ GAGNÉ':'❌ PERDU'}</span>`
+      : `<div class="pp-actions">
+           <button class="pp-btn win"  onclick="setPerfStatus('${p.id}','won')">✅ W</button>
+           <button class="pp-btn loss" onclick="setPerfStatus('${p.id}','lost')">❌ L</button>
+           <button class="pp-btn skip" onclick="setPerfStatus('${p.id}','skip')">— Skip</button>
+         </div>`;
+    const evColor = (p.ev||0) > 0 ? 'var(--green)' : 'var(--muted)';
+    return `<div class="pp-row">
+      <div style="flex:1">
+        <div class="pp-match">${p.match}</div>
+        <div class="pp-bet">${p.bet} · ${p.prob}% · <span style="color:${evColor}">EV ${((p.ev||0)*100).toFixed(1)}%</span></div>
+        <div style="font-size:8px;color:var(--muted);margin-top:1px">${p.league} · ${p.date}</div>
+      </div>
+      <div class="pp-cote">×${p.cote}</div>
+      ${statusHtml}
+    </div>`;
+  }).join('');
+
+  $('perfDate').textContent = `${perfData.filter(p=>p.status==='won').length}W · ${perfData.filter(p=>p.status==='lost').length}L · ${perfData.filter(p=>p.status==='pending').length} en attente`;
+}
+
+// ═══════════════════════════════════════════
+//  CHAT ASSISTANT
+// ═══════════════════════════════════════════
+let chatHistory = [];
+
+function clearChat() {
+  chatHistory = [];
+  $('chatArea').innerHTML = '<div class="chat-msg ai"><div class="chat-thinking">BetAI Assistant</div>Bonjour ! Posez-moi vos questions sur les matchs, les cotes, les stratégies de paris…</div>';
+}
+
+function sendChatQ(el) { $('chatInput').value = el.textContent.replace(/^[^a-zA-ZÀ-ÿ0-9]+/,'').trim(); sendChat(); }
+
+async function sendChat() {
+  const input = $('chatInput').value.trim();
+  if (!input) return;
+  const claudeKey = sGet('claudeKey');
+  if (!claudeKey) { alert('Clé API Anthropic manquante.'); return; }
+
+  // Add user message
+  $('chatArea').innerHTML += `<div class="chat-msg user">${input}</div>`;
+  $('chatInput').value = '';
+  $('chatSend').disabled = true;
+
+  // Thinking bubble
+  const thinkId = 'think_' + Date.now();
+  $('chatArea').innerHTML += `<div class="chat-msg ai" id="${thinkId}"><div class="chat-thinking">BetAI recherche…</div><span style="color:var(--muted);font-size:10px">⏳</span></div>`;
+  $('chatArea').scrollTop = $('chatArea').scrollHeight;
+
+  chatHistory.push({ role:'user', content: input });
+
+  const sysPrompt = `Tu es BetAI, un expert en paris sportifs football. Tu utilises le web search pour récupérer des stats en temps réel.
+Contexte actuel: ${$('matchInput').value ? 'Matchs analysés: '+$('matchInput').value.substring(0,200) : 'Aucun match chargé'}
+Réponds en français, de façon concise et pratique. Donne des chiffres précis, des cotes estimées, des conseils actionnables.
+Si on te demande un match spécifique, recherche les stats réelles via web search.
+Format: commence par une ligne de synthèse courte, puis le détail si nécessaire.`;
+
+  try {
+    // Build clean message history
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1500,
+        system: sysPrompt,
+        tools:[{ type:'web_search_20250305', name:'web_search', max_uses:4 }],
+        messages: chatHistory.slice(-8)
+      })
+    });
+
+    let data = await res.json();
+    let loops = 0;
+    const msgs2 = [...chatHistory.slice(-8)];
+    while (data.stop_reason === 'tool_use' && loops < 4) {
+      loops++;
+      const tblocks = data.content.filter(b => b.type === 'tool_use');
+      msgs2.push({ role:'assistant', content: data.content });
+      msgs2.push({ role:'user', content: tblocks.map(tb => ({ type:'tool_result', tool_use_id:tb.id, content: String(tb.output||'') })) });
+      const r2 = await fetch('https://api.anthropic.com/v1/messages', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
+        body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1500, system:sysPrompt, tools:[{type:'web_search_20250305',name:'web_search',max_uses:4}], messages:msgs2 })
+      });
+      data = await r2.json();
+    }
+
+    const reply = data.content.filter(b => b.type==='text').map(b => b.text).join('').trim();
+    chatHistory.push({ role:'assistant', content: reply });
+
+    // Replace thinking bubble
+    const tb = document.getElementById(thinkId);
+    if (tb) tb.outerHTML = `<div class="chat-msg ai">${reply.replace(/\n/g,'<br>')}</div>`;
+
+  } catch(e) {
+    const tb2 = document.getElementById(thinkId);
+    if (tb2) tb2.outerHTML = `<div class="chat-msg ai" style="color:var(--red)">⚠️ Erreur: ${e.message}</div>`;
+  } finally {
+    $('chatSend').disabled = false;
+    $('chatArea').scrollTop = $('chatArea').scrollHeight;
+  }
+}
+
 function saveHist(data, matches) {
   const valCt = data.ticket.filter(t => t.is_value_bet).length;
   hist.unshift({
