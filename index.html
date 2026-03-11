@@ -95,11 +95,6 @@ textarea::placeholder{color:var(--muted);}
 .mode.on.safe{background:rgba(0,245,160,.07);border-color:rgba(0,245,160,.3);color:var(--green);}
 .mode.on.bal{background:rgba(77,184,255,.07);border-color:rgba(77,184,255,.3);color:var(--blue);}
 .mode.on.agg{background:rgba(255,140,66,.07);border-color:rgba(255,140,66,.3);color:var(--orange);}
-.mode.on.smart{background:rgba(200,100,255,.1);border-color:rgba(200,100,255,.4);color:var(--purple);}
-.smart-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(200,100,255,.12);border:1px solid rgba(200,100,255,.35);border-radius:5px;padding:2px 7px;font-size:7.5px;font-weight:700;letter-spacing:1px;color:var(--purple);}
-.smart-threshold{display:none;margin-top:7px;background:rgba(200,100,255,.05);border:1px solid rgba(200,100,255,.15);border-radius:8px;padding:9px 11px;}
-.smart-threshold.show{display:block;}
-.smart-threshold .slabel{font-size:8.5px;margin-bottom:5px;}
 
 /* Features */
 .feats{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
@@ -492,19 +487,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
   <!-- Mode -->
   <div>
     <div class="slabel">Mode de jeu</div>
-    <div class="modes" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+    <div class="modes">
       <button class="mode safe on" data-m="safe" onclick="setMode(this)"><span class="mode-icon">🛡️</span>Sécurisé</button>
       <button class="mode bal" data-m="balanced" onclick="setMode(this)"><span class="mode-icon">⚖️</span>Équilibré</button>
       <button class="mode agg" data-m="aggressive" onclick="setMode(this)"><span class="mode-icon">🔥</span>Agressif</button>
-      <button class="mode smart" data-m="smart" onclick="setMode(this)"><span class="mode-icon">🧠</span>Intelligent</button>
-    </div>
-    <div class="smart-threshold" id="smartThreshold">
-      <div class="slabel">🎯 Seuil Sélection Intelligente</div>
-      <div class="thresh-row">
-        <div class="thresh-val" id="smartVal">80%</div>
-        <input type="range" id="smartSlider" min="70" max="95" value="80" oninput="document.getElementById('smartVal').textContent=this.value+'%'">
-      </div>
-      <div style="font-size:8.5px;color:var(--muted);margin-top:4px;">Une seule option par match · Minimum requis · Si égalité → meilleure cote</div>
     </div>
   </div>
 
@@ -656,6 +642,22 @@ function sGetJSON(k, def) {
 // ═══════════════════════════════════════════
 //  GLOBAL STATE
 // ═══════════════════════════════════════════
+// ── Extraction JSON robuste (depth-counting) ──
+function safeJSON(raw) {
+  const txt = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+  try { const r=JSON.parse(txt); if(r&&typeof r==='object') return r; } catch(_){}
+  for(let s=0;s<txt.length;s++){
+    if(txt[s]!=='{') continue;
+    let depth=0,end=-1;
+    for(let i=s;i<txt.length;i++){
+      if(txt[i]==='{')depth++;else if(txt[i]==='}'){depth--;if(depth===0){end=i;break;}}
+    }
+    if(end===-1) continue;
+    try{const r=JSON.parse(txt.substring(s,end+1));if(r&&typeof r==='object'&&!Array.isArray(r))return r;}catch(_){}
+  }
+  throw new Error('Réponse non-JSON. Réessayez.');
+}
+
 const $ = id => document.getElementById(id);
 
 let selCount = 10;
@@ -739,19 +741,9 @@ function setMode(btn) {
   document.querySelectorAll('.mode').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
   curMode = btn.dataset.m;
-  if (curMode === 'smart') {
-    $('smartThreshold').classList.add('show');
-    // Disable the regular threshold slider when smart mode is on
-    $('threshSlider').disabled = true;
-    $('threshSlider').style.opacity = '0.3';
-  } else {
-    $('smartThreshold').classList.remove('show');
-    $('threshSlider').disabled = false;
-    $('threshSlider').style.opacity = '1';
-    const v = { safe:'60', balanced:'55', aggressive:'50' }[curMode];
-    $('threshSlider').value = v;
-    $('threshVal').textContent = v + '%';
-  }
+  const v = { safe:'60', balanced:'55', aggressive:'50' }[curMode];
+  $('threshSlider').value = v;
+  $('threshVal').textContent = v + '%';
 }
 
 function showTab(tab, btn) {
@@ -820,33 +812,40 @@ async function autoFetch(mode) {
   st.style.color = 'var(--blue)';
   st.classList.add('show');
 
+  const _hdrs = {
+    'Content-Type':'application/json','x-api-key':key,
+    'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'
+  };
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2000,
-        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        messages: [{ role: 'user', content: prompts[mode] }]
-      })
+    // Phase 1 : recherche web — Haiku 4.5 (~0,01€)
+    let _msgs = [{ role:'user', content:prompts[mode] }];
+    let _res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:_hdrs,
+      body:JSON.stringify({ model:'claude-haiku-4-5-20251001', max_tokens:1500,
+        tools:[{type:'web_search_20250305',name:'web_search',max_uses:2}], messages:_msgs })
     });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error?.message || `Erreur ${res.status}`);
+    if(!_res.ok){const e=await _res.json().catch(()=>({}));throw new Error(e.error?.message||`Erreur ${_res.status}`);}
+    let _data = await _res.json();
+    let _loop = 0;
+    while((_data.content||[]).some(b=>b.type==='tool_use') && _loop++<3){
+      const _tus=_data.content.filter(b=>b.type==='tool_use');
+      _msgs.push({role:'assistant',content:_data.content});
+      _msgs.push({role:'user',content:_tus.map(tu=>({type:'tool_result',tool_use_id:tu.id,content:''}))});
+      _res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:_hdrs,
+        body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1500,
+          tools:[{type:'web_search_20250305',name:'web_search',max_uses:2}],messages:_msgs})});
+      if(!_res.ok){const e=await _res.json().catch(()=>({}));throw new Error(e.error?.message||`Err ${_res.status}`);}
+      _data=await _res.json();
     }
-
-    const data = await res.json();
-    const txt = data.content.filter(c => c.type === 'text').map(c => c.text).join('');
-    if (!txt) throw new Error('Aucune réponse reçue.');
-
-    const result = JSON.parse(txt.replace(/```json|```/g, '').trim());
+    // Phase 2 : prefill JSON — garantit réponse JSON pure
+    _msgs.push({role:'assistant',content:_data.content});
+    _msgs.push({role:'user',content:'Output ONLY the JSON object. Nothing before {, nothing after }.'});
+    _msgs.push({role:'assistant',content:'{'});
+    const _r2=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:_hdrs,
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1200,messages:_msgs})});
+    const _d2=await _r2.json();
+    const _jsonTxt='{'+((_d2.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('')||'').trim();
+    const result = safeJSON(_jsonTxt);
     if (!result.matches?.length) throw new Error('Aucun match trouvé.');
 
     $('matchInput').value = result.matches.join('\n');
@@ -1019,7 +1018,7 @@ async function generate() {
   if (!matches.length) return;
 
   // Read config
-  const thresh   = curMode === 'smart' ? $('smartSlider').value : $('threshSlider').value;
+  const thresh   = $('threshSlider').value;
   const optList  = [...activeOpts].join(', ');
   const hasFD    = !!$('apiFD').value.trim();
   const hasBZ    = !!$('apiBZ').value.trim();
@@ -1028,13 +1027,7 @@ async function generate() {
   const wantRel  = activeFeats.has('rel');
   const wantTrap = activeFeats.has('trap');
   const wantBest = activeFeats.has('best');
-  const smartMinProb = curMode === 'smart' ? parseInt($('smartSlider').value) : null;
-  const modeDesc = {
-    safe: 'Sécurité max, probabilités élevées',
-    balanced: 'Équilibre probabilité/valeur',
-    aggressive: 'Meilleures opportunités, plus de risque',
-    smart: `Sélection intelligente — 1 seule option par match, minimum ${smartMinProb}% requis`
-  }[curMode];
+  const modeDesc = { safe:'Sécurité max, probabilités élevées', balanced:'Équilibre probabilité/valeur', aggressive:'Meilleures opportunités, plus de risque' }[curMode];
 
   $('genBtn').disabled = true;
   usedSrc = { fd:false, bz:false, af:false };
@@ -1147,38 +1140,21 @@ async function generate() {
   const srcList = [usedSrc.fd ? 'Football-Data' : null, usedSrc.af ? 'API-Football' : null, usedSrc.bz ? 'Bzzoiro ML' : null].filter(Boolean).join(', ') || 'connaissances générales';
 
   // Build instruction blocks
-  // Smart mode instruction
-  const smartInstr = curMode === 'smart' ? `
-TICKET COMPLET TOUTES OPTIONS — MODE ACTIF (RÈGLES ABSOLUES):
-
-Seuil minimum obligatoire : ${smartMinProb}%
-
-OBJECTIF : Générer UN SEUL TICKET contenant TOUTES les options valides de TOUS les matchs.
-→ Pour chaque match, tu analyses CHAQUE type de pari autorisé (${optList}).
-→ Tu inclus dans le ticket TOUTES les options dont la probabilité est >= ${smartMinProb}%.
-→ Un même match peut donc apparaître PLUSIEURS FOIS dans le ticket avec des types différents.
-   Exemple : "PSG vs Monaco" peut donner 3 lignes : DC 1X (85%), BTTS OUI (82%), Plus 2.5 buts (81%)
-→ Si une option est sous ${smartMinProb}% pour un match → elle est exclue, point.
-→ Si AUCUNE option d'un match ne dépasse ${smartMinProb}% → ce match n'apparaît pas du tout.
-
-ALGORITHME (à appliquer pour chaque match × chaque type autorisé) :
-1. Estime la probabilité de chaque type de pari pour ce match.
-2. Si probabilité >= ${smartMinProb}% → INCLURE dans le ticket.
-3. Si probabilité < ${smartMinProb}% → EXCLURE.
-4. Pas de limite de nombre de sélections — inclus TOUT ce qui passe le seuil.
-
-DANS "reason" : liste toutes les options analysées avec leur probabilité, puis confirme pourquoi cette option est retenue.
-Exemple reason : "DC 1X 86%✓, Résultat 71%✗, BTTS 83%✓, Over2.5 78%✗ — retenu car >= ${smartMinProb}%"
-
-IMPORTANT : Le ticket peut contenir 5 lignes comme 40 lignes selon les matchs. C'est voulu.` : '';
-
   const bestInstr = wantBest ? `
-BEST PICK MODE — ACTIF:
-Types autorisés (UNIQUEMENT ces types, ne propose rien d'autre) : ${optList}
-Pour chaque match, évalue CHAQUE type autorisé ci-dessus et estime sa probabilité.
-→ Choisis UNE SEULE option parmi les types autorisés : celle avec la probabilité la plus haute.
-→ NE PROPOSE JAMAIS un type qui n'est pas dans la liste ci-dessus.
-→ Dans "reason", explique en 1 phrase pourquoi cette option est la meilleure parmi les types autorisés.` : '';
+BEST PICK MODE — ACTIF (PRIORITÉ ABSOLUE):
+Pour chaque match, tu DOIS évaluer TOUS ces types de paris et choisir LE MEILLEUR :
+1. Résultat (1/N/2) — quelle proba de victoire/nul ?
+2. Double chance 1X, X2, 12 — lequel est le plus solide ?
+3. Plus/Moins buts — tendance offensive/défensive des 2 équipes ?
+4. BTTS OUI/NON — les 2 défenses sont-elles poreuses ou solides ?
+5. Win + BTTS — équipe dominante qui prend des buts ?
+6. Double chance + BTTS — pari combiné très solide ?
+7. Résultat + buts — confirment-ils la même chose ?
+8. Corners — équipes qui jouent en largeur ?
+9. Cartons — match physique ou derby ?
+10. Draw No Bet — si victoire probable mais nul possible ?
+→ Compare toutes les probas, choisis UNE SEULE option : la plus probable et la plus cohérente avec les données.
+→ Dans "reason" explique pourquoi cette option est meilleure que les autres.` : '';
 
   const valInstr = wantVal ? `
 VALUE BET:
@@ -1209,76 +1185,58 @@ MATCHS:
 ${matches.map((m, i) => `${i+1}. ${m}`).join('\n')}
 
 CONFIGURATION:
-- Types de paris autorisés: ${optList}
-- Mode Best Pick: ${wantBest ? 'ACTIVÉ — compare ces types entre eux et choisis le MEILLEUR, sans jamais sortir de cette liste' : 'DÉSACTIVÉ — propose un pari pour chaque type de la liste'}
-- Sélections: ${selCount}
-- Seuil minimum: ${thresh}%
+- Sélections demandées: ${selCount}
+- Seuil minimum de probabilité: ${thresh}%
 - Mode: ${curMode} — ${modeDesc}
+
+RÈGLE ABSOLUE SUR LES TYPES DE PARIS:
+${wantBest
+  ? `Best Pick ACTIVÉ — pour chaque match, évalue tous les types et choisis UN SEUL : le plus pertinent selon les données.
+  MAIS tu dois obligatoirement varier les types sur l'ensemble du ticket.
+  INTERDIT : plus de 40% des picks avec le même bet_type (ex: pas plus de 4 "result" sur 10 picks).
+  Répartition cible : 3-4 types différents minimum sur l'ensemble du ticket.`
+  : `Best Pick DÉSACTIVÉ — tu dois IMPÉRATIVEMENT utiliser UNIQUEMENT ces types: ${optList}
+  INTERDIT ABSOLU : utiliser un type de pari qui n'est PAS dans cette liste.
+  Si "result" n'est pas dans la liste, ne génère AUCUN pick de type "result".
+  Si seul "btts" est sélectionné, TOUS les picks doivent être de type "btts".
+  Répartis équitablement entre les types disponibles.`
+}
 ${bestInstr}
 ${valInstr}
 ${relInstr}
 ${trapInstr}
-${smartInstr}
 
-TYPES DE PARIS — DÉFINITION ET CRITÈRES DE SÉLECTION:
-
-IMPORTANT: Chaque type de pari nécessite des critères de sélection DIFFÉRENTS.
-Ne sélectionne PAS les mêmes matchs pour des types différents.
-Pour chaque type, choisis les matchs où ce pari spécifique est le plus pertinent.
-
-=== RÉSULTATS (sélectionne : équipes avec forme dominante, écart de niveau clair) ===
+TYPES DE PARIS DISPONIBLES:
 - result: Victoire 1 / Nul / Victoire 2
-- double: Double chance 1X ou X2 (équipe favorie mais résultat incertain)
-- double12: Double chance 12 — aucun nul (2 équipes offensives, matchs ouverts)
-- dnb: Draw No Bet (favori clair mais nul non exclu)
-- htft: HT/FT ex "1/1" (équipes qui démarrent fort ou lentement)
+- double: Double chance 1X ou X2
+- double12: Double chance 12 (aucun nul)
+- dnb: Draw No Bet
+- htft: HT/FT ex "1/1" ou "N/2"
 - asian: Handicap asiatique ex "PSG -1.0"
 - euro_hdc: Handicap européen ex "Bayern -1"
-- cleansheet: Victoire + aucun but encaissé (défense très solide, attaque modeste en face)
-
-=== BUTS (sélectionne : selon la moyenne de buts des 2 équipes, pas la force) ===
-- goals: Plus/Moins buts — CRITÈRES: moyenne buts/match des 2 équipes combinée
-  → Over: équipes qui marquent ET prennent des buts (moyennes élevées)
-  → Under: équipes défensives, matchs fermés, enjeux importants
-- btts: BTTS OUI/NON — CRITÈRES: les 2 équipes marquent-elles ET encaissent-elles?
-  → OUI: les 2 attaques marquent souvent, les 2 défenses sont poreuses
-  → NON: au moins une des 2 équipes a une défense solide ou ne marque pas souvent
+- cleansheet: Victoire + aucun but encaissé
+- goals: Plus/Moins buts ex "Plus de 2.5 buts"
+- btts: BTTS OUI ou NON
 - btts_goals: BTTS + Over/Under ex "BTTS OUI + Plus de 2.5"
-- goals_ht: Buts 1ère MT — CRITÈRES: équipes qui démarrent fort, qui pressent haut
-- goals_st: Buts 2ème MT — CRITÈRES: équipes qui accélèrent en 2ème période, remontadas
-- first_goal: Première équipe à marquer — CRITÈRES: équipe qui presse le plus en début
+- goals_ht: Buts 1ère MT ex "Plus de 0.5 buts MT1"
+- goals_st: Buts 2ème MT ex "Plus de 1.5 buts MT2"
+- first_goal: Première équipe à marquer
+- corners: Corners ex "Plus de 9.5 corners"
+- corners_ht: Corners 1ère MT
+- cards: Cartons ex "Plus de 3.5 cartons"
+- fouls: Fautes ex "Plus de 19.5 fautes"
+- winbtts: Victoire + Les 2 marquent ex "PSG Victoire + BTTS OUI"
+- double_btts: Double chance + BTTS ex "1X + BTTS OUI" ou "12 + BTTS OUI"
+- result_goals: Résultat + buts ex "PSG Victoire + Plus de 2.5 buts"
 
-=== STATS (sélectionne : critères physiques et tactiques, pas la force des équipes) ===
-- corners: Corners total — CRITÈRES: équipes qui jouent LARGE, font beaucoup de centres, style offensif avec débordements. Ne pas choisir une équipe juste parce qu'elle est forte.
-- corners_ht: Corners 1ère MT — CRITÈRES: équipes qui pressent haut en début de match
-- cards: Cartons — CRITÈRES: rencontres physiques, rivaux, arbitres stricts, équipes qui font des fautes. NE PAS choisir les mêmes matchs que pour les buts ou résultats.
-- fouls: Fautes — CRITÈRES: équipes défensives, matchs tendus, rivaux régionaux
-
-=== COMBINÉS (sélectionne : cumul des critères de chaque composante) ===
-- winbtts: Victoire + Les 2 marquent — CRITÈRES: équipe dominante ET défense poreuse des deux côtés
-- double_btts: Double chance + BTTS — CRITÈRES: match ouvert avec buts des 2 côtés ex "1X + BTTS OUI" ou "12 + BTTS OUI"
-- result_goals: Résultat + buts — CRITÈRES: résultat probable confirmé par tendance de buts ex "PSG Victoire + Plus de 2.5 buts"
-
-RÈGLE FONDAMENTALE — DIVERSITÉ DES MATCHS:
-Si plusieurs types sont actifs, tu DOIS sélectionner des matchs DIFFÉRENTS pour chaque type autant que possible.
-Exemple avec 75 matchs disponibles et 3 types actifs (corners, cards, btts) :
-- corners → choisis les 5 matchs avec le plus de centres/débordements attendus
-- cards → choisis les 5 matchs les plus physiques/derbies (différents des corners !)
-- btts → choisis les 5 matchs où les 2 équipes marquent ET encaissent souvent
-→ Ces 3 groupes doivent être DISTINCTS. Ne répète pas les mêmes matchs.
-
-EXCEPTION — UN MATCH PEUT APPARAÎTRE DANS PLUSIEURS TYPES SI :
-Sa probabilité pour ce type est STRICTEMENT SUPÉRIEURE OU ÉGALE à la meilleure alternative disponible.
-Exemple : PSG vs Monaco peut apparaître en "corners" ET en "btts" uniquement si :
-- Pour corners : probabilité PSG vs Monaco ≥ probabilité du meilleur autre match corners disponible
-- Pour btts : probabilité PSG vs Monaco ≥ probabilité du meilleur autre match btts disponible
-→ Si un match moins connu a une meilleure probabilité pour ce type, choisis le match moins connu.
-→ Un match très connu (PSG, Real Madrid, Bayern...) ne doit PAS être favorisé par défaut.
-
-AUTRES RÈGLES:
+RÈGLES STRICTES:
 - Cote estimée = (1/probabilité) × 1.08
-- Sois concis dans "reason" (max 15 mots, mentionne le critère spécifique du type de pari)
+- Sois concis dans "reason" (max 15 mots)
 - JSON compact sans espaces superflus
+- INTERDIT : deux picks avec exactement le même match ET le même bet_type
+- INTERDIT : générer plus de sélections que le nombre demandé (${selCount} maximum)
+- Si un match apparaît plusieurs fois dans le ticket, les bet_type DOIVENT être différents
+- Les ${selCount} picks doivent couvrir au maximum les matchs fournis (idéalement 1 pick par match)
 
 Réponds UNIQUEMENT avec ce JSON valide, sans texte autour, sans backticks:
 {"ticket":[{"num":1,"match":"PSG vs Monaco","league":"Ligue 1","home":"PSG","away":"Monaco","bet_type":"result","bet_label":"RÉSULTAT","bet_value":"Victoire PSG","probability":72,"cote":1.45,"confidence":"high","reason":"Forme WWWDW, ML 72%, Monaco sans Golovin","tag_type":"result","is_value_bet":false,"value_edge":0,"reliability_score":82,"reliability_label":"Très fiable","is_trap":false,"trap_reason":null,"real_data":{"form_home":"WWWDW","form_away":"DWLWL","h2h":"4V-2N-1D","rank_home":"1er","rank_away":"3ème","ml_home":72,"ml_draw":18,"ml_away":10,"injuries":null}}],"summary":{"total":1,"avg_prob":72,"total_cote":1.45,"high_conf":1,"value_bets":0}}`;
@@ -1293,9 +1251,10 @@ Réponds UNIQUEMENT avec ce JSON valide, sans texte autour, sans backticks:
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 16000,
-        messages: [{ role: 'user', content: prompt }]
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 8000,
+        system: 'You are a football betting expert. OUTPUT RULE: respond with ONLY a raw JSON object. Start with { end with }. No text before. No text after.',
+        messages: [{ role: 'user', content: prompt }, { role: 'assistant', content: '{' }]
       })
     });
 
@@ -1308,10 +1267,10 @@ Réponds UNIQUEMENT avec ce JSON valide, sans texte autour, sans backticks:
     }
 
     const data = await res.json();
-    const txt  = data.content.map(c => c.text || '').join('');
+    const txt  = (data.content||[]).filter(c => c.type==='text').map(c => c.text || '').join('').trim();
     if (!txt) throw new Error('Réponse vide de l\'API Claude.');
 
-    const result = JSON.parse(txt.replace(/```json|```/g, '').trim());
+    const result = safeJSON('{' + txt);   // { recolé depuis le prefill
     if (!result.ticket?.length) throw new Error('Ticket vide retourné par Claude.');
 
     curTicket = result;
@@ -1369,7 +1328,7 @@ function renderTicket(data, totalMatches) {
   const highC = data.ticket.filter(t => t.confidence === 'high').length;
   const valCt = data.ticket.filter(t => t.is_value_bet).length;
   const trapCt = data.ticket.filter(t => t.is_trap).length;
-  const mL = { safe:'🛡️ Sécurisé', balanced:'⚖️ Équilibré', aggressive:'🔥 Agressif', smart:'🧠 Intelligent' }[curMode];
+  const mL = { safe:'🛡️ Sécurisé', balanced:'⚖️ Équilibré', aggressive:'🔥 Agressif' }[curMode];
 
   $('sumBar').innerHTML = `
     <span class="spill g">⚡ <span class="sv">${data.ticket.length}</span> sélections</span>
