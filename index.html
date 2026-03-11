@@ -2,11 +2,117 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>BetAI — Intelligence Football</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+*{box-sizing:border-box;margin:0;padding:0;}html,body{height:100%;}
+.view{display:none!important;}.view.active{display:block!important;}
+#view-app.active{display:grid!important;}
+
+:root{
+  --bg:#080b10;--surf:#0d1117;--card:#111820;--card2:#161e28;
+  --b1:rgba(255,255,255,.07);--b2:rgba(255,255,255,.13);
+  --text:#e8edf5;--muted:#5a6a80;--muted2:#8a9ab0;
+  --green:#00e5a0;--green2:#00b87a;--gold:#f5c842;--red:#ff4d6a;
+  --cyan:#06d6e8;--blue:#3d9eff;
+  --font-head:'Syne',sans-serif;--font-mono:'DM Mono',monospace;--font-body:'Inter',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--font-body);}
+
+/* Background grid */
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,160,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,160,.025) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
+
+/* Glow orbs */
+.orb{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0;}
+.orb1{width:500px;height:500px;background:rgba(0,229,160,.06);top:-150px;left:-150px;}
+.orb2{width:400px;height:400px;background:rgba(6,214,232,.04);bottom:-100px;right:-100px;}
+
+.page-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;position:relative;z-index:1;}
+
+/* Logo top */
+.top-logo{position:fixed;top:20px;left:28px;display:flex;align-items:center;gap:10px;}
+.logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--green),var(--cyan));border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;font-size:15px;color:#080b10;letter-spacing:-1px;}
+.logo-name{font-family:var(--font-head);font-weight:800;font-size:19px;letter-spacing:-0.5px;}
+.logo-name em{color:var(--green);font-style:normal;}
+
+/* Card */
+.auth-card{width:100%;max-width:440px;background:var(--surf);border:1px solid var(--b1);border-radius:20px;padding:40px;box-shadow:0 32px 80px rgba(0,0,0,.5);}
+
+.auth-hero{text-align:center;margin-bottom:32px;}
+.auth-hero-icon{width:64px;height:64px;background:linear-gradient(135deg,rgba(0,229,160,.12),rgba(6,214,232,.12));border:1px solid rgba(0,229,160,.2);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;}
+.auth-hero-title{font-family:var(--font-head);font-size:28px;font-weight:800;letter-spacing:-0.5px;line-height:1;}
+.auth-hero-title em{color:var(--green);font-style:normal;}
+.auth-hero-sub{font-size:12px;color:var(--muted2);margin-top:8px;line-height:1.6;}
+
+/* Tabs */
+.auth-tabs{display:flex;background:var(--card);border-radius:12px;padding:4px;margin-bottom:28px;}
+.auth-tab{flex:1;padding:10px;text-align:center;border-radius:9px;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted2);transition:.2s;font-family:var(--font-body);}
+.auth-tab.on{background:var(--card2);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3);}
+
+/* Fields */
+.field{margin-bottom:16px;}
+.field-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.field-label::before{content:'';width:3px;height:10px;background:var(--green);border-radius:2px;}
+.field-input{width:100%;background:var(--card);border:1px solid var(--b1);border-radius:10px;color:var(--text);font-family:var(--font-body);font-size:13px;padding:12px 14px;outline:none;transition:.2s;}
+.field-input:focus{border-color:rgba(0,229,160,.4);box-shadow:0 0 0 3px rgba(0,229,160,.06);}
+.field-input::placeholder{color:var(--muted);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* Plan selector */
+.plan-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
+.plan-card{background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;transition:.2s;}
+.plan-card:hover{border-color:var(--b2);}
+.plan-card.on{border-color:rgba(0,229,160,.35);background:rgba(0,229,160,.05);}
+.plan-card.on .plan-price{color:var(--green);}
+.plan-icon{font-size:20px;margin-bottom:6px;}
+.plan-name{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted2);margin-bottom:4px;}
+.plan-price{font-family:var(--font-mono);font-size:15px;font-weight:500;color:var(--text);}
+.plan-perks{font-size:8px;color:var(--muted);margin-top:4px;line-height:1.5;}
+
+/* Submit btn */
+.auth-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--green2),var(--green));border:none;border-radius:12px;font-family:var(--font-head);font-size:16px;font-weight:800;letter-spacing:2px;color:#080b10;cursor:pointer;transition:.2s;margin-top:8px;box-shadow:0 6px 24px rgba(0,229,160,.2);}
+.auth-btn:hover{opacity:.88;transform:translateY(-1px);box-shadow:0 10px 30px rgba(0,229,160,.3);}
+.auth-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+.auth-btn.ghost{background:var(--card);border:1px solid var(--b1);color:var(--muted2);box-shadow:none;font-family:var(--font-body);font-size:13px;font-weight:600;letter-spacing:.5px;}
+.auth-btn.ghost:hover{border-color:var(--b2);color:var(--text);}
+
+.auth-sep{display:flex;align-items:center;gap:12px;margin:20px 0;}
+.auth-sep-line{flex:1;height:1px;background:var(--b1);}
+.auth-sep-txt{font-size:10px;color:var(--muted);letter-spacing:1px;white-space:nowrap;}
+
+/* Alert */
+.alert{border-radius:9px;padding:10px 14px;font-size:11px;margin-bottom:16px;display:none;line-height:1.5;}
+.alert.show{display:block;}
+.alert.err{background:rgba(255,77,106,.07);border:1px solid rgba(255,77,106,.2);color:#ff7888;}
+.alert.ok{background:rgba(0,229,160,.07);border:1px solid rgba(0,229,160,.2);color:var(--green);}
+
+/* Footer links */
+.auth-footer{text-align:center;margin-top:20px;font-size:10px;color:var(--muted);}
+.auth-footer a{color:var(--green);text-decoration:none;cursor:pointer;}
+.auth-footer a:hover{text-decoration:underline;}
+
+/* Features strip */
+.features{display:flex;gap:20px;justify-content:center;margin-top:32px;flex-wrap:wrap;}
+.feat{display:flex;align-items:center;gap:7px;font-size:10px;color:var(--muted2);}
+.feat-dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
+
+/* Admin link */
+.admin-hint{position:fixed;bottom:20px;right:24px;font-size:9px;color:rgba(255,255,255,.1);cursor:pointer;letter-spacing:1px;transition:.2s;}
+.admin-hint:hover{color:var(--muted);}
+
+/* Spinner */
+.spin{width:16px;height:16px;border:2px solid rgba(0,0,0,.2);border-top:2px solid #080b10;border-radius:50%;animation:sp .6s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px;}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* Password toggle */
+.field-pw{position:relative;}
+.field-pw .field-input{padding-right:40px;}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;color:var(--muted);user-select:none;}
+.pw-toggle:hover{color:var(--muted2);}
+
+
 /* ════════════════════════════════════════════
    TOKENS & RESET
 ════════════════════════════════════════════ */
@@ -634,9 +740,357 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .empty-state-icon{font-size:42px;opacity:.07;}
 .empty-state-title{font-family:var(--font-head);font-size:18px;font-weight:800;opacity:.1;letter-spacing:2px;}
 .empty-state-sub{font-size:11px;color:var(--muted);max-width:240px;line-height:1.7;}
+
+
+:root{
+  --bg:#06080d;--surf:#0a0e16;--card:#0f1520;--card2:#141c28;
+  --b1:rgba(255,255,255,.07);--b2:rgba(255,255,255,.12);
+  --text:#e8edf5;--muted:#5a6a80;--muted2:#8a9ab0;
+  --green:#00e5a0;--green2:#00b87a;--gold:#f5c842;--red:#ff4d6a;
+  --cyan:#06d6e8;--blue:#3d9eff;--purple:#a855f7;--orange:#ff7849;
+  --nav-w:230px;--top-h:58px;
+  --font-head:'Syne',sans-serif;--font-mono:'DM Mono',monospace;--font-body:'Inter',sans-serif;
+  --r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:13px;overflow:hidden;}
+
+/* ── LOCK SCREEN ── */
+.lock{position:fixed;inset:0;background:#06080d;z-index:999;display:flex;align-items:center;justify-content:center;}
+.lock-card{width:360px;background:var(--surf);border:1px solid var(--b1);border-radius:20px;padding:40px;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,.7);}
+.lock-icon{font-size:48px;margin-bottom:16px;}
+.lock-title{font-family:var(--font-head);font-size:22px;font-weight:800;margin-bottom:6px;}
+.lock-title em{color:var(--gold);font-style:normal;}
+.lock-sub{font-size:11px;color:var(--muted);margin-bottom:24px;}
+.lock-input{width:100%;background:var(--card);border:1px solid var(--b1);border-radius:10px;color:var(--text);font-family:var(--font-mono);font-size:14px;padding:12px 16px;outline:none;transition:.2s;text-align:center;letter-spacing:4px;margin-bottom:14px;}
+.lock-input:focus{border-color:rgba(245,200,66,.4);}
+.lock-btn{width:100%;padding:13px;background:linear-gradient(135deg,#c89000,var(--gold));border:none;border-radius:10px;font-family:var(--font-head);font-size:15px;font-weight:800;letter-spacing:2px;color:#06080d;cursor:pointer;transition:.2s;}
+.lock-btn:hover{opacity:.88;}
+.lock-err{color:var(--red);font-size:10px;margin-top:8px;min-height:16px;}
+.lock-back{font-size:10px;color:var(--muted);margin-top:12px;cursor:pointer;}
+.lock-back:hover{color:var(--muted2);}
+
+/* ── SHELL ── */
+.shell{display:grid;grid-template-columns:var(--nav-w) 1fr;grid-template-rows:var(--top-h) 1fr;height:100vh;}
+
+/* ── TOPBAR ── */
+.topbar{grid-column:1/-1;background:var(--surf);border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:16px;padding:0 22px;z-index:100;}
+.logo{display:flex;align-items:center;gap:10px;min-width:var(--nav-w);padding-right:20px;border-right:1px solid var(--b1);}
+.logo-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--gold),#c89000);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;font-size:14px;color:#06080d;}
+.logo-name{font-family:var(--font-head);font-weight:800;font-size:17px;letter-spacing:-.5px;}
+.logo-name em{color:var(--gold);font-style:normal;}
+.logo-badge{background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.25);border-radius:4px;padding:2px 7px;font-size:7.5px;font-weight:700;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-left:2px;}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.topbar-admin{font-size:10px;font-weight:600;color:var(--gold);background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:20px;padding:5px 12px;}
+.topbar-logout{font-size:10px;font-weight:600;color:var(--muted2);background:var(--card);border:1px solid var(--b1);border-radius:8px;padding:6px 12px;cursor:pointer;transition:.15s;font-family:var(--font-body);}
+.topbar-logout:hover{border-color:rgba(255,77,106,.3);color:var(--red);}
+.live-indicator{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--green);}
+.live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 1.2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+
+/* ── SIDEBAR ── */
+.sidebar{background:var(--surf);border-right:1px solid var(--b1);display:flex;flex-direction:column;padding:14px 10px;overflow-y:auto;gap:2px;}
+.sidebar::-webkit-scrollbar{width:3px;}
+.nav-sect{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 10px 4px;margin-top:4px;}
+.nitem{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:.15s;border:1px solid transparent;color:var(--muted2);}
+.nitem:hover{background:var(--card);color:var(--text);}
+.nitem.on{background:rgba(245,200,66,.06);border-color:rgba(245,200,66,.15);color:var(--gold);}
+.nitem-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+.nitem-label{font-size:11px;font-weight:600;}
+.nitem-badge{margin-left:auto;background:var(--gold);color:#06080d;font-size:7.5px;font-weight:800;padding:2px 6px;border-radius:20px;}
+.nitem-badge.red{background:var(--red);color:#fff;}
+.nitem-badge.green{background:var(--green);color:#080b10;}
+.sidebar-footer{margin-top:auto;padding-top:12px;border-top:1px solid var(--b1);}
+.sys-status{background:var(--card);border:1px solid var(--b1);border-radius:8px;padding:10px;}
+.sys-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.sys-row:last-child{margin-bottom:0;}
+.sys-label{font-size:9px;color:var(--muted);}
+.sys-dot{width:6px;height:6px;border-radius:50%;}
+.sys-dot.ok{background:var(--green);}
+.sys-dot.warn{background:var(--gold);}
+.sys-dot.err{background:var(--red);}
+
+/* ── MAIN ── */
+.main{overflow-y:auto;background:var(--bg);}
+.main::-webkit-scrollbar{width:4px;}
+.main::-webkit-scrollbar-thumb{background:rgba(255,255,255,.05);}
+.page{display:none;padding:24px;}
+.page.on{display:block;}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+.ph-title{font-family:var(--font-head);font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1;}
+.ph-title em{color:var(--gold);font-style:normal;}
+.ph-sub{font-size:11px;color:var(--muted2);margin-top:5px;}
+.ph-actions{display:flex;gap:8px;}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font-body);font-size:11px;font-weight:600;transition:.15s;}
+.btn-gold{background:linear-gradient(135deg,#c89000,var(--gold));color:#06080d;}
+.btn-gold:hover{opacity:.88;transform:translateY(-1px);}
+.btn-ghost{background:var(--card);border:1px solid var(--b1);color:var(--muted2);}
+.btn-ghost:hover{border-color:var(--b2);color:var(--text);}
+.btn-red{background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.2);color:var(--red);}
+.btn-green{background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.2);color:var(--green);}
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-bottom:22px;}
+.kpi{background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:14px 16px;position:relative;overflow:hidden;}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.kpi.g::before{background:var(--green);}
+.kpi.gold::before{background:var(--gold);}
+.kpi.b::before{background:var(--blue);}
+.kpi.r::before{background:var(--red);}
+.kpi.p::before{background:var(--purple);}
+.kpi-val{font-family:var(--font-mono);font-size:28px;font-weight:500;line-height:1;margin-bottom:4px;}
+.kpi.g .kpi-val{color:var(--green);}
+.kpi.gold .kpi-val{color:var(--gold);}
+.kpi.b .kpi-val{color:var(--blue);}
+.kpi.r .kpi-val{color:var(--red);}
+.kpi.p .kpi-val{color:var(--purple);}
+.kpi-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.kpi-delta{font-size:9px;margin-top:3px;}
+.kpi-delta.up{color:var(--green);}
+.kpi-delta.down{color:var(--red);}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:20px;}
+.card-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted2);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:8px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+
+/* ── FORM FIELDS ── */
+.field{margin-bottom:14px;}
+.field-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.field-input{width:100%;background:var(--card2);border:1px solid var(--b1);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:12px;padding:9px 12px;outline:none;transition:.2s;}
+.field-input:focus{border-color:rgba(245,200,66,.4);}
+.field-input::placeholder{color:var(--muted);}
+.field-input.mono{font-family:var(--font-mono);letter-spacing:1px;}
+.select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%235a6a80'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+.save-btn{padding:9px 18px;background:linear-gradient(135deg,#c89000,var(--gold));border:none;border-radius:8px;font-family:var(--font-head);font-size:13px;font-weight:800;letter-spacing:1.5px;color:#06080d;cursor:pointer;transition:.2s;}
+.save-btn:hover{opacity:.88;}
+
+/* ── API KEY BLOCK ── */
+.api-block{background:rgba(245,200,66,.04);border:1px solid rgba(245,200,66,.2);border-radius:12px;padding:16px;margin-bottom:16px;}
+.api-block-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.api-block-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);}
+.api-status-badge{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;}
+.api-pw-wrap{position:relative;}
+.api-pw-wrap .field-input{padding-right:90px;}
+.api-pw-actions{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;gap:4px;}
+.api-mini-btn{padding:3px 8px;border-radius:5px;font-size:9px;font-weight:700;cursor:pointer;border:none;font-family:var(--font-body);transition:.15s;}
+.api-mini-btn.reveal{background:rgba(245,200,66,.1);color:var(--gold);}
+.api-mini-btn.copy{background:rgba(0,229,160,.1);color:var(--green);}
+.api-test-row{display:flex;gap:6px;margin-top:8px;align-items:center;}
+.api-test-result{font-size:9px;font-weight:600;padding:3px 9px;border-radius:5px;}
+.api-test-result.ok{background:rgba(0,229,160,.08);color:var(--green);}
+.api-test-result.err{background:rgba(255,77,106,.08);color:var(--red);}
+.api-hint{font-size:8.5px;color:var(--muted);margin-top:6px;}
+.api-hint a{color:var(--gold);text-decoration:none;}
+
+/* ── USERS TABLE ── */
+.users-filters{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+.uf-input{background:var(--card2);border:1px solid var(--b1);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:11px;padding:7px 12px;outline:none;transition:.2s;width:220px;}
+.uf-input:focus{border-color:rgba(245,200,66,.3);}
+.uf-select{background:var(--card2);border:1px solid var(--b1);border-radius:8px;color:var(--muted2);font-family:var(--font-body);font-size:11px;padding:7px 10px;outline:none;}
+.users-table{background:var(--card);border:1px solid var(--b1);border-radius:var(--r);overflow:hidden;}
+.ut-head{display:grid;grid-template-columns:2fr 1.2fr 1fr 1fr 1fr 1.2fr;background:rgba(255,255,255,.03);border-bottom:1px solid var(--b1);padding:10px 14px;gap:8px;}
+.ut-th{font-size:8.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
+.ut-row{display:grid;grid-template-columns:2fr 1.2fr 1fr 1fr 1fr 1.2fr;padding:10px 14px;gap:8px;border-bottom:1px solid rgba(255,255,255,.04);align-items:center;transition:.12s;cursor:default;}
+.ut-row:last-child{border-bottom:none;}
+.ut-row:hover{background:rgba(255,255,255,.02);}
+.ut-name{font-weight:600;font-size:12px;}
+.ut-email{font-size:9px;color:var(--muted);margin-top:2px;}
+.plan-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:8px;font-weight:700;letter-spacing:.5px;}
+.plan-badge.free{background:rgba(255,255,255,.06);color:var(--muted2);}
+.plan-badge.starter{background:rgba(61,158,255,.1);color:var(--blue);}
+.plan-badge.pro{background:rgba(0,229,160,.1);color:var(--green);}
+.plan-badge.demo{background:rgba(168,85,247,.1);color:var(--purple);}
+.status-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:8px;font-weight:700;}
+.status-badge.active{background:rgba(0,229,160,.1);color:var(--green);}
+.status-badge.banned{background:rgba(255,77,106,.1);color:var(--red);}
+.quota-bar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:4px;overflow:hidden;}
+.quota-fill{height:4px;border-radius:2px;}
+.quota-fill.green{background:var(--green);}
+.quota-fill.gold{background:var(--gold);}
+.quota-fill.red{background:var(--red);}
+.ut-actions{display:flex;gap:4px;}
+.ut-btn{padding:4px 8px;border-radius:5px;font-size:8px;font-weight:700;cursor:pointer;border:none;font-family:var(--font-body);transition:.15s;}
+.ut-btn.edit{background:rgba(61,158,255,.1);color:var(--blue);}
+.ut-btn.ban{background:rgba(255,77,106,.1);color:var(--red);}
+.ut-btn.unban{background:rgba(0,229,160,.1);color:var(--green);}
+.ut-btn.reset{background:rgba(245,200,66,.1);color:var(--gold);}
+.ut-tickets{font-family:var(--font-mono);font-size:12px;}
+
+/* ── USAGE CHART ── */
+.usage-item{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.usage-label{font-size:10px;color:var(--muted2);min-width:90px;}
+.usage-track{flex:1;height:6px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;}
+.usage-fill{height:6px;border-radius:3px;transition:width 1s;}
+.usage-val{font-family:var(--font-mono);font-size:10px;min-width:50px;text-align:right;color:var(--muted2);}
+
+/* ── ALERT ── */
+.toastbox{position:fixed;top:70px;right:20px;z-index:999;display:flex;flex-direction:column;gap:6px;}
+.toast{background:var(--card);border-radius:9px;padding:10px 16px;font-size:11px;border-left:3px solid;animation:toastin .25s ease;box-shadow:0 8px 24px rgba(0,0,0,.4);max-width:300px;}
+@keyframes toastin{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+.toast.ok{border-color:var(--green);color:var(--green);}
+.toast.err{border-color:var(--red);color:var(--red);}
+.toast.info{border-color:var(--blue);color:var(--blue);}
+
+/* ── TOGGLE ── */
+.toggle{position:relative;width:36px;height:20px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.08);border-radius:20px;cursor:pointer;transition:.25s;}
+.toggle-slider::before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:var(--muted);border-radius:50%;transition:.25s;}
+.toggle input:checked+.toggle-slider{background:rgba(0,229,160,.25);}
+.toggle input:checked+.toggle-slider::before{transform:translateX(16px);background:var(--green);}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--surf);border:1px solid var(--b1);border-radius:16px;padding:28px;width:400px;max-width:94vw;}
+.modal-title{font-family:var(--font-head);font-size:18px;font-weight:800;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;}
+.modal-close{cursor:pointer;color:var(--muted);font-size:18px;}
+.modal-close:hover{color:var(--text);}
+
+/* ── LOG TABLE ── */
+.log-row{display:flex;gap:12px;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;}
+.log-row:last-child{border-bottom:none;}
+.log-time{font-family:var(--font-mono);color:var(--muted);min-width:80px;font-size:9px;}
+.log-user{color:var(--blue);font-weight:600;}
+.log-action{color:var(--muted2);}
+.log-badge{padding:1px 6px;border-radius:3px;font-size:8px;font-weight:700;}
+.log-badge.ticket{background:rgba(0,229,160,.08);color:var(--green);}
+.log-badge.login{background:rgba(61,158,255,.08);color:var(--blue);}
+.log-badge.admin{background:rgba(245,200,66,.08);color:var(--gold);}
+
+/* ── REVENUE ── */
+.rev-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.rev-item:last-child{border-bottom:none;}
+.rev-label{font-size:11px;color:var(--muted2);}
+.rev-val{font-family:var(--font-mono);font-size:16px;color:var(--green);}
+
 </style>
 </head>
 <body>
+<div id="view-auth" class="view active">
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="top-logo">
+  <div class="logo-mark">BA</div>
+  <div class="logo-name">Bet<em>AI</em></div>
+</div>
+
+<div class="page-wrap">
+  <div class="auth-card">
+    <div class="auth-hero">
+      <div class="auth-hero-icon">⚡</div>
+      <div class="auth-hero-title">Bet<em>AI</em></div>
+      <div class="auth-hero-sub">Intelligence artificielle pour les paris football<br>Analyse temps réel · xG · Value Bets · Dropping Odds</div>
+    </div>
+
+    <div class="auth-tabs">
+      <div class="auth-tab on" id="tabLogin" onclick="setTab('login')">Connexion</div>
+      <div class="auth-tab" id="tabRegister" onclick="setTab('register')">Créer un compte</div>
+    </div>
+
+    <div class="alert" id="alertBox"></div>
+
+    <!-- LOGIN FORM -->
+    <div id="formLogin">
+      <div class="field">
+        <div class="field-label">Email</div>
+        <input type="email" class="field-input" id="loginEmail" placeholder="votre@email.com" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div class="field">
+        <div class="field-label">Mot de passe</div>
+        <div class="field-pw">
+          <input type="password" class="field-input" id="loginPwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+          <span class="pw-toggle" onclick="togglePw('loginPwd',this)">👁</span>
+        </div>
+      </div>
+      <div style="text-align:right;margin-bottom:12px">
+        <a style="font-size:10px;color:var(--green);cursor:pointer;text-decoration:none" onclick="forgotPw()">Mot de passe oublié ?</a>
+      </div>
+      <button class="auth-btn" id="loginBtn" onclick="doLogin()">SE CONNECTER</button>
+      <div class="auth-sep"><div class="auth-sep-line"></div><div class="auth-sep-txt">OU</div><div class="auth-sep-line"></div></div>
+      <button class="auth-btn ghost" onclick="demoLogin()">🎮 Essayer en démo</button>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="formRegister" style="display:none">
+      <div class="field-row">
+        <div class="field">
+          <div class="field-label">Prénom</div>
+          <input type="text" class="field-input" id="regFirst" placeholder="Mohamed">
+        </div>
+        <div class="field">
+          <div class="field-label">Nom</div>
+          <input type="text" class="field-input" id="regLast" placeholder="Koné">
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Email</div>
+        <input type="email" class="field-input" id="regEmail" placeholder="votre@email.com">
+      </div>
+      <div class="field">
+        <div class="field-label">Mot de passe</div>
+        <div class="field-pw">
+          <input type="password" class="field-input" id="regPwd" placeholder="8 caractères minimum">
+          <span class="pw-toggle" onclick="togglePw('regPwd',this)">👁</span>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Choisir un plan</div>
+        <div class="plan-grid">
+          <div class="plan-card on" id="plan-free" onclick="selPlan('free',this)">
+            <div class="plan-icon">🆓</div>
+            <div class="plan-name">Gratuit</div>
+            <div class="plan-price">0 FCFA</div>
+            <div class="plan-perks">5 tickets/mois</div>
+          </div>
+          <div class="plan-card" id="plan-starter" onclick="selPlan('starter',this)">
+            <div class="plan-icon">🚀</div>
+            <div class="plan-name">Starter</div>
+            <div class="plan-price">2 000 F</div>
+            <div class="plan-perks">25 tickets/mois</div>
+          </div>
+          <div class="plan-card" id="plan-pro" onclick="selPlan('pro',this)">
+            <div class="plan-icon">💎</div>
+            <div class="plan-name">Pro</div>
+            <div class="plan-price">5 000 F</div>
+            <div class="plan-perks">Illimité + Value Bets</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+          <input type="checkbox" id="regTerms" style="margin-top:2px;accent-color:var(--green)">
+          <span style="font-size:10px;color:var(--muted2);line-height:1.5">J'accepte les <a style="color:var(--green)" href="#">conditions d'utilisation</a> et comprends que BetAI est un outil d'aide à la décision</span>
+        </label>
+      </div>
+      <button class="auth-btn" id="regBtn" onclick="doRegister()">CRÉER MON COMPTE</button>
+    </div>
+
+    <div class="auth-footer">
+      Problème de connexion ? <a onclick="goAdmin()">Contacter le support</a>
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="feat"><div class="feat-dot"></div>Analyse IA en temps réel</div>
+    <div class="feat"><div class="feat-dot"></div>60+ ligues africaines & européennes</div>
+    <div class="feat"><div class="feat-dot"></div>xG · Kelly · Dropping Odds</div>
+  </div>
+</div>
+
+<div class="admin-hint" onclick="goAdmin()" title="Accès administrateur">⚙ ADMIN</div>
+
+
+
+</div>
+<div id="view-app" class="view">
+
 <div class="shell">
 
 <!-- ══════════════ TOPBAR ══════════════ -->
@@ -663,6 +1117,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 
   <div class="topbar-right">
     <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+    <div style="font-size:10px;font-weight:600;color:var(--muted2);background:var(--card);border:1px solid var(--b1);border-radius:20px;padding:5px 12px;">👤 <span id="userNameDisplay">—</span></div>
     <div class="date-display" id="dateDisplay">—</div>
   </div>
 </div>
@@ -981,24 +1436,19 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
           </div>
         </div>
 
-        <!-- API Keys -->
-        <div class="api-section">
-          <div class="api-row">
-            <div class="api-hd"><span class="api-hd-label claude">🤖 ANTHROPIC</span><span class="api-badge badge-req">REQUIS</span></div>
-            <input type="password" class="api-input" id="apiClaude" placeholder="sk-ant-api03-…" oninput="saveKey('bc',this.value);checkApiStatus()">
-            <div class="api-hint">🔑 <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></div>
+        <!-- User Quota Display -->
+        <div id="quotaBlock" style="background:var(--card2);border:1px solid var(--b1);border-radius:9px;padding:12px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">VOTRE QUOTA</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div style="font-size:11px;color:var(--muted2)">Tickets restants</div>
+            <div id="quotaLeft" style="font-family:var(--font-mono);font-size:22px;color:var(--green)">—</div>
           </div>
-          <div class="api-hr"></div>
-          <div class="api-row">
-            <div class="api-hd"><span class="api-hd-label fd">📊 FOOTBALL-DATA</span><span class="api-badge badge-free">GRATUIT</span></div>
-            <input type="password" class="api-input" id="apiFD" placeholder="Token football-data.org" oninput="saveKey('bfd',this.value)">
-            <div class="api-hint">📧 <a href="https://www.football-data.org/client/register" target="_blank">football-data.org/register</a></div>
+          <div style="height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-bottom:8px">
+            <div id="quotaBar" style="height:4px;border-radius:2px;background:linear-gradient(90deg,var(--green2),var(--green));transition:width .6s"></div>
           </div>
-          <div class="api-hr"></div>
-          <div class="api-row">
-            <div class="api-hd"><span class="api-hd-label af">🏟️ API-FOOTBALL</span><span class="api-badge badge-free">GRATUIT</span></div>
-            <input type="password" class="api-input" id="apiAF" placeholder="Token api-football.com" oninput="saveKey('baf',this.value)">
-            <div class="api-hint">📧 <a href="https://dashboard.api-football.com/register" target="_blank">api-football.com/register</a></div>
+          <div style="font-size:9px;color:var(--muted);display:flex;justify-content:space-between">
+            <span id="quotaPlan" style="text-transform:capitalize"></span>
+            <span id="quotaReset">Se renouvelle chaque mois</span>
           </div>
         </div>
 
@@ -1145,18 +1595,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
     </div>
     <div class="settings-grid">
       <div class="settings-card">
-        <div class="settings-title">CLÉS API</div>
+        <div class="settings-title">MON COMPTE</div>
         <div class="setting-row">
-          <div><div class="setting-label">🤖 Anthropic Claude</div><div class="setting-sub">Requis pour toutes les analyses IA</div></div>
-          <input type="password" class="api-input" style="width:160px" id="apiClaude2" placeholder="sk-ant-…" oninput="saveKey('bc',this.value);checkApiStatus()">
+          <div><div class="setting-label">Plan actif</div><div class="setting-sub">Votre abonnement actuel</div></div>
+          <span id="settingPlan" style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;background:rgba(0,229,160,.1);color:var(--green)">—</span>
         </div>
         <div class="setting-row">
-          <div><div class="setting-label">📊 Football-Data.org</div><div class="setting-sub">Forme, classements, H2H — Gratuit</div></div>
-          <input type="password" class="api-input" style="width:160px" id="apiFD2" placeholder="Token…" oninput="saveKey('bfd',this.value)">
+          <div><div class="setting-label">Email</div><div class="setting-sub">Votre adresse email</div></div>
+          <span id="settingEmail" style="font-size:10px;color:var(--muted2)">—</span>
         </div>
         <div class="setting-row">
-          <div><div class="setting-label">🏟️ API-Football</div><div class="setting-sub">Blessures, compositions — Gratuit</div></div>
-          <input type="password" class="api-input" style="width:160px" id="apiAF2" placeholder="Token…" oninput="saveKey('baf',this.value)">
+          <div><div class="setting-label">Intelligence IA</div><div class="setting-sub" id="settingAiStatus">Vérification…</div></div>
+          <div id="settingAiDot" style="width:8px;height:8px;border-radius:50%;background:var(--gold)"></div>
+        </div>
+        <div style="margin-top:12px">
+          <button class="btn btn-red" style="width:100%;justify-content:center" onclick="doLogout()">🚪 Se déconnecter</button>
         </div>
       </div>
       <div class="settings-card">
@@ -1189,13 +1642,534 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 </div>
 
 <!-- ══════════════ JAVASCRIPT ══════════════ -->
+
+
+</div>
+<div id="view-admin" class="view">
+
+
+<!-- ══ LOCK SCREEN ══ -->
+<div class="lock" id="lockScreen">
+  <div class="lock-card">
+    <div class="lock-icon">🔐</div>
+    <div class="lock-title"><em>Admin</em> BetAI</div>
+    <div class="lock-sub">Accès réservé à l'administrateur</div>
+    <input type="password" class="lock-input" id="lockPwd" placeholder="••••••" onkeydown="if(event.key==='Enter')unlock()">
+    <button class="lock-btn" onclick="unlock()">ACCÉDER</button>
+    <div class="lock-err" id="lockErr"></div>
+    <div class="lock-back" onclick="window.location.href='index.html'">← Retour à l'accueil</div>
+  </div>
+</div>
+
+<div class="toastbox" id="toastBox"></div>
+
+<!-- ══ SHELL ══ -->
+<div class="shell" id="adminShell" style="display:none">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-mark">BA</div>
+      <div>
+        <div class="logo-name">Bet<em>AI</em></div>
+      </div>
+      <span class="logo-badge">ADMIN</span>
+    </div>
+    <div class="live-indicator"><div class="live-dot"></div>Système opérationnel</div>
+    <div class="topbar-right">
+      <div class="topbar-admin" id="adminName">⚙️ Administrateur</div>
+      <button class="topbar-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="nav-sect">Vue d'ensemble</div>
+    <div class="nitem on" onclick="goPage('dashboard',this)"><div class="nitem-icon">📊</div><div class="nitem-label">Dashboard</div></div>
+    <div class="nitem" onclick="goPage('users',this)"><div class="nitem-icon">👥</div><div class="nitem-label">Utilisateurs</div><div class="nitem-badge" id="badgeUsers">0</div></div>
+    <div class="nitem" onclick="goPage('revenue',this)"><div class="nitem-icon">💰</div><div class="nitem-label">Revenus</div></div>
+
+    <div class="nav-sect">Configuration</div>
+    <div class="nitem" onclick="goPage('api',this)"><div class="nitem-icon">🔑</div><div class="nitem-label">Clés API</div></div>
+    <div class="nitem" onclick="goPage('plans',this)"><div class="nitem-icon">💎</div><div class="nitem-label">Plans & Quotas</div></div>
+    <div class="nitem" onclick="goPage('settings',this)"><div class="nitem-icon">⚙️</div><div class="nitem-label">Paramètres</div></div>
+
+    <div class="nav-sect">Monitoring</div>
+    <div class="nitem" onclick="goPage('logs',this)"><div class="nitem-icon">📋</div><div class="nitem-label">Logs d'activité</div></div>
+    <div class="nitem" onclick="goPage('usage',this)"><div class="nitem-icon">📈</div><div class="nitem-label">Utilisation API</div></div>
+
+    <div class="sidebar-footer">
+      <div class="sys-status">
+        <div class="sys-row"><div class="sys-label">API Anthropic</div><div class="sys-dot" id="sysDotAI"></div></div>
+        <div class="sys-row"><div class="sys-label">Utilisateurs actifs</div><div class="sys-dot ok"></div></div>
+        <div class="sys-row"><div class="sys-label">Stockage</div><div class="sys-dot ok"></div></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page on" id="page-dashboard">
+      <div class="ph">
+        <div>
+          <div class="ph-title">📊 <em>Dashboard</em> Admin</div>
+          <div class="ph-sub" id="dashDate">—</div>
+        </div>
+        <div class="ph-actions">
+          <button class="btn btn-ghost" onclick="refreshDash()">🔄 Actualiser</button>
+          <button class="btn btn-gold" onclick="goPage('users',null)">👥 Gérer utilisateurs</button>
+        </div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi g"><div class="kpi-val" id="kpiUsers">0</div><div class="kpi-label">Utilisateurs total</div></div>
+        <div class="kpi gold"><div class="kpi-val" id="kpiActive">0</div><div class="kpi-label">Actifs ce mois</div></div>
+        <div class="kpi b"><div class="kpi-val" id="kpiTickets">0</div><div class="kpi-label">Tickets générés</div></div>
+        <div class="kpi p"><div class="kpi-val" id="kpiPro">0</div><div class="kpi-label">Comptes Pro</div></div>
+        <div class="kpi r"><div class="kpi-val" id="kpiBanned">0</div><div class="kpi-label">Comptes suspendus</div></div>
+      </div>
+      <div class="grid2" style="margin-bottom:14px">
+        <div class="card">
+          <div class="card-title">📊 RÉPARTITION DES PLANS</div>
+          <div id="planChart"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">💰 REVENUS ESTIMÉS (FCFA)</div>
+          <div id="revenueChart"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📋 ACTIVITÉ RÉCENTE</div>
+        <div id="recentLogs"></div>
+      </div>
+    </div>
+
+    <!-- ── USERS ── -->
+    <div class="page" id="page-users">
+      <div class="ph">
+        <div>
+          <div class="ph-title">👥 <em>Utilisateurs</em></div>
+          <div class="ph-sub" id="usersSub">Chargement…</div>
+        </div>
+        <div class="ph-actions">
+          <button class="btn btn-ghost" onclick="exportUsers()">📤 Export CSV</button>
+          <button class="btn btn-gold" onclick="openAddUser()">➕ Ajouter</button>
+        </div>
+      </div>
+      <div class="users-filters">
+        <input type="text" class="uf-input" id="userSearch" placeholder="🔍 Chercher par nom ou email…" oninput="renderUsers()">
+        <select class="uf-select" id="planFilter" onchange="renderUsers()">
+          <option value="all">Tous les plans</option>
+          <option value="free">Gratuit</option>
+          <option value="starter">Starter</option>
+          <option value="pro">Pro</option>
+        </select>
+        <select class="uf-select" id="statusFilter" onchange="renderUsers()">
+          <option value="all">Tous les statuts</option>
+          <option value="active">Actifs</option>
+          <option value="banned">Suspendus</option>
+        </select>
+      </div>
+      <div class="users-table" id="usersTable">
+        <div class="ut-head">
+          <div class="ut-th">Utilisateur</div>
+          <div class="ut-th">Email</div>
+          <div class="ut-th">Plan</div>
+          <div class="ut-th">Tickets restants</div>
+          <div class="ut-th">Statut</div>
+          <div class="ut-th">Actions</div>
+        </div>
+        <div id="usersBody"></div>
+      </div>
+    </div>
+
+    <!-- ── API KEYS ── -->
+    <div class="page" id="page-api">
+      <div class="ph">
+        <div>
+          <div class="ph-title">🔑 <em>Clés API</em></div>
+          <div class="ph-sub">Configuration sécurisée — clés jamais exposées aux utilisateurs</div>
+        </div>
+      </div>
+
+      <!-- Anthropic -->
+      <div class="api-block" style="margin-bottom:14px">
+        <div class="api-block-hd">
+          <div class="api-block-title">🤖 ANTHROPIC CLAUDE</div>
+          <div class="api-status-badge" id="aiStatusBadge">
+            <div class="sys-dot" id="aiDot"></div>
+            <span id="aiStatusTxt">Non configuré</span>
+          </div>
+        </div>
+        <div class="api-pw-wrap">
+          <input type="password" class="field-input mono" id="aiKeyInput" placeholder="sk-ant-api03-XXXXXXXXXXXXXXXXXXXX" autocomplete="off">
+          <div class="api-pw-actions">
+            <button class="api-mini-btn reveal" onclick="toggleApiVis('aiKeyInput',this)">👁 Voir</button>
+            <button class="api-mini-btn copy" onclick="copyApiKey('aiKeyInput')">📋</button>
+          </div>
+        </div>
+        <div class="api-test-row">
+          <button class="btn btn-ghost" style="font-size:10px;padding:6px 12px" onclick="testApiKey()">⚡ Tester la clé</button>
+          <button class="save-btn" style="font-size:11px;padding:7px 14px" onclick="saveApiKey()">💾 Sauvegarder</button>
+          <div id="aiTestResult" class="api-test-result" style="display:none"></div>
+        </div>
+        <div class="api-hint">🔑 Obtenez votre clé sur <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> · La clé est chiffrée et jamais visible dans l'application utilisateur</div>
+      </div>
+
+      <!-- Football Data -->
+      <div class="grid2">
+        <div class="api-block" style="border-color:rgba(0,229,160,.2)">
+          <div class="api-block-hd">
+            <div class="api-block-title" style="color:var(--green)">📊 FOOTBALL-DATA.ORG</div>
+            <span style="font-size:8px;background:rgba(0,229,160,.1);color:var(--green);padding:2px 6px;border-radius:4px;font-weight:700">GRATUIT</span>
+          </div>
+          <div class="api-pw-wrap">
+            <input type="password" class="field-input mono" id="fdKeyInput" placeholder="Token football-data.org" autocomplete="off">
+            <div class="api-pw-actions">
+              <button class="api-mini-btn reveal" onclick="toggleApiVis('fdKeyInput',this)">👁</button>
+            </div>
+          </div>
+          <div style="margin-top:8px"><button class="save-btn" style="font-size:10px;padding:6px 12px" onclick="saveFdKey()">💾 Sauvegarder</button></div>
+          <div class="api-hint"><a href="https://www.football-data.org/client/register" target="_blank">football-data.org/register</a></div>
+        </div>
+        <div class="api-block" style="border-color:rgba(61,158,255,.2)">
+          <div class="api-block-hd">
+            <div class="api-block-title" style="color:var(--blue)">🏟️ API-FOOTBALL</div>
+            <span style="font-size:8px;background:rgba(61,158,255,.1);color:var(--blue);padding:2px 6px;border-radius:4px;font-weight:700">GRATUIT</span>
+          </div>
+          <div class="api-pw-wrap">
+            <input type="password" class="field-input mono" id="afKeyInput" placeholder="Token api-football.com" autocomplete="off">
+            <div class="api-pw-actions">
+              <button class="api-mini-btn reveal" onclick="toggleApiVis('afKeyInput',this)">👁</button>
+            </div>
+          </div>
+          <div style="margin-top:8px"><button class="save-btn" style="font-size:10px;padding:6px 12px" onclick="saveAfKey()">💾 Sauvegarder</button></div>
+          <div class="api-hint"><a href="https://dashboard.api-football.com/register" target="_blank">api-football.com/register</a></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <div class="card-title">🔒 SÉCURITÉ DES CLÉS</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+          <div style="background:rgba(0,229,160,.04);border:1px solid rgba(0,229,160,.1);border-radius:8px;padding:12px">
+            <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--green);margin-bottom:6px">✅ CE QUI EST PROTÉGÉ</div>
+            <div style="font-size:10px;color:var(--muted2);line-height:1.7">Les clés API sont chiffrées avec obfuscation Base64+XOR<br>Jamais exposées dans le code visible par l'utilisateur<br>L'utilisateur utilise BetAI sans jamais voir la clé</div>
+          </div>
+          <div style="background:rgba(245,200,66,.04);border:1px solid rgba(245,200,66,.1);border-radius:8px;padding:12px">
+            <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--gold);margin-bottom:6px">⚠️ RECOMMANDATION</div>
+            <div style="font-size:10px;color:var(--muted2);line-height:1.7">Pour une sécurité maximale en production, utilisez un backend (Node.js / Flask) comme proxy API<br>Cette version utilise le localStorage avec obfuscation</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PLANS & QUOTAS ── -->
+    <div class="page" id="page-plans">
+      <div class="ph">
+        <div>
+          <div class="ph-title">💎 <em>Plans</em> & Quotas</div>
+          <div class="ph-sub">Configuration des accès et tickets mensuels par plan</div>
+        </div>
+        <div class="ph-actions">
+          <button class="btn btn-gold" onclick="savePlans()">💾 Sauvegarder tout</button>
+        </div>
+      </div>
+      <div class="grid3">
+        <div class="card">
+          <div class="card-title" style="color:var(--muted2)">🆓 PLAN GRATUIT</div>
+          <div class="field"><div class="field-label">Tickets/mois</div><input type="number" class="field-input" id="planFreeTickets" value="5" min="0" max="100"></div>
+          <div class="field"><div class="field-label">Value Bets</div>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <label class="toggle"><input type="checkbox" id="planFreeValue"><span class="toggle-slider"></span></label>
+              <span style="font-size:10px;color:var(--muted2)">Activé</span>
+            </label>
+          </div>
+          <div class="field"><div class="field-label">Dropping Odds</div>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <label class="toggle"><input type="checkbox" id="planFreeDrop"><span class="toggle-slider"></span></label>
+              <span style="font-size:10px;color:var(--muted2)">Activé</span>
+            </label>
+          </div>
+          <div class="field"><div class="field-label">Picks max par ticket</div><input type="number" class="field-input" id="planFreePicks" value="5" min="1" max="20"></div>
+        </div>
+        <div class="card" style="border-color:rgba(61,158,255,.15)">
+          <div class="card-title" style="color:var(--blue)">🚀 PLAN STARTER</div>
+          <div class="field"><div class="field-label">Tickets/mois</div><input type="number" class="field-input" id="planStarterTickets" value="25" min="0" max="500"></div>
+          <div class="field"><div class="field-label">Prix (FCFA)</div><input type="number" class="field-input" id="planStarterPrice" value="2000" min="0"></div>
+          <div class="field"><div class="field-label">Value Bets</div>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <label class="toggle"><input type="checkbox" id="planStarterValue" checked><span class="toggle-slider"></span></label>
+              <span style="font-size:10px;color:var(--muted2)">Activé</span>
+            </label>
+          </div>
+          <div class="field"><div class="field-label">Picks max par ticket</div><input type="number" class="field-input" id="planStarterPicks" value="10" min="1" max="20"></div>
+        </div>
+        <div class="card" style="border-color:rgba(0,229,160,.15)">
+          <div class="card-title" style="color:var(--green)">💎 PLAN PRO</div>
+          <div class="field"><div class="field-label">Tickets/mois</div><input type="number" class="field-input" id="planProTickets" value="9999" min="0"></div>
+          <div class="field"><div class="field-label">Prix (FCFA)</div><input type="number" class="field-input" id="planProPrice" value="5000" min="0"></div>
+          <div class="field"><div class="field-label">Value Bets</div>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <label class="toggle"><input type="checkbox" id="planProValue" checked><span class="toggle-slider"></span></label>
+              <span style="font-size:10px;color:var(--muted2)">Activé</span>
+            </label>
+          </div>
+          <div class="field"><div class="field-label">Picks max par ticket</div><input type="number" class="field-input" id="planProPicks" value="20" min="1" max="20"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div class="page" id="page-settings">
+      <div class="ph">
+        <div>
+          <div class="ph-title">⚙️ <em>Paramètres</em></div>
+          <div class="ph-sub">Configuration globale de BetAI</div>
+        </div>
+        <div class="ph-actions">
+          <button class="btn btn-gold" onclick="saveSettings()">💾 Sauvegarder</button>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">🔐 ACCÈS ADMIN</div>
+          <div class="field"><div class="field-label">Mot de passe admin actuel</div>
+            <div style="position:relative"><input type="password" class="field-input mono" id="curAdminPwd" placeholder="Mot de passe actuel"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--muted)" onclick="toggleApiVis('curAdminPwd',this)">👁</span></div>
+          </div>
+          <div class="field"><div class="field-label">Nouveau mot de passe</div>
+            <div style="position:relative"><input type="password" class="field-input mono" id="newAdminPwd" placeholder="Min. 8 caractères"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--muted)" onclick="toggleApiVis('newAdminPwd',this)">👁</span></div>
+          </div>
+          <button class="save-btn" onclick="changeAdminPwd()">🔒 Changer le mot de passe</button>
+        </div>
+        <div class="card">
+          <div class="card-title">⚙️ CONFIGURATION APP</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div><div style="font-size:11px;font-weight:600">Mode maintenance</div><div style="font-size:9px;color:var(--muted)">Bloque les connexions utilisateurs</div></div>
+              <label class="toggle"><input type="checkbox" id="setMaintenance" onchange="saveSetting('maintenance',this.checked)"><span class="toggle-slider"></span></label>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div><div style="font-size:11px;font-weight:600">Inscriptions ouvertes</div><div style="font-size:9px;color:var(--muted)">Autoriser les nouveaux comptes</div></div>
+              <label class="toggle"><input type="checkbox" id="setRegistration" checked onchange="saveSetting('registration',this.checked)"><span class="toggle-slider"></span></label>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div><div style="font-size:11px;font-weight:600">Mode démo</div><div style="font-size:9px;color:var(--muted)">Activer le bouton demo sur la page login</div></div>
+              <label class="toggle"><input type="checkbox" id="setDemo" checked onchange="saveSetting('demo',this.checked)"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LOGS ── -->
+    <div class="page" id="page-logs">
+      <div class="ph">
+        <div>
+          <div class="ph-title">📋 <em>Logs</em> d'activité</div>
+          <div class="ph-sub">Toutes les actions utilisateurs</div>
+        </div>
+        <div class="ph-actions">
+          <button class="btn btn-red" onclick="clearLogs()">🗑️ Effacer</button>
+          <button class="btn btn-ghost" onclick="renderLogs()">🔄 Actualiser</button>
+        </div>
+      </div>
+      <div class="card"><div id="logsContainer"></div></div>
+    </div>
+
+    <!-- ── USAGE ── -->
+    <div class="page" id="page-usage">
+      <div class="ph">
+        <div>
+          <div class="ph-title">📈 <em>Utilisation</em> API</div>
+          <div class="ph-sub">Consommation de tokens Anthropic par type d'opération</div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">🤖 ANTHROPIC — TOKENS CONSOMMÉS</div>
+          <div id="usageAnthropicChart"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">💰 COÛT ESTIMÉ</div>
+          <div id="usageCostChart"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REVENUE ── -->
+    <div class="page" id="page-revenue">
+      <div class="ph">
+        <div>
+          <div class="ph-title">💰 <em>Revenus</em></div>
+          <div class="ph-sub">Abonnements actifs et projections</div>
+        </div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi g"><div class="kpi-val" id="revMRR">0</div><div class="kpi-label">MRR (FCFA)</div></div>
+        <div class="kpi gold"><div class="kpi-val" id="revPaying">0</div><div class="kpi-label">Abonnés payants</div></div>
+        <div class="kpi b"><div class="kpi-val" id="revARPU">0</div><div class="kpi-label">ARPU (FCFA)</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">💰 DÉTAIL DES REVENUS</div>
+        <div id="revDetailList"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL: Add/Edit User -->
+<div class="modal-overlay" id="modalUser">
+  <div class="modal">
+    <div class="modal-title">👤 <span id="modalUserTitle">Ajouter un utilisateur</span><span class="modal-close" onclick="closeModal()">✕</span></div>
+    <div class="field"><div class="field-label">Prénom & Nom</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <input type="text" class="field-input" id="muFirst" placeholder="Prénom">
+        <input type="text" class="field-input" id="muLast" placeholder="Nom">
+      </div>
+    </div>
+    <div class="field"><div class="field-label">Email</div><input type="email" class="field-input" id="muEmail" placeholder="email@exemple.com"></div>
+    <div class="field"><div class="field-label">Mot de passe</div><input type="password" class="field-input" id="muPwd" placeholder="Laisser vide pour garder l'actuel"></div>
+    <div class="field"><div class="field-label">Plan</div>
+      <select class="field-input select" id="muPlan">
+        <option value="free">Gratuit (5 tickets)</option>
+        <option value="starter">Starter (25 tickets / 2000 FCFA)</option>
+        <option value="pro">Pro (Illimité / 5000 FCFA)</option>
+      </select>
+    </div>
+    <div class="field"><div class="field-label">Tickets restants</div><input type="number" class="field-input" id="muTickets" min="0" value="5"></div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-gold" style="flex:1" onclick="saveUser()">💾 Sauvegarder</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+    </div>
+  </div>
+</div>
+
+
+
+</div>
 <script>
-// ─── Helpers ───
+// SHARED
 const $ = id => document.getElementById(id);
-const sGet = k => { try { return localStorage.getItem(k) || '' } catch { return '' } };
-const sSet = (k,v) => { try { localStorage.setItem(k,v) } catch {} };
-const sGetJSON = (k, def) => { try { return JSON.parse(localStorage.getItem(k)) || def } catch { return def } };
-const sSetJSON = (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch {} };
+const sGet = k => { try{return localStorage.getItem(k)||''}catch{return ''} };
+const sSet = (k,v) => { try{localStorage.setItem(k,v)}catch{} };
+const sGetJSON = (k,d) => { try{return JSON.parse(localStorage.getItem(k))||d}catch{return d} };
+const sSetJSON = (k,v) => { try{localStorage.setItem(k,JSON.stringify(v))}catch{} };
+function enc(s){return btoa(unescape(encodeURIComponent(s.split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)^(42+i%13))).join(''))));}
+function dec(s){try{return decodeURIComponent(escape(atob(s))).split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)^(42+i%13))).join('');}catch{return '';}}
+function getAdminKey(){return dec(sGet('_betai_ak_app'))||dec(sGet('_betai_ak'));}
+function claudeKey(){return getAdminKey();}
+// ROUTER
+const VIEWS=['view-auth','view-app','view-admin'];
+function showView(id){VIEWS.forEach(v=>{const el=document.getElementById(v);if(el)el.classList.toggle('active',v===id);});}
+// AUTH
+
+
+// ─── Check if already logged in ───
+(function(){
+  const u = sGetJSON('betai_session', null);
+  if (u && u.email) {
+    if (u.role === 'admin') window.location.href = 'admin.html';
+    else window.location.href = 'app.html';
+  }
+})();
+
+let selectedPlan = 'free';
+
+function setTab(t) {
+  clearAlert();
+  ['login','register'].forEach(x => {
+    $('tab'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('on', x===t);
+    $('form'+x.charAt(0).toUpperCase()+x.slice(1)).style.display = x===t ? 'block' : 'none';
+  });
+}
+
+function selPlan(p, el) {
+  selectedPlan = p;
+  document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function showAlert(msg, type='err') {
+  const b = $('alertBox');
+  b.textContent = msg; b.className = 'alert '+type+' show';
+}
+function clearAlert() { $('alertBox').className = 'alert'; }
+
+function togglePw(id, el) {
+  const inp = $(id);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  el.textContent = inp.type === 'password' ? '👁' : '🙈';
+}
+
+// ─── LOGIN ───
+function doLogin() {
+  const email = $('loginEmail').value.trim().toLowerCase();
+  const pwd   = $('loginPwd').value;
+  if (!email || !pwd) { showAlert('Remplissez tous les champs.'); return; }
+
+  const users = sGetJSON('betai_users', []);
+  const user  = users.find(u => u.email === email && u.pwd === btoa(pwd));
+  if (!user) { showAlert('Email ou mot de passe incorrect.'); return; }
+  if (user.banned) { showAlert('Votre compte a été suspendu. Contactez le support.'); return; }
+
+  sSetJSON('betai_session', { email:user.email, firstName:user.firstName, lastName:user.lastName, plan:user.plan, role:user.role||'user', loginAt: Date.now() });
+  $('loginBtn').innerHTML = '<span class="spin"></span>Connexion…';
+  setTimeout(() => { window.location.href = user.role==='admin' ? 'admin.html' : 'app.html'; }, 800);
+}
+
+// ─── REGISTER ───
+function doRegister() {
+  const first = $('regFirst').value.trim();
+  const last  = $('regLast').value.trim();
+  const email = $('regEmail').value.trim().toLowerCase();
+  const pwd   = $('regPwd').value;
+
+  if (!first||!last||!email||!pwd) { showAlert('Remplissez tous les champs.'); return; }
+  if (pwd.length < 8) { showAlert('Le mot de passe doit faire au moins 8 caractères.'); return; }
+  if (!email.includes('@')) { showAlert('Email invalide.'); return; }
+  if (!$('regTerms').checked) { showAlert('Acceptez les conditions d\'utilisation.'); return; }
+
+  const users = sGetJSON('betai_users', []);
+  if (users.find(u => u.email === email)) { showAlert('Un compte existe déjà avec cet email.'); return; }
+
+  // Determine free tickets based on plan
+  const quotas = { free:5, starter:25, pro:9999 };
+
+  const newUser = { email, firstName:first, lastName:last, pwd:btoa(pwd), plan:selectedPlan, role:'user', ticketsLeft:quotas[selectedPlan], ticketsTotal:quotas[selectedPlan], registeredAt:new Date().toISOString(), lastLogin:null, banned:false };
+  users.push(newUser);
+  sSetJSON('betai_users', users);
+
+  showAlert(`✅ Compte créé ! Bienvenue ${first} 🎉`, 'ok');
+  $('regBtn').disabled = true;
+
+  // Auto-login
+  setTimeout(() => {
+    sSetJSON('betai_session', { email:newUser.email, firstName:first, lastName:last, plan:selectedPlan, role:'user', loginAt: Date.now() });
+    window.location.href = 'app.html';
+  }, 1200);
+}
+
+// ─── DEMO ───
+function demoLogin() {
+  sSetJSON('betai_session', { email:'demo@betai.app', firstName:'Demo', lastName:'', plan:'starter', role:'demo', loginAt: Date.now() });
+  window.location.href = 'app.html';
+}
+
+function forgotPw() { showAlert('Fonctionnalité disponible prochainement. Contactez l\'admin.', 'ok'); }
+function goAdmin() { window.location.href = 'admin.html'; }
+
+// APP
+
+
+// API key is ONLY set by admin — never exposed to users
+
+// Auth guard — redirect if not logged in
+const _session = sGetJSON('betai_session', null);
+if (!_session || !_session.email) { window.location.href = 'index.html'; }
+
+// Override claudeKey to use admin-stored key
 
 // ─── State ───
 let curMode = 'safe';
@@ -1208,20 +2182,40 @@ let perfData = sGetJSON('betai_perf_v2', []);
 let hist = sGetJSON('betai_hist_v2', []);
 let _lastMatches = [];
 let usedSrc = { fd: false, bz: false, af: false };
-const claudeKey = () => sGet('bc');
 
 // ─── Init ───
-document.addEventListener('DOMContentLoaded', () => {
-  $('dateDisplay').textContent = new Date().toLocaleDateString('fr-FR', { weekday:'short', day:'2-digit', month:'short', year:'numeric' });
-  // Restore keys
-  const keys = [['apiClaude','bc'],['apiClaude2','bc'],['apiFD','bfd'],['apiFD2','bfd'],['apiAF','baf'],['apiAF2','baf']];
-  keys.forEach(([id,k]) => { const el=$(id); if(el && sGet(k)) el.value = sGet(k); });
-  checkApiStatus();
-  updHistBadge();
-  renderTracker();
-  renderHistPage();
-  updateDashKPIs();
-});
+function doLogout() { sSet('betai_session',''); window.location.href='index.html'; }
+
+
+
+function updateQuotaDisplay(sess) {
+  if (!sess) return;
+  const users = sGetJSON('betai_users', []);
+  const user = users.find(u => u.email === sess.email);
+  const quotas = {free:5,starter:25,pro:9999,demo:25};
+  const tot = user ? (user.ticketsTotal||quotas[user.plan]||5) : quotas[sess.plan]||5;
+  const left = user ? (user.ticketsLeft!=null?user.ticketsLeft:tot) : tot;
+  const pct = tot>=9999?100:Math.round(left/tot*100);
+  const ql=$('quotaLeft'); if(ql)ql.textContent=tot>=9999?'∞':left;
+  const qb=$('quotaBar'); if(qb)qb.style.width=pct+'%';
+  if(qb){qb.style.background=pct>60?'linear-gradient(90deg,var(--green2),var(--green))':pct>30?'linear-gradient(90deg,#c89000,var(--gold))':'linear-gradient(90deg,#c03030,var(--red))';}
+  const qp=$('quotaPlan'); if(qp)qp.textContent='Plan '+(user?.plan||sess.plan||'free');
+}
+
+function consumeTicket() {
+  const sess = sGetJSON('betai_session',null); if(!sess)return true;
+  const users = sGetJSON('betai_users',[]);
+  const idx = users.findIndex(u=>u.email===sess.email);
+  if(idx<0)return true; // demo user
+  if(users[idx].plan==='pro'||users[idx].ticketsLeft>=9990)return true; // unlimited
+  if((users[idx].ticketsLeft||0)<=0){showErr('Quota épuisé — votre limite mensuelle de tickets est atteinte. Passez au plan supérieur.');return false;}
+  users[idx].ticketsLeft=Math.max(0,(users[idx].ticketsLeft||1)-1);
+  sSetJSON('betai_users',users);
+  updateQuotaDisplay(sess);
+  // Log ticket generation
+  const logs=sGetJSON('betai_logs',[]); logs.unshift({user:sess.email,action:'ticket_generated',type:'ticket',time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}); if(logs.length>200)logs.splice(200); sSetJSON('betai_logs',logs);
+  return true;
+}
 
 // ─── Navigation ───
 function goPage(id, el) {
@@ -1242,18 +2236,19 @@ function goPage(id, el) {
 function checkApiStatus() {
   const k = claudeKey();
   const dot = $('apiDot'), lbl = $('apiLabel'), sub = $('apiSub');
+  const aiDot2 = $('settingAiDot'), aiSub2 = $('settingAiStatus');
   if (k && k.startsWith('sk-ant')) {
-    dot.className = 'api-dot ok';
-    lbl.style.color = 'var(--green)';
-    sub.textContent = 'Connecté ✓';
-    $('genBtn').disabled = false;
-    $('importBtn').disabled = false;
-    $('chatSendBtn').disabled = false;
+    if(dot){dot.className='api-dot ok';lbl.style.color='var(--green)';sub.textContent='Connecté ✓';}
+    if(aiDot2){aiDot2.style.background='var(--green)';}
+    if(aiSub2){aiSub2.textContent='API Anthropic — Opérationnelle ✓';}
+    const genBtn=$('genBtn'); if(genBtn)genBtn.disabled=false;
+    const impBtn=$('importBtn'); if(impBtn)impBtn.disabled=false;
+    const chatBtn=$('chatSendBtn'); if(chatBtn)chatBtn.disabled=false;
   } else {
-    dot.className = 'api-dot warn';
-    lbl.style.color = 'var(--gold)';
-    sub.textContent = 'Clé non configurée';
-    $('genBtn').disabled = true;
+    if(dot){dot.className='api-dot warn';lbl.style.color='var(--gold)';sub.textContent='Service IA indisponible';}
+    if(aiDot2){aiDot2.style.background='var(--red)';}
+    if(aiSub2){aiSub2.textContent="API non configurée — Contactez l'admin";}
+    const genBtn=$('genBtn'); if(genBtn)genBtn.disabled=true;
   }
 }
 
@@ -1396,7 +2391,8 @@ function sCur(i){const e=$('ls'+i);if(e)e.classList.add('cur');}
 
 async function generate() {
   const key = claudeKey();
-  if (!key) { showErr('Clé API Anthropic manquante — configurez-la dans Paramètres ⚙️'); return; }
+  if (!key) { showErr("Service IA temporairement indisponible — contactez l'administrateur."); return; }
+  if (!consumeTicket()) return;
   const raw = $('matchInput').value.trim();
   if (!raw) { showErr('Entrez au moins un match ou utilisez les boutons de chargement automatique.'); return; }
   const matches = raw.split('\n').filter(l=>l.trim());
@@ -1967,6 +2963,390 @@ async function sendChat() {
 }
 function chatQ(el){$('chatInput').value=el.textContent.replace(/^[^\w]/,'').trim();sendChat();}
 function clearChat(){chatHistory=[];$('chatBody').innerHTML='<div class="chat-msg ai"><div class="thinking">BetAI Assistant</div>Bonjour ! Je peux analyser n\'importe quel match avec des stats en temps réel. Que souhaitez-vous savoir ?</div>';}
+
+// ADMIN
+
+
+// ── Obfuscation for API key storage ──
+
+const DEFAULT_ADMIN_PWD = 'admin2024';
+let editingUserEmail = null;
+
+// ── LOCK / UNLOCK ──
+function unlock() {
+  const pwd = $('lockPwd').value;
+  const stored = sGet('betai_admin_pwd') || DEFAULT_ADMIN_PWD;
+  if (pwd === stored) {
+    $('lockScreen').style.display = 'none';
+    $('adminShell').style.display = 'grid';
+    initAdmin();
+  } else {
+    $('lockErr').textContent = 'Mot de passe incorrect.';
+    $('lockPwd').value = '';
+    setTimeout(() => $('lockErr').textContent = '', 2500);
+  }
+}
+$('lockPwd').addEventListener('keydown', e => { if(e.key==='Enter') unlock(); });
+
+function logout() {
+  $('adminShell').style.display = 'none';
+  $('lockScreen').style.display = 'flex';
+  $('lockPwd').value = '';
+}
+
+// ── INIT ──
+function initAdmin() {
+  $('dashDate').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  refreshDash();
+  loadApiKeys();
+  loadPlanSettings();
+  loadAppSettings();
+  renderUsers();
+  renderLogs();
+  renderUsage();
+  updateSysDot();
+}
+
+// ── NAVIGATION ──
+function goPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  $('page-'+id).classList.add('on');
+  document.querySelectorAll('.nitem').forEach(n => n.classList.remove('on'));
+  if (el) el.classList.add('on');
+  else document.querySelectorAll('.nitem').forEach(n => { if(n.onclick&&String(n.onclick).includes("'"+id+"'")) n.classList.add('on'); });
+  if (id==='users') renderUsers();
+  if (id==='logs') renderLogs();
+  if (id==='revenue') renderRevenue();
+}
+
+// ── TOAST ──
+function toast(msg, type='ok') {
+  const b = $('toastBox');
+  const t = document.createElement('div');
+  t.className = 'toast '+type; t.textContent = msg;
+  b.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// ── API KEYS ──
+function loadApiKeys() {
+  const aiKey = dec(sGet('_betai_ak'));
+  const fdKey = dec(sGet('_betai_fk'));
+  const afKey = dec(sGet('_betai_afk'));
+  if (aiKey) $('aiKeyInput').value = aiKey;
+  if (fdKey) $('fdKeyInput').value = fdKey;
+  if (afKey) $('afKeyInput').value = afKey;
+  updateAiDot(aiKey);
+}
+function saveApiKey() {
+  const key = $('aiKeyInput').value.trim();
+  if (!key) { toast('Entrez une clé API', 'err'); return; }
+  sSet('_betai_ak', enc(key));
+  toast('✅ Clé Anthropic sauvegardée et chiffrée', 'ok');
+  updateAiDot(key);
+  // Also save decoded version for the app to use (obfuscated)
+  sSet('_betai_ak_app', enc(key)); // app will decode this
+}
+function saveFdKey() { const k=$('fdKeyInput').value.trim(); if(k){sSet('_betai_fk',enc(k));toast('✅ Clé Football-Data sauvegardée','ok');} }
+function saveAfKey() { const k=$('afKeyInput').value.trim(); if(k){sSet('_betai_afk',enc(k));toast('✅ Clé API-Football sauvegardée','ok');} }
+
+function updateAiDot(key) {
+  const ok = key && key.startsWith('sk-ant');
+  $('aiDot').className = 'sys-dot '+(ok?'ok':'warn');
+  $('aiStatusTxt').textContent = ok ? 'Connecté ✓' : 'Non configuré';
+  $('aiStatusTxt').style.color = ok ? 'var(--green)' : 'var(--gold)';
+  $('sysDotAI').className = 'sys-dot '+(ok?'ok':'warn');
+}
+function updateSysDot() { updateAiDot(dec(sGet('_betai_ak'))); }
+
+async function testApiKey() {
+  const key = $('aiKeyInput').value.trim();
+  if (!key) { toast('Entrez une clé', 'err'); return; }
+  const r = $('aiTestResult');
+  r.style.display='flex'; r.textContent='⏳ Test…'; r.className='api-test-result';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:20,messages:[{role:'user',content:'Réponds "OK" uniquement.'}]})
+    });
+    const d = await res.json();
+    if (d.content) { r.textContent='✅ Clé valide — '+d.model; r.className='api-test-result ok'; updateAiDot(key); }
+    else { r.textContent='❌ '+(d.error?.message||'Erreur'); r.className='api-test-result err'; }
+  } catch(e) { r.textContent='❌ '+e.message.substring(0,40); r.className='api-test-result err'; }
+}
+
+function toggleApiVis(id, btn) {
+  const inp = $(id); if(!inp)return;
+  inp.type = inp.type==='password'?'text':'password';
+  btn.textContent = inp.type==='password'?'👁 Voir':'🙈 Masquer';
+}
+function copyApiKey(id) {
+  const inp=$(id); if(!inp||!inp.value)return;
+  navigator.clipboard.writeText(inp.value).then(()=>toast('Clé copiée','ok'));
+}
+
+// ── USERS ──
+function getUsers() { return sGetJSON('betai_users', []); }
+function saveUsers(users) { sSetJSON('betai_users', users); }
+
+function renderUsers() {
+  const users = getUsers();
+  const q = ($('userSearch')?.value||'').toLowerCase();
+  const pf = $('planFilter')?.value||'all';
+  const sf = $('statusFilter')?.value||'all';
+  let filtered = users.filter(u => {
+    const matchQ = !q || u.email.includes(q) || (u.firstName+' '+u.lastName).toLowerCase().includes(q);
+    const matchP = pf==='all' || u.plan===pf;
+    const matchS = sf==='all' || (sf==='banned'?u.banned:!u.banned);
+    return matchQ && matchP && matchS;
+  });
+  $('usersSub').textContent = `${filtered.length} utilisateur${filtered.length>1?'s':''} sur ${users.length} total`;
+  $('badgeUsers').textContent = users.length;
+  if (!filtered.length) { $('usersBody').innerHTML = '<div style="padding:30px;text-align:center;color:var(--muted);font-size:11px">Aucun utilisateur trouvé</div>'; return; }
+  const quotas = { free:5, starter:25, pro:9999, demo:25 };
+  $('usersBody').innerHTML = filtered.map(u => {
+    const tot = quotas[u.plan]||5;
+    const left = u.ticketsLeft||0;
+    const pct = tot>=9999?100:Math.max(0,Math.round(left/tot*100));
+    const barCol = pct>60?'green':pct>30?'gold':'red';
+    return `<div class="ut-row">
+      <div><div class="ut-name">${u.firstName} ${u.lastName}</div></div>
+      <div style="font-size:10px;color:var(--muted2)">${u.email}</div>
+      <div><span class="plan-badge ${u.plan}">${u.plan}</span></div>
+      <div><div class="ut-tickets" style="color:${pct<30?'var(--red)':'var(--text)'}">${tot>=9999?'∞':left+'/'+(tot||5)}</div><div class="quota-bar"><div class="quota-fill ${barCol}" style="width:${pct}%"></div></div></div>
+      <div><span class="status-badge ${u.banned?'banned':'active'}">${u.banned?'🚫 Suspendu':'✅ Actif'}</span></div>
+      <div class="ut-actions">
+        <button class="ut-btn edit" onclick="openEditUser('${u.email}')">✏️</button>
+        ${u.banned?`<button class="ut-btn unban" onclick="toggleBan('${u.email}',false)">✅</button>`:`<button class="ut-btn ban" onclick="toggleBan('${u.email}',true)">🚫</button>`}
+        <button class="ut-btn reset" onclick="resetQuota('${u.email}')">🔄</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openAddUser() { editingUserEmail=null; $('modalUserTitle').textContent='Ajouter un utilisateur'; $('muFirst').value=''; $('muLast').value=''; $('muEmail').value=''; $('muPwd').value=''; $('muPlan').value='free'; $('muTickets').value='5'; $('modalUser').classList.add('show'); }
+function openEditUser(email) {
+  const users=getUsers(); const u=users.find(x=>x.email===email); if(!u)return;
+  editingUserEmail=email;
+  $('modalUserTitle').textContent='Modifier l\'utilisateur';
+  $('muFirst').value=u.firstName||''; $('muLast').value=u.lastName||''; $('muEmail').value=u.email; $('muPwd').value=''; $('muPlan').value=u.plan||'free'; $('muTickets').value=u.ticketsLeft||0;
+  $('modalUser').classList.add('show');
+}
+function closeModal() { $('modalUser').classList.remove('show'); }
+function saveUser() {
+  const users=getUsers();
+  const first=$('muFirst').value.trim(), last=$('muLast').value.trim(), email=$('muEmail').value.trim().toLowerCase(), pwd=$('muPwd').value, plan=$('muPlan').value, tickets=+$('muTickets').value;
+  if(!first||!email){toast('Remplissez prénom et email','err');return;}
+  if (editingUserEmail) {
+    const idx=users.findIndex(u=>u.email===editingUserEmail);
+    if(idx<0){toast('Utilisateur introuvable','err');return;}
+    users[idx]={...users[idx],firstName:first,lastName:last,email,plan,ticketsLeft:tickets};
+    if(pwd) users[idx].pwd=btoa(pwd);
+  } else {
+    if(users.find(u=>u.email===email)){toast('Email déjà utilisé','err');return;}
+    users.push({email,firstName:first,lastName:last,pwd:btoa(pwd||'betai2024'),plan,role:'user',ticketsLeft:tickets,ticketsTotal:tickets,registeredAt:new Date().toISOString(),banned:false});
+  }
+  saveUsers(users); closeModal(); renderUsers(); refreshDash(); addLog(email,'Profil modifié par admin','admin'); toast('✅ Utilisateur sauvegardé','ok');
+}
+function toggleBan(email, ban) {
+  const users=getUsers(); const u=users.find(x=>x.email===email); if(!u)return;
+  u.banned=ban; saveUsers(users); renderUsers(); addLog(email,ban?'Compte suspendu':'Compte réactivé','admin'); toast(ban?'Compte suspendu':'Compte réactivé','ok');
+}
+function resetQuota(email) {
+  const users=getUsers(); const u=users.find(x=>x.email===email); if(!u)return;
+  const quotas={free:5,starter:25,pro:9999}; u.ticketsLeft=quotas[u.plan]||5; saveUsers(users); renderUsers(); addLog(email,'Quota réinitialisé','admin'); toast('✅ Quota réinitialisé','ok');
+}
+function exportUsers() {
+  const users=getUsers();
+  const rows=['Prénom,Nom,Email,Plan,Tickets restants,Statut,Inscription',...users.map(u=>`"${u.firstName}","${u.lastName}","${u.email}","${u.plan}",${u.ticketsLeft||0},"${u.banned?'suspendu':'actif'}","${u.registeredAt||''}"`)].join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([rows],{type:'text/csv'})); a.download='betai_users.csv'; a.click(); toast('Export CSV téléchargé','ok');
+}
+
+// ── DASHBOARD REFRESH ──
+function refreshDash() {
+  const users=getUsers();
+  $('kpiUsers').textContent=users.length;
+  $('kpiActive').textContent=users.filter(u=>!u.banned).length;
+  $('kpiPro').textContent=users.filter(u=>u.plan==='pro').length;
+  $('kpiBanned').textContent=users.filter(u=>u.banned).length;
+  const logs=sGetJSON('betai_logs',[]);
+  $('kpiTickets').textContent=logs.filter(l=>l.action==='ticket_generated').length;
+  $('badgeUsers').textContent=users.length;
+  renderPlanChart(users);
+  renderRevChart(users);
+  renderRecentLogs();
+}
+
+function renderPlanChart(users) {
+  const counts={free:0,starter:0,pro:0,demo:0};
+  users.forEach(u=>counts[u.plan]=(counts[u.plan]||0)+1);
+  const total=users.length||1;
+  const colors={free:'var(--muted)',starter:'var(--blue)',pro:'var(--green)',demo:'var(--purple)'};
+  $('planChart').innerHTML=Object.entries(counts).filter(([,v])=>v>0).map(([p,v])=>`
+    <div class="usage-item">
+      <div class="usage-label" style="color:${colors[p]||'var(--muted2)'}">Plan ${p}</div>
+      <div class="usage-track"><div class="usage-fill" style="width:${Math.round(v/total*100)}%;background:${colors[p]}"></div></div>
+      <div class="usage-val">${v} (${Math.round(v/total*100)}%)</div>
+    </div>`).join('');
+}
+
+function renderRevChart(users) {
+  const prices={starter:2000,pro:5000};
+  let mrr=0; users.forEach(u=>mrr+=(prices[u.plan]||0));
+  const paying=users.filter(u=>u.plan==='starter'||u.plan==='pro').length;
+  $('revenueChart').innerHTML=`
+    <div class="rev-item"><div class="rev-label">MRR estimé</div><div class="rev-val">${mrr.toLocaleString('fr-FR')} FCFA</div></div>
+    <div class="rev-item"><div class="rev-label">Abonnés payants</div><div class="rev-val">${paying}</div></div>
+    <div class="rev-item"><div class="rev-label">Starters (2 000 FCFA)</div><div class="rev-val">${users.filter(u=>u.plan==='starter').length}</div></div>
+    <div class="rev-item"><div class="rev-label">Pro (5 000 FCFA)</div><div class="rev-val">${users.filter(u=>u.plan==='pro').length}</div></div>`;
+}
+
+// ── REVENUE PAGE ──
+function renderRevenue() {
+  const users=getUsers();
+  const prices={starter:2000,pro:5000};
+  let mrr=0; users.forEach(u=>mrr+=(prices[u.plan]||0));
+  const paying=users.filter(u=>u.plan==='starter'||u.plan==='pro').length;
+  $('revMRR').textContent=mrr.toLocaleString('fr-FR');
+  $('revPaying').textContent=paying;
+  $('revARPU').textContent=paying>0?Math.round(mrr/paying).toLocaleString('fr-FR'):'0';
+  $('revDetailList').innerHTML=`
+    <div class="rev-item"><div class="rev-label">Comptes Starter (2 000 FCFA/mois)</div><div class="rev-val">${users.filter(u=>u.plan==='starter').length} × 2 000 = ${(users.filter(u=>u.plan==='starter').length*2000).toLocaleString()} FCFA</div></div>
+    <div class="rev-item"><div class="rev-label">Comptes Pro (5 000 FCFA/mois)</div><div class="rev-val">${users.filter(u=>u.plan==='pro').length} × 5 000 = ${(users.filter(u=>u.plan==='pro').length*5000).toLocaleString()} FCFA</div></div>
+    <div class="rev-item" style="border-top:2px solid var(--gold)"><div class="rev-label" style="font-weight:700;color:var(--gold)">TOTAL MRR</div><div class="rev-val">${mrr.toLocaleString()} FCFA</div></div>`;
+}
+
+// ── LOGS ──
+function addLog(user, action, type='login') {
+  const logs=sGetJSON('betai_logs',[]);
+  logs.unshift({user,action,type,time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})});
+  if(logs.length>200)logs.splice(200);
+  sSetJSON('betai_logs',logs);
+}
+function renderLogs() {
+  const logs=sGetJSON('betai_logs',[]);
+  if(!logs.length){$('logsContainer').innerHTML='<div style="text-align:center;padding:30px;color:var(--muted)">Aucun log disponible</div>';return;}
+  $('logsContainer').innerHTML=logs.slice(0,80).map(l=>`
+    <div class="log-row">
+      <div class="log-time">${l.time}</div>
+      <div class="log-user">${l.user}</div>
+      <div class="log-action">${l.action}</div>
+      <span class="log-badge ${l.type}">${l.type}</span>
+    </div>`).join('');
+}
+function renderRecentLogs() { const logs=sGetJSON('betai_logs',[]); if(!logs.length){$('recentLogs').innerHTML='<div style="color:var(--muted);font-size:11px;padding:10px 0">Aucune activité enregistrée</div>';return;} $('recentLogs').innerHTML=logs.slice(0,8).map(l=>`<div class="log-row"><div class="log-time">${l.time}</div><div class="log-user">${l.user}</div><div class="log-action">${l.action}</div><span class="log-badge ${l.type}">${l.type}</span></div>`).join(''); }
+function clearLogs() { if(!confirm('Effacer tous les logs ?'))return; sSetJSON('betai_logs',[]); renderLogs(); toast('Logs effacés','ok'); }
+
+// ── USAGE ──
+function renderUsage() {
+  const logs=sGetJSON('betai_logs',[]);
+  const tickets=logs.filter(l=>l.action==='ticket_generated').length;
+  const chats=logs.filter(l=>l.action==='chat_message').length;
+  const vb=logs.filter(l=>l.action==='value_bets_scan').length;
+  const totCalls=tickets+chats+vb||1;
+  const costEst=(tickets*0.15+chats*0.04+vb*0.10).toFixed(2);
+  $('usageAnthropicChart').innerHTML=`
+    <div class="usage-item"><div class="usage-label">Tickets générés</div><div class="usage-track"><div class="usage-fill" style="width:${Math.round(tickets/totCalls*100)}%;background:var(--green)"></div></div><div class="usage-val">${tickets} appels</div></div>
+    <div class="usage-item"><div class="usage-label">Chat messages</div><div class="usage-track"><div class="usage-fill" style="width:${Math.round(chats/totCalls*100)}%;background:var(--blue)"></div></div><div class="usage-val">${chats} appels</div></div>
+    <div class="usage-item"><div class="usage-label">Value Bets scan</div><div class="usage-track"><div class="usage-fill" style="width:${Math.round(vb/totCalls*100)}%;background:var(--gold)"></div></div><div class="usage-val">${vb} appels</div></div>`;
+  $('usageCostChart').innerHTML=`
+    <div class="rev-item"><div class="rev-label">Coût estimé tickets</div><div class="rev-val" style="color:var(--green)">~$${(tickets*0.15).toFixed(2)}</div></div>
+    <div class="rev-item"><div class="rev-label">Coût estimé chats</div><div class="rev-val" style="color:var(--blue)">~$${(chats*0.04).toFixed(2)}</div></div>
+    <div class="rev-item"><div class="rev-label">Total estimé</div><div class="rev-val" style="color:var(--gold)">~$${costEst}</div></div>`;
+}
+
+// ── PLANS & SETTINGS ──
+function loadPlanSettings() {
+  const p=sGetJSON('betai_plans',{freeTickets:5,starterTickets:25,proTickets:9999,starterPrice:2000,proPrice:5000,freePicks:5,starterPicks:10,proPicks:20});
+  $('planFreeTickets').value=p.freeTickets; $('planStarterTickets').value=p.starterTickets; $('planProTickets').value=p.proTickets;
+  $('planStarterPrice').value=p.starterPrice; $('planProPrice').value=p.proPrice;
+  $('planFreePicks').value=p.freePicks; $('planStarterPicks').value=p.starterPicks; $('planProPicks').value=p.proPicks;
+}
+function savePlans() {
+  sSetJSON('betai_plans',{freeTickets:+$('planFreeTickets').value,starterTickets:+$('planStarterTickets').value,proTickets:+$('planProTickets').value,starterPrice:+$('planStarterPrice').value,proPrice:+$('planProPrice').value,freePicks:+$('planFreePicks').value,starterPicks:+$('planStarterPicks').value,proPicks:+$('planProPicks').value});
+  toast('✅ Plans sauvegardés','ok');
+}
+function loadAppSettings() {
+  const s=sGetJSON('betai_settings',{maintenance:false,registration:true,demo:true});
+  if($('setMaintenance'))$('setMaintenance').checked=s.maintenance;
+  if($('setRegistration'))$('setRegistration').checked=s.registration;
+  if($('setDemo'))$('setDemo').checked=s.demo;
+}
+function saveSetting(key,val) { const s=sGetJSON('betai_settings',{}); s[key]=val; sSetJSON('betai_settings',s); toast(`Paramètre mis à jour`,'ok'); }
+function saveSettings() { toast('✅ Paramètres sauvegardés','ok'); }
+function changeAdminPwd() {
+  const cur=$('curAdminPwd').value, newp=$('newAdminPwd').value;
+  const stored=sGet('betai_admin_pwd')||DEFAULT_ADMIN_PWD;
+  if(cur!==stored){toast('Mot de passe actuel incorrect','err');return;}
+  if(newp.length<8){toast('Nouveau mot de passe trop court (8 min)','err');return;}
+  sSet('betai_admin_pwd',newp); $('curAdminPwd').value=''; $('newAdminPwd').value=''; toast('✅ Mot de passe admin changé','ok');
+}
+
+// PATCHES
+window.doLogin=function(){
+  const email=($('loginEmail')||{}).value?.trim().toLowerCase();
+  const pwd=($('loginPwd')||{}).value;
+  if(!email||!pwd){showAlert('Remplissez tous les champs.');return;}
+  const users=sGetJSON('betai_users',[]);
+  const user=users.find(u=>u.email===email&&u.pwd===btoa(pwd));
+  if(!user){showAlert('Email ou mot de passe incorrect.');return;}
+  if(user.banned){showAlert('Compte suspendu.');return;}
+  sSetJSON('betai_session',{email:user.email,firstName:user.firstName,lastName:user.lastName,plan:user.plan,role:user.role||'user',loginAt:Date.now()});
+  const btn=$('loginBtn');if(btn){btn.innerHTML='<span class="spin"></span>Connexion…';btn.disabled=true;}
+  setTimeout(()=>{
+    if(user.role==='admin'){showView('view-admin');const ls=$('lockScreen'),as_=$('adminShell');if(ls)ls.style.display='none';if(as_)as_.style.display='grid';initAdmin();}
+    else{showView('view-app');initApp();}
+  },700);
+};
+window.doRegister=function(){
+  const first=($('regFirst')||{}).value?.trim();
+  const last=($('regLast')||{}).value?.trim();
+  const email=($('regEmail')||{}).value?.trim().toLowerCase();
+  const pwd=($('regPwd')||{}).value;
+  if(!first||!last||!email||!pwd){showAlert('Remplissez tous les champs.');return;}
+  if(pwd.length<8){showAlert('Mot de passe trop court (8 min).');return;}
+  if(!email.includes('@')){showAlert('Email invalide.');return;}
+  const termsEl=$('regTerms');if(termsEl&&!termsEl.checked){showAlert('Acceptez les conditions.');return;}
+  const users=sGetJSON('betai_users',[]);
+  if(users.find(u=>u.email===email)){showAlert('Email déjà utilisé.');return;}
+  const quotas={free:5,starter:25,pro:9999};
+  const nu={email,firstName:first,lastName:last,pwd:btoa(pwd),plan:selectedPlan,role:'user',ticketsLeft:quotas[selectedPlan],ticketsTotal:quotas[selectedPlan],registeredAt:new Date().toISOString(),lastLogin:null,banned:false};
+  users.push(nu);sSetJSON('betai_users',users);
+  showAlert('✅ Compte créé ! Bienvenue '+first+' !','ok');
+  const btn=$('regBtn');if(btn)btn.disabled=true;
+  sSetJSON('betai_session',{email:nu.email,firstName:first,lastName:last,plan:selectedPlan,role:'user',loginAt:Date.now()});
+  setTimeout(()=>{showView('view-app');initApp();},1000);
+};
+window.demoLogin=function(){sSetJSON('betai_session',{email:'demo@betai.app',firstName:'Demo',lastName:'',plan:'starter',role:'demo',loginAt:Date.now()});showView('view-app');initApp();};
+window.goAdmin=function(){showView('view-admin');const ls=$('lockScreen'),as_=$('adminShell');if(ls)ls.style.display='flex';if(as_)as_.style.display='none';};
+window.unlock=function(){const pwd=$('lockPwd')?.value;const stored=sGet('betai_admin_pwd')||DEFAULT_ADMIN_PWD;if(pwd===stored){const ls=$('lockScreen'),as_=$('adminShell');if(ls)ls.style.display='none';if(as_)as_.style.display='grid';initAdmin();}else{const e=$('lockErr');if(e){e.textContent='Mot de passe incorrect.';setTimeout(()=>e.textContent='',2500);}const p=$('lockPwd');if(p)p.value='';}};
+window.logout=function(){showView('view-auth');resetAuthForm();};
+window.doLogout=function(){sSet('betai_session','');showView('view-auth');resetAuthForm();};
+function resetAuthForm(){['loginEmail','loginPwd'].forEach(id=>{const e=$(id);if(e)e.value='';});const lb=$('loginBtn');if(lb){lb.disabled=false;lb.innerHTML='SE CONNECTER';}if(typeof clearAlert==='function')clearAlert();if(typeof setTab==='function')setTab('login');}
+function initApp(){
+  const sess=sGetJSON('betai_session',null);
+  if(!sess||!sess.email){showView('view-auth');return;}
+  const de=$('dateDisplay');if(de)de.textContent=new Date().toLocaleDateString('fr-FR',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+  const ne=$('userNameDisplay');if(ne)ne.textContent=sess.firstName||sess.email.split('@')[0];
+  if(typeof updateQuotaDisplay==='function')updateQuotaDisplay(sess);
+  const sp=$('settingPlan');if(sp)sp.textContent=sess.plan||'free';
+  const se=$('settingEmail');if(se)se.textContent=sess.email;
+  if(typeof checkApiStatus==='function')checkApiStatus();
+  if(typeof updHistBadge==='function')updHistBadge();
+  if(typeof renderTracker==='function')renderTracker();
+  if(typeof renderHistPage==='function')renderHistPage();
+  if(typeof updateDashKPIs==='function')updateDashKPIs();
+  const logs=sGetJSON('betai_logs',[]);
+  logs.unshift({user:sess.email,action:'Connexion',type:'login',time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})});
+  if(logs.length>200)logs.splice(200);sSetJSON('betai_logs',logs);
+  const lp=$('lockPwd');if(lp&&!lp._kb){lp._kb=true;lp.addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});}
+}
+(function(){
+  const sess=sGetJSON('betai_session',null);
+  if(sess&&sess.email){if(sess.role==='admin'){showView('view-admin');const ls=$('lockScreen'),as_=$('adminShell');if(ls)ls.style.display='none';if(as_)as_.style.display='grid';initAdmin();}else{showView('view-app');initApp();}}
+  else showView('view-auth');
+})();
 </script>
 </body>
 </html>
