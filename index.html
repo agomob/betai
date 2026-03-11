@@ -1026,38 +1026,74 @@ async function qFetch(mode,arg){
   const prompt=FETCH_PROMPTS[mode]?FETCH_PROMPTS[mode](arg):`Matchs: ${arg}. JSON: {"matches":["Ligue: E1 vs E2"]} — max 15 matchs`;
   try{
     const res=await callClaude(prompt,[{type:'web_search_20250305',name:'web_search',max_uses:2}],1500,2);
-    const parsed=JSON.parse(res.replace(/```json|```/g,'').trim());
+    const parsed=extractJSON(res);
     if(parsed.matches&&parsed.matches.length){$('matchInput').value=parsed.matches.join('\n');$('autoStatus').textContent=`✅ ${parsed.matches.length} matchs chargés`;}
   }catch(e){$('autoStatus').textContent='⚠️ '+e.message.substring(0,60);}
 }
 function quickFetch(mode,el){document.querySelectorAll('.tpill').forEach(p=>p.classList.remove('active'));if(el)el.classList.add('active');goPage('generator',null);qFetch(mode);}
 
-// ─── Core API call (centralisé, Haiku, loops limités) ───
+// ─── Extraction JSON robuste (Bug 3 fix) ───
+function extractJSON(txt) {
+  txt = txt.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+  const start = txt.indexOf('{');
+  const end = txt.lastIndexOf('}');
+  if (start === -1 || end === -1 || end <= start)
+    throw new Error('Aucun JSON valide dans la réponse Claude');
+  return JSON.parse(txt.substring(start, end + 1));
+}
+
+// ─── Core API call — Haiku 4.5, boucle robuste (Bugs 1,2,6 fix) ───
 async function callClaude(prompt, tools, maxTokens=8000, maxLoops=3, system='') {
   const key = getKey();
   if (!key) throw new Error("Clé API manquante — allez dans Paramètres");
-  const MODEL = 'claude-haiku-4-5-20251001'; // ← HAIKU: 4× moins cher que Sonnet
+  const MODEL = 'claude-haiku-4-5-20251001';
   const headers = {'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'};
-  const body = {model:MODEL,max_tokens:maxTokens,messages:[{role:'user',content:prompt}]};
-  if (system) body.system=system;
-  if (tools&&tools.length) body.tools=tools;
-  const res = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers,body:JSON.stringify(body)});
-  if (!res.ok) { const e=await res.json().catch(()=>{}); throw new Error(e?.error?.message||`Erreur API ${res.status}`); }
-  let data = await res.json();
-  let msgs = [{role:'user',content:prompt}];
-  let loops = 0;
-  // Boucle tool_use limitée à maxLoops
-  while (data.stop_reason==='tool_use' && loops++ < maxLoops) {
-    const tbs=data.content.filter(b=>b.type==='tool_use');
-    msgs.push({role:'assistant',content:data.content});
-    msgs.push({role:'user',content:tbs.map(tb=>({type:'tool_result',tool_use_id:tb.id,content:String(tb.output||'')}))});
-    const body2={model:MODEL,max_tokens:maxTokens,messages:msgs};
-    if(system)body2.system=system;
-    if(tools&&tools.length)body2.tools=tools;
-    const r2=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers,body:JSON.stringify(body2)});
-    data=await r2.json();
+
+  const buildBody = (msgs) => {
+    const b = {model:MODEL, max_tokens:maxTokens, messages:msgs};
+    if (system) b.system = system;
+    if (tools && tools.length) b.tools = tools;
+    return b;
+  };
+
+  let msgs = [{role:'user', content:prompt}];
+  let res = await fetch('https://api.anthropic.com/v1/messages', {method:'POST', headers, body:JSON.stringify(buildBody(msgs))});
+  if (!res.ok) {
+    const e = await res.json().catch(()=>({}));
+    throw new Error(e?.error?.message || `Erreur API ${res.status}`);
   }
-  return data.content.filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+  let data = await res.json();
+  let loops = 0;
+
+  // Boucle tool_use — limitée à maxLoops, vérification HTTP à chaque tour (Bugs 1+2 fix)
+  while ((data.content||[]).some(b=>b.type==='tool_use') && loops++ < maxLoops) {
+    const content = data.content || [];
+    const tbs = content.filter(b => b.type === 'tool_use');
+    if (!tbs.length) break;
+
+    msgs.push({role:'assistant', content});
+    // web_search_20250305 : exécution côté Anthropic — on renvoie tool_result vides
+    msgs.push({role:'user', content: tbs.map(tb => ({
+      type: 'tool_result',
+      tool_use_id: tb.id,
+      content: '' // Anthropic exécute la recherche côté serveur
+    }))});
+
+    res = await fetch('https://api.anthropic.com/v1/messages', {method:'POST', headers, body:JSON.stringify(buildBody(msgs))});
+    if (!res.ok) {
+      const e = await res.json().catch(()=>({}));
+      throw new Error(e?.error?.message || `Erreur API ${res.status} (tour ${loops})`);
+    }
+    data = await res.json();
+  }
+
+  // Extraction texte finale avec guard (Bug 6 fix)
+  const textContent = (data.content || []).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+  if (!textContent) {
+    const errBlock = (data.content||[]).find(b=>b.type==='error');
+    throw new Error(errBlock?.error?.message || data.error?.message || 'Réponse vide de l\'API');
+  }
+  return textContent;
 }
 
 // ─── GENERATE TICKET ───
@@ -1121,30 +1157,43 @@ Réponds UNIQUEMENT avec ce JSON valide, sans texte ni backticks:
     // Use callClaude with max 3 loops — économique
     const txt=await callClaude(prompt,tools,8000,3);
     sDone(1);sDone(2);sDone(3);sCur(4);setLoaderMsg('FINALISATION','Mise en forme du ticket…');
-    const result=JSON.parse(txt.replace(/```json|```/g,'').trim());
+    const result = extractJSON(txt);
+    if (!result.ticket || !Array.isArray(result.ticket) || result.ticket.length === 0) {
+      throw new Error(`Le modèle n'a retourné aucun pick. Réessayez avec des matchs plus précis.`);
+    }
     sDone(4);
-    _lastMatches=[...new Set(result.ticket.map(t=>t.match))];
-    saveHist(result,matches.length);
-    if($('setAutoTrack')&&$('setAutoTrack').checked)addToPerf(result.ticket);
-    renderTicket(result,matches.length);
-  }catch(e){
+    _lastMatches = [...new Set(result.ticket.map(t => t.match||''))];
+    saveHist(result, matches.length);
+    if ($('setAutoTrack') && $('setAutoTrack').checked) addToPerf(result.ticket);
+    renderTicket(result, matches.length);
+  } catch(e) {
     $('ticketLoading').classList.remove('show');
-    $('ticketEmpty').style.display='flex';
-    showErr('Erreur: '+e.message);
-  }finally{
-    $('genBtn').disabled=false;
+    $('ticketEmpty').style.display = 'flex';
+    showErr('⚠️ ' + e.message);
+  } finally {
+    $('genBtn').disabled = false;
     $('ticketLoading').classList.remove('show');
+    if (!$('ticketResult').innerHTML || $('ticketResult').style.display === 'none') {
+      $('ticketEmpty').style.display = 'flex';
+    }
   }
 }
 
 // ─── Render Ticket ───
 function renderTicket(data,totalMatchCount){
+  // Guard: vérification données valides (Bug 4 fix)
+  if (!data || !data.ticket || !Array.isArray(data.ticket) || data.ticket.length === 0) {
+    showErr('⚠️ Données du ticket invalides');
+    $('ticketEmpty').style.display='flex';
+    return;
+  }
   $('ticketLoading').classList.remove('show');
   $('ticketEmpty').style.display='none';
   $('ticketResult').style.display='block';
   const s=data.summary||{};
-  const avgP=s.avg_prob||Math.round(data.ticket.reduce((a,t)=>a+t.probability,0)/data.ticket.length);
-  const totC=s.total_cote||data.ticket.reduce((a,t)=>a*(t.cote||1),1).toFixed(2);
+  const probs=data.ticket.map(t=>+(t.probability)||0);
+  const avgP=s.avg_prob||Math.round(probs.reduce((a,b)=>a+b,0)/Math.max(probs.length,1));
+  const totC=s.total_cote||(data.ticket.reduce((a,t)=>a*(+(t.cote)||1),1)).toFixed(2);
   const highC=data.ticket.filter(t=>t.confidence==='high').length;
   const valCt=data.ticket.filter(t=>t.is_value_bet).length;
   const now=new Date();
@@ -1211,7 +1260,7 @@ async function loadValueBets(){
     const prompt=`Value bets football aujourd'hui ${new Date().toLocaleDateString('fr-FR')}. Recherche les matchs et cotes sur 1xBet/Bet365. EV = (prob/100 × (cote-1)) - (1-prob/100). Ne retenir que EV > 0.
 JSON uniquement: {"value_bets":[{"match":"PSG vs Monaco","league":"Ligue 1","bet":"Victoire PSG","probability":72,"cote":1.55,"ev":0.07,"kelly":8.2,"time":"21:00"}]}`;
     const txt=await callClaude(prompt,[{type:'web_search_20250305',name:'web_search',max_uses:3}],3000,3);
-    const result=JSON.parse(txt.replace(/```json|```/g,'').trim());
+    const result=extractJSON(txt);
     renderValueBets(result.value_bets||[]);
     $('kpiValue').textContent=(result.value_bets||[]).length;
   }catch(e){$('vbTable').innerHTML=`<div class="empty-state" style="padding:30px"><div class="empty-state-sub" style="color:var(--red)">Erreur: ${e.message}</div></div>`;}
@@ -1229,7 +1278,7 @@ async function loadDropping(){
     const prompt=`Dropping odds football aujourd'hui ${new Date().toLocaleDateString('fr-FR')}. Recherche les cotes qui ont baissé significativement (signal sharp money).
 JSON: {"dropping":[{"match":"PSG vs Monaco","league":"Ligue 1","market":"Victoire PSG","cote_before":1.72,"cote_after":1.45,"drop_pct":15.7,"is_sharp":true,"note":"Baisse en 3h — sharp money","time":"21:00"}]}`;
     const txt=await callClaude(prompt,[{type:'web_search_20250305',name:'web_search',max_uses:3}],2500,3);
-    const result=JSON.parse(txt.replace(/```json|```/g,'').trim());
+    const result=extractJSON(txt);
     renderDropping(result.dropping||[]);
     $('kpiDrop').textContent=(result.dropping||[]).length;
   }catch(e){$('dropGrid').innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-sub" style="color:var(--red)">Erreur: ${e.message}</div></div>`;}
@@ -1254,7 +1303,7 @@ Pour chaque combi: identifie picks forts/faibles, calcule proba globale, verdict
 JSON: {"results":[{"original":"PSG gagne, BTTS Liverpool","verdict":"retained","score":72,"global_prob":58,"analysis":"PSG 4W/5, Liverpool BTTS 4/5","picks":[{"pick":"PSG gagne","status":"strong","prob":78},{"pick":"BTTS Liverpool","status":"risky","prob":74}],"estimated_cote":3.2,"improved_version":null}],"summary":{"total":2,"retained":1,"rejected":1}}`;
   try{
     const txt=await callClaude(prompt,[{type:'web_search_20250305',name:'web_search',max_uses:2}],4000,2);
-    const result=JSON.parse(txt.replace(/```json|```/g,'').trim());
+    const result=extractJSON(txt);
     renderImport(result);
   }catch(e){$('importResults').innerHTML=`<div style="color:var(--red);padding:20px">Erreur: ${e.message}</div>`;}
   finally{$('importBtn').disabled=false;}
@@ -1289,8 +1338,19 @@ async function sendChat(){
     const body={model:MODEL,max_tokens:1200,system:sys,tools:[{type:'web_search_20250305',name:'web_search',max_uses:2}],messages:chatHistory.slice(-8)};
     const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers,body:JSON.stringify(body)});
     let data=await res.json(),msgs2=[...chatHistory.slice(-8)],loops=0;
-    while(data.stop_reason==='tool_use'&&loops++<2){const tbs=data.content.filter(b=>b.type==='tool_use');msgs2.push({role:'assistant',content:data.content});msgs2.push({role:'user',content:tbs.map(tb=>({type:'tool_result',tool_use_id:tb.id,content:String(tb.output||'')}))});const body2={model:MODEL,max_tokens:1200,system:sys,tools:[{type:'web_search_20250305',name:'web_search',max_uses:2}],messages:msgs2};const r2=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers,body:JSON.stringify(body2)});data=await r2.json();}
-    const reply=data.content.filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+    while((data.content||[]).some(b=>b.type==='tool_use') && loops++<2){
+      const cont=data.content||[];
+      const tbs=cont.filter(b=>b.type==='tool_use');
+      if(!tbs.length) break;
+      msgs2.push({role:'assistant',content:cont});
+      msgs2.push({role:'user',content:tbs.map(tb=>({type:'tool_result',tool_use_id:tb.id,content:''}))});
+      const body2={model:MODEL,max_tokens:1200,system:sys,tools:[{type:'web_search_20250305',name:'web_search',max_uses:2}],messages:msgs2};
+      const r2=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers,body:JSON.stringify(body2)});
+      if(!r2.ok){const er=await r2.json().catch(()=>({}));throw new Error(er?.error?.message||'Erreur API chat '+r2.status);}
+      data=await r2.json();
+    }
+    const reply=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+    if(!reply) throw new Error('Réponse vide');
     chatHistory.push({role:'assistant',content:reply});
     const tb=document.getElementById(tid);
     if(tb)tb.outerHTML=`<div class="chat-msg ai">${reply.replace(/\n/g,'<br>')}</div>`;
