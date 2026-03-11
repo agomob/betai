@@ -1241,21 +1241,68 @@ RÈGLES STRICTES:
 Réponds UNIQUEMENT avec ce JSON valide, sans texte autour, sans backticks:
 {"ticket":[{"num":1,"match":"PSG vs Monaco","league":"Ligue 1","home":"PSG","away":"Monaco","bet_type":"result","bet_label":"RÉSULTAT","bet_value":"Victoire PSG","probability":72,"cote":1.45,"confidence":"high","reason":"Forme WWWDW, ML 72%, Monaco sans Golovin","tag_type":"result","is_value_bet":false,"value_edge":0,"reliability_score":82,"reliability_label":"Très fiable","is_trap":false,"trap_reason":null,"real_data":{"form_home":"WWWDW","form_away":"DWLWL","h2h":"4V-2N-1D","rank_home":"1er","rank_away":"3ème","ml_home":72,"ml_draw":18,"ml_away":10,"injuries":null}}],"summary":{"total":1,"avg_prob":72,"total_cote":1.45,"high_conf":1,"value_bets":0}}`;
 
+  const _gH = {
+    'Content-Type':'application/json','x-api-key':claudeKey,
+    'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'
+  };
+  const _wsTool = [{ type:'web_search_20250305', name:'web_search', max_uses:4 }];
+
   try {
+    // ═══ PHASE A : WEB SEARCH RÉEL — données temps réel ═══
+    // Claude cherche vraiment les stats, forme, blessés, cotes du moment
+    setMsg('🔍 Recherche web — stats & blessés en temps réel…');
+    const _sp = `You are a football analyst with web search access. Search for REAL current data on these matches:
+${matches.map((m,i) => `${i+1}. ${m}`).join('\n')}
+
+For EACH match search and find:
+- Last 5 games form for both teams (real results W/D/L with scores)
+- Key players injured or suspended RIGHT NOW
+- Current league standings (real position, points)
+- Head-to-head recent history
+- Any rotation risk, cup hangover, already-qualified/relegated situation
+
+Be specific with real numbers. Search multiple times if needed.`;
+
+    let _sm = [{ role:'user', content:_sp }];
+    let _sr = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:_gH,
+      body:JSON.stringify({ model:'claude-haiku-4-5-20251001', max_tokens:3000, tools:_wsTool, messages:_sm })
+    });
+    if(!_sr.ok){const e=await _sr.json().catch(()=>({}));throw new Error(e.error?.message||`Erreur recherche ${_sr.status}`);}
+    let _sd = await _sr.json();
+
+    // Boucle tool_use — jusqu'à 4 web searches
+    let _sl=0;
+    while((_sd.content||[]).some(b=>b.type==='tool_use') && _sl++<4){
+      const _tu=_sd.content.filter(b=>b.type==='tool_use');
+      _sm.push({role:'assistant',content:_sd.content});
+      _sm.push({role:'user',content:_tu.map(t=>({type:'tool_result',tool_use_id:t.id,content:''}))});
+      _sr=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:_gH,
+        body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:3000,tools:_wsTool,messages:_sm})});
+      if(!_sr.ok){const e=await _sr.json().catch(()=>({}));throw new Error(e.error?.message||`Err ${_sr.status}`);}
+      _sd=await _sr.json();
+    }
+
+    // ═══ PHASE B : GÉNÉRATION JSON avec les données réelles ═══
+    setMsg('🧠 Génération du ticket sur données réelles…');
+    _sm.push({role:'assistant', content:_sd.content});
+    _sm.push({role:'user', content:`Using ALL the real data you just found above, now generate the betting ticket.
+
+${prompt}
+
+CRITICAL: Populate real_data fields with ACTUAL numbers from your web search:
+- form_home / form_away: real last-5 results (e.g. "WWDLW")
+- rank_home / rank_away: real current league position (e.g. "3ème - 41pts")
+- h2h: real head-to-head (e.g. "3V-2N-1D")
+- ml_home / ml_draw / ml_away: probabilities based on real data
+- injuries: real injured/suspended players found in search
+
+Output ONLY the JSON. Start immediately with {. Nothing before {, nothing after }.`});
+    _sm.push({role:'assistant', content:'{'}); // prefill — JSON pur garanti
+
     const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': claudeKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 8000,
-        system: 'You are a football betting expert. OUTPUT RULE: respond with ONLY a raw JSON object. Start with { end with }. No text before. No text after.',
-        messages: [{ role: 'user', content: prompt }, { role: 'assistant', content: '{' }]
-      })
+      method:'POST', headers:_gH,
+      body:JSON.stringify({ model:'claude-haiku-4-5-20251001', max_tokens:8000, messages:_sm })
     });
 
     clearInterval(aiTimer);
@@ -1267,10 +1314,10 @@ Réponds UNIQUEMENT avec ce JSON valide, sans texte autour, sans backticks:
     }
 
     const data = await res.json();
-    const txt  = (data.content||[]).filter(c => c.type==='text').map(c => c.text || '').join('').trim();
+    const txt  = (data.content||[]).filter(c=>c.type==='text').map(c=>c.text||'').join('').trim();
     if (!txt) throw new Error('Réponse vide de l\'API Claude.');
 
-    const result = safeJSON('{' + txt);   // { recolé depuis le prefill
+    const result = safeJSON('{' + txt);
     if (!result.ticket?.length) throw new Error('Ticket vide retourné par Claude.');
 
     curTicket = result;
