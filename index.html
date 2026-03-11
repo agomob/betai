@@ -1032,14 +1032,29 @@ async function qFetch(mode,arg){
 }
 function quickFetch(mode,el){document.querySelectorAll('.tpill').forEach(p=>p.classList.remove('active'));if(el)el.classList.add('active');goPage('generator',null);qFetch(mode);}
 
-// ─── Extraction JSON robuste (Bug 3 fix) ───
+// ─── Extraction JSON ultra-robuste ───
 function extractJSON(txt) {
   txt = txt.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
-  const start = txt.indexOf('{');
-  const end = txt.lastIndexOf('}');
-  if (start === -1 || end === -1 || end <= start)
-    throw new Error('Aucun JSON valide dans la réponse Claude');
-  return JSON.parse(txt.substring(start, end + 1));
+  // Stratégie 1 : texte entier est du JSON
+  try { const r = JSON.parse(txt); if (r && typeof r === 'object') return r; } catch(e){}
+  // Stratégie 2 : trouver le premier { qui démarre un JSON valide
+  let pos = 0;
+  while ((pos = txt.indexOf('{', pos)) !== -1) {
+    // Chercher le } correspondant (depth counting)
+    let depth = 0, end = -1;
+    for (let i = pos; i < txt.length; i++) {
+      if (txt[i] === '{') depth++;
+      else if (txt[i] === '}') { depth--; if (depth === 0) { end = i; break; } }
+    }
+    if (end !== -1) {
+      try {
+        const r = JSON.parse(txt.substring(pos, end + 1));
+        if (r && typeof r === 'object' && !Array.isArray(r)) return r;
+      } catch(e) {}
+    }
+    pos++;
+  }
+  throw new Error('Réponse non-JSON du modèle. Réessayez.');
 }
 
 // ─── Core API call — Haiku 4.5, boucle robuste (Bugs 1,2,6 fix) ───
@@ -1155,7 +1170,8 @@ Réponds UNIQUEMENT avec ce JSON valide, sans texte ni backticks:
     sDone(0);sCur(1);setLoaderMsg('WEB SEARCH','Recherche des stats en temps réel…');
     const tools=[{type:'web_search_20250305',name:'web_search',max_uses:3}];
     // Use callClaude with max 3 loops — économique
-    const txt=await callClaude(prompt,tools,8000,3);
+    const genSys = 'You are a football data scientist. CRITICAL: respond ONLY with a raw JSON object. No text before {, no text after }. Never write an introduction.';
+    const txt=await callClaude(prompt,tools,8000,3,genSys);
     sDone(1);sDone(2);sDone(3);sCur(4);setLoaderMsg('FINALISATION','Mise en forme du ticket…');
     const result = extractJSON(txt);
     if (!result.ticket || !Array.isArray(result.ticket) || result.ticket.length === 0) {
@@ -1293,20 +1309,72 @@ function setImMode(m,el){importMode=m;document.querySelectorAll('.imode').forEac
 function clearImport(){$('importText').value='';$('importResults').innerHTML='<div class="empty-state"><div class="empty-state-icon">📥</div><div class="empty-state-title">COMBIS</div><div class="empty-state-sub">Collez vos paris et lancez l\'analyse</div></div>';}
 async function analyseImport(){
   const text=$('importText').value.trim();if(!text){alert('Entrez vos combis');return;}
-  const thresh=$('importThresh').value;
+  const thresh=+$('importThresh').value;
   $('importBtn').disabled=true;
-  $('importResults').innerHTML='<div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-sub">Analyse en cours…</div></div>';
-  const modeDesc={filter:'Filtre les picks faibles',score:'Note chaque combi de 0 à 100',improve:'Améliore en remplaçant les picks faibles'}[importMode];
-  const prompt=`Expert paris football. Mode: ${importMode} (${modeDesc}). Seuil: ${thresh}%.
-COMBIS: ${text}
-Pour chaque combi: identifie picks forts/faibles, calcule proba globale, verdict retained/rejected.
-JSON: {"results":[{"original":"PSG gagne, BTTS Liverpool","verdict":"retained","score":72,"global_prob":58,"analysis":"PSG 4W/5, Liverpool BTTS 4/5","picks":[{"pick":"PSG gagne","status":"strong","prob":78},{"pick":"BTTS Liverpool","status":"risky","prob":74}],"estimated_cote":3.2,"improved_version":null}],"summary":{"total":2,"retained":1,"rejected":1}}`;
-  try{
-    const txt=await callClaude(prompt,[{type:'web_search_20250305',name:'web_search',max_uses:2}],4000,2);
-    const result=extractJSON(txt);
-    renderImport(result);
-  }catch(e){$('importResults').innerHTML=`<div style="color:var(--red);padding:20px">Erreur: ${e.message}</div>`;}
-  finally{$('importBtn').disabled=false;}
+
+  // Séparer les picks ligne par ligne (format: "Match → Pari" ou "Match: Pari")
+  const lines = text.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
+  const BATCH = 8; // max 8 picks par appel pour éviter troncature
+  const batches = [];
+  for(let i=0;i<lines.length;i+=BATCH) batches.push(lines.slice(i,i+BATCH));
+
+  $('importResults').innerHTML=`<div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-sub">Analyse de ${lines.length} picks en ${batches.length} lot(s)…</div></div>`;
+
+  const modeDesc={filter:'filter: keep only picks with prob>=thresh, reject the rest',score:'score: rate each pick 0-100',improve:'improve: for weak picks, suggest a better alternative bet on same match'}[importMode];
+  // System prompt : JSON UNIQUEMENT
+  const sys = `You are a football betting analyst. CRITICAL RULE: You MUST respond with ONLY a raw JSON object. NO introduction sentence, NO explanation, NO markdown, NO text before or after the JSON. Start your response with { and end with }. Never write "Je vais", "Voici", "Here is" or any sentence. ONLY JSON.`;
+
+  const allResults = [];
+  let hasError = false;
+
+  for(let b=0;b<batches.length;b++){
+    const batch = batches[b];
+    $('importResults').innerHTML=`<div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-sub">Lot ${b+1}/${batches.length} — ${batch.length} picks…</div></div>`;
+
+    const prompt = `Analyze these ${batch.length} football betting picks. Mode: ${modeDesc}. Threshold: ${thresh}%.
+
+PICKS TO ANALYZE:
+${batch.map((l,i)=>`${i+1}. ${l}`).join('\n')}
+
+For each pick, estimate win probability based on team strength and recent form.
+Mark as "retained" if prob >= ${thresh}, else "rejected".
+
+RESPOND WITH ONLY THIS JSON (no text before or after):
+{"results":[{"original":"Real Madrid vs Elche → Victoire Real Madrid","verdict":"retained","score":82,"global_prob":78,"analysis":"Real Madrid home favorite, Elche in lower half","picks":[{"pick":"Victoire Real Madrid","status":"strong","prob":78}],"estimated_cote":1.35,"improved_version":null}],"summary":{"total":${batch.length},"retained":0,"rejected":0}}`;
+
+    try{
+      const txt = await callClaude(prompt, [{type:'web_search_20250305',name:'web_search',max_uses:1}], 5000, 2, sys);
+      const result = extractJSON(txt);
+      if(result.results && Array.isArray(result.results)){
+        allResults.push(...result.results);
+      }
+    }catch(e){
+      // Si un lot échoue, on note l'erreur mais on continue les autres
+      console.error('Lot '+b+' failed:', e.message);
+      hasError = true;
+      // Ajouter des entrées d'erreur pour ce lot
+      batch.forEach(line => allResults.push({
+        original: line, verdict:'error', score:0, global_prob:0,
+        analysis:'Erreur analyse: '+e.message.substring(0,80), picks:[], estimated_cote:null
+      }));
+    }
+  }
+
+  $('importBtn').disabled=false;
+
+  if(!allResults.length){
+    $('importResults').innerHTML=`<div style="color:var(--red);padding:20px">❌ Aucun résultat obtenu. Vérifiez votre clé API.</div>`;
+    return;
+  }
+
+  // Assembler le résultat final
+  const retained = allResults.filter(r=>r.verdict==='retained').length;
+  const rejected = allResults.filter(r=>r.verdict==='rejected').length;
+  renderImport({results:allResults, summary:{total:allResults.length, retained, rejected}});
+  if(hasError) {
+    $('importResults').insertAdjacentHTML('afterbegin',
+      '<div style="background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.2);border-radius:8px;padding:8px 14px;font-size:10px;color:var(--gold);margin-bottom:10px">⚠️ Certains lots ont rencontré une erreur. Les picks marqués "error" peuvent être re-analysés.</div>');
+  }
 }
 function renderImport(data){
   if(!data.results||!data.results.length){$('importResults').innerHTML='<div class="empty-state"><div class="empty-state-sub">Aucun résultat</div></div>';return;}
@@ -1314,6 +1382,10 @@ function renderImport(data){
   let html=`<div class="stats-bar" style="margin-bottom:14px"><span class="sbar-pill">${s.total||data.results.length} combis</span>${s.retained>0?`<span class="sbar-pill green"><span class="sv">${s.retained}</span> retenues</span>`:''} ${s.rejected>0?`<span class="sbar-pill" style="border-color:rgba(255,77,106,.2)"><span class="sv" style="color:var(--red)">${s.rejected}</span> rejetées</span>`:''}</div>`;
   data.results.forEach(r=>{
     const probColor=r.global_prob>=65?'var(--green)':r.global_prob>=50?'var(--gold)':'var(--red)';
+    if(r.verdict==='error'){
+      html+=`<div class="ac rejected" style="opacity:.6"><div class="ac-stripe rejected"></div><div class="ac-hd"><span class="ac-verdict rejected">⚠️ ERREUR</span><span style="font-size:9px;color:var(--muted)">${r.original}</span></div><div class="ac-analysis">${r.analysis}</div></div>`;
+      return;
+    }
     html+=`<div class="ac ${r.verdict}"><div class="ac-stripe ${r.verdict}"></div><div class="ac-hd"><span class="ac-verdict ${r.verdict}">${r.verdict==='retained'?'✅ RETENUE':'❌ REJETÉE'}</span><span class="ac-score ${r.score>=65?'good':'bad'}" style="color:${r.score>=65?'var(--green)':'var(--orange)'}">${r.score}/100</span></div><div style="font-size:10px;font-weight:600;margin-bottom:8px">${r.original}</div>${r.picks?`<div class="ac-picks">${r.picks.map(p=>`<span class="ac-pick ${p.status}">${p.pick} ${p.prob?'('+p.prob+'%)':''}</span>`).join('')}</div>`:''} ${r.analysis?`<div class="ac-analysis">${r.analysis}</div>`:''}<div class="ac-prob-track"><div class="ac-prob-fill" style="width:${r.global_prob||0}%;background:${probColor}"></div></div><div class="ac-footer"><span class="ac-badge">Proba: <b style="color:${probColor}">${r.global_prob||'?'}%</b></span>${r.estimated_cote?`<span class="ac-badge">×${r.estimated_cote}</span>`:''}</div>${r.improved_version?`<div style="background:rgba(0,229,160,.04);border:1px solid rgba(0,229,160,.15);border-radius:7px;padding:8px 10px;margin-top:8px;font-size:9px;color:var(--green)"><b>⚡ Version améliorée:</b> ${r.improved_version}</div>`:''}</div>`;
   });
   $('importResults').innerHTML=html;
