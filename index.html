@@ -634,9 +634,865 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .empty-state-icon{font-size:42px;opacity:.07;}
 .empty-state-title{font-family:var(--font-head);font-size:18px;font-weight:800;opacity:.1;letter-spacing:2px;}
 .empty-state-sub{font-size:11px;color:var(--muted);max-width:240px;line-height:1.7;}
+
+/* ══ SPA VIEW SYSTEM ══ */
+.spa-view{display:none;position:fixed;inset:0;z-index:500;overflow:auto;}
+.spa-view.active{display:block;}
+#view-auth{background:var(--bg);z-index:800;}
+#view-admin{background:var(--bg);z-index:900;}
+
+:root{
+  --bg:#080b10;--surf:#0d1117;--card:#111820;--card2:#161e28;
+  --b1:rgba(255,255,255,.07);--b2:rgba(255,255,255,.13);
+  --text:#e8edf5;--muted:#5a6a80;--muted2:#8a9ab0;
+  --green:#00e5a0;--green2:#00b87a;--gold:#f5c842;--red:#ff4d6a;
+  --cyan:#06d6e8;--blue:#3d9eff;
+  --font-head:'Syne',sans-serif;--font-mono:'DM Mono',monospace;--font-body:'Inter',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--font-body);}
+
+/* Background grid */
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,160,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,160,.025) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
+
+/* Glow orbs */
+.orb{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0;}
+.orb1{width:500px;height:500px;background:rgba(0,229,160,.06);top:-150px;left:-150px;}
+.orb2{width:400px;height:400px;background:rgba(6,214,232,.04);bottom:-100px;right:-100px;}
+
+.page-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;position:relative;z-index:1;}
+
+/* Logo top */
+.top-logo{position:fixed;top:20px;left:28px;display:flex;align-items:center;gap:10px;}
+.logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--green),var(--cyan));border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;font-size:15px;color:#080b10;letter-spacing:-1px;}
+.logo-name{font-family:var(--font-head);font-weight:800;font-size:19px;letter-spacing:-0.5px;}
+.logo-name em{color:var(--green);font-style:normal;}
+
+/* Card */
+.auth-card{width:100%;max-width:440px;background:var(--surf);border:1px solid var(--b1);border-radius:20px;padding:40px;box-shadow:0 32px 80px rgba(0,0,0,.5);}
+
+.auth-hero{text-align:center;margin-bottom:32px;}
+.auth-hero-icon{width:64px;height:64px;background:linear-gradient(135deg,rgba(0,229,160,.12),rgba(6,214,232,.12));border:1px solid rgba(0,229,160,.2);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;}
+.auth-hero-title{font-family:var(--font-head);font-size:28px;font-weight:800;letter-spacing:-0.5px;line-height:1;}
+.auth-hero-title em{color:var(--green);font-style:normal;}
+.auth-hero-sub{font-size:12px;color:var(--muted2);margin-top:8px;line-height:1.6;}
+
+/* Tabs */
+.auth-tabs{display:flex;background:var(--card);border-radius:12px;padding:4px;margin-bottom:28px;}
+.auth-tab{flex:1;padding:10px;text-align:center;border-radius:9px;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted2);transition:.2s;font-family:var(--font-body);}
+.auth-tab.on{background:var(--card2);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3);}
+
+/* Fields */
+.field{margin-bottom:16px;}
+.field-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.field-label::before{content:'';width:3px;height:10px;background:var(--green);border-radius:2px;}
+.field-input{width:100%;background:var(--card);border:1px solid var(--b1);border-radius:10px;color:var(--text);font-family:var(--font-body);font-size:13px;padding:12px 14px;outline:none;transition:.2s;}
+.field-input:focus{border-color:rgba(0,229,160,.4);box-shadow:0 0 0 3px rgba(0,229,160,.06);}
+.field-input::placeholder{color:var(--muted);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* Plan selector */
+.plan-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
+.plan-card{background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;transition:.2s;}
+.plan-card:hover{border-color:var(--b2);}
+.plan-card.on{border-color:rgba(0,229,160,.35);background:rgba(0,229,160,.05);}
+.plan-card.on .plan-price{color:var(--green);}
+.plan-icon{font-size:20px;margin-bottom:6px;}
+.plan-name{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted2);margin-bottom:4px;}
+.plan-price{font-family:var(--font-mono);font-size:15px;font-weight:500;color:var(--text);}
+.plan-perks{font-size:8px;color:var(--muted);margin-top:4px;line-height:1.5;}
+
+/* Submit btn */
+.auth-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--green2),var(--green));border:none;border-radius:12px;font-family:var(--font-head);font-size:16px;font-weight:800;letter-spacing:2px;color:#080b10;cursor:pointer;transition:.2s;margin-top:8px;box-shadow:0 6px 24px rgba(0,229,160,.2);}
+.auth-btn:hover{opacity:.88;transform:translateY(-1px);box-shadow:0 10px 30px rgba(0,229,160,.3);}
+.auth-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+.auth-btn.ghost{background:var(--card);border:1px solid var(--b1);color:var(--muted2);box-shadow:none;font-family:var(--font-body);font-size:13px;font-weight:600;letter-spacing:.5px;}
+.auth-btn.ghost:hover{border-color:var(--b2);color:var(--text);}
+
+.auth-sep{display:flex;align-items:center;gap:12px;margin:20px 0;}
+.auth-sep-line{flex:1;height:1px;background:var(--b1);}
+.auth-sep-txt{font-size:10px;color:var(--muted);letter-spacing:1px;white-space:nowrap;}
+
+/* Alert */
+.alert{border-radius:9px;padding:10px 14px;font-size:11px;margin-bottom:16px;display:none;line-height:1.5;}
+.alert.show{display:block;}
+.alert.err{background:rgba(255,77,106,.07);border:1px solid rgba(255,77,106,.2);color:#ff7888;}
+.alert.ok{background:rgba(0,229,160,.07);border:1px solid rgba(0,229,160,.2);color:var(--green);}
+
+/* Footer links */
+.auth-footer{text-align:center;margin-top:20px;font-size:10px;color:var(--muted);}
+.auth-footer a{color:var(--green);text-decoration:none;cursor:pointer;}
+.auth-footer a:hover{text-decoration:underline;}
+
+/* Features strip */
+.features{display:flex;gap:20px;justify-content:center;margin-top:32px;flex-wrap:wrap;}
+.feat{display:flex;align-items:center;gap:7px;font-size:10px;color:var(--muted2);}
+.feat-dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
+
+/* Admin link */
+.admin-hint{position:fixed;bottom:20px;right:24px;font-size:9px;color:rgba(255,255,255,.1);cursor:pointer;letter-spacing:1px;transition:.2s;}
+.admin-hint:hover{color:var(--muted);}
+
+/* Spinner */
+.spin{width:16px;height:16px;border:2px solid rgba(0,0,0,.2);border-top:2px solid #080b10;border-radius:50%;animation:sp .6s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px;}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* Password toggle */
+.field-pw{position:relative;}
+.field-pw .field-input{padding-right:40px;}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;color:var(--muted);user-select:none;}
+.pw-toggle:hover{color:var(--muted2);}
+
+
+:root{
+  --bg:#06080d;--surf:#0a0e16;--card:#0f1520;--card2:#141c28;
+  --b1:rgba(255,255,255,.07);--b2:rgba(255,255,255,.12);
+  --text:#e8edf5;--muted:#5a6a80;--muted2:#8a9ab0;
+  --green:#00e5a0;--green2:#00b87a;--gold:#f5c842;--red:#ff4d6a;
+  --cyan:#06d6e8;--blue:#3d9eff;--purple:#a855f7;--orange:#ff7849;
+  --nav-w:230px;--top-h:58px;
+  --font-head:'Syne',sans-serif;--font-mono:'DM Mono',monospace;--font-body:'Inter',sans-serif;
+  --r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:13px;overflow:hidden;}
+
+/* ── LOCK SCREEN ── */
+.lock{position:fixed;inset:0;background:#06080d;z-index:999;display:flex;align-items:center;justify-content:center;}
+.lock-card{width:360px;background:var(--surf);border:1px solid var(--b1);border-radius:20px;padding:40px;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,.7);}
+.lock-icon{font-size:48px;margin-bottom:16px;}
+.lock-title{font-family:var(--font-head);font-size:22px;font-weight:800;margin-bottom:6px;}
+.lock-title em{color:var(--gold);font-style:normal;}
+.lock-sub{font-size:11px;color:var(--muted);margin-bottom:24px;}
+.lock-input{width:100%;background:var(--card);border:1px solid var(--b1);border-radius:10px;color:var(--text);font-family:var(--font-mono);font-size:14px;padding:12px 16px;outline:none;transition:.2s;text-align:center;letter-spacing:4px;margin-bottom:14px;}
+.lock-input:focus{border-color:rgba(245,200,66,.4);}
+.lock-btn{width:100%;padding:13px;background:linear-gradient(135deg,#c89000,var(--gold));border:none;border-radius:10px;font-family:var(--font-head);font-size:15px;font-weight:800;letter-spacing:2px;color:#06080d;cursor:pointer;transition:.2s;}
+.lock-btn:hover{opacity:.88;}
+.lock-err{color:var(--red);font-size:10px;margin-top:8px;min-height:16px;}
+.lock-back{font-size:10px;color:var(--muted);margin-top:12px;cursor:pointer;}
+.lock-back:hover{color:var(--muted2);}
+
+/* ── SHELL ── */
+.shell{display:grid;grid-template-columns:var(--nav-w) 1fr;grid-template-rows:var(--top-h) 1fr;height:100vh;}
+
+/* ── TOPBAR ── */
+.topbar{grid-column:1/-1;background:var(--surf);border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:16px;padding:0 22px;z-index:100;}
+.logo{display:flex;align-items:center;gap:10px;min-width:var(--nav-w);padding-right:20px;border-right:1px solid var(--b1);}
+.logo-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--gold),#c89000);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;font-size:14px;color:#06080d;}
+.logo-name{font-family:var(--font-head);font-weight:800;font-size:17px;letter-spacing:-.5px;}
+.logo-name em{color:var(--gold);font-style:normal;}
+.logo-badge{background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.25);border-radius:4px;padding:2px 7px;font-size:7.5px;font-weight:700;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-left:2px;}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.topbar-admin{font-size:10px;font-weight:600;color:var(--gold);background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:20px;padding:5px 12px;}
+.topbar-logout{font-size:10px;font-weight:600;color:var(--muted2);background:var(--card);border:1px solid var(--b1);border-radius:8px;padding:6px 12px;cursor:pointer;transition:.15s;font-family:var(--font-body);}
+.topbar-logout:hover{border-color:rgba(255,77,106,.3);color:var(--red);}
+.live-indicator{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--green);}
+.live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 1.2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+
+/* ── SIDEBAR ── */
+.sidebar{background:var(--surf);border-right:1px solid var(--b1);display:flex;flex-direction:column;padding:14px 10px;overflow-y:auto;gap:2px;}
+.sidebar::-webkit-scrollbar{width:3px;}
+.nav-sect{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 10px 4px;margin-top:4px;}
+.nitem{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:.15s;border:1px solid transparent;color:var(--muted2);}
+.nitem:hover{background:var(--card);color:var(--text);}
+.nitem.on{background:rgba(245,200,66,.06);border-color:rgba(245,200,66,.15);color:var(--gold);}
+.nitem-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+.nitem-label{font-size:11px;font-weight:600;}
+.nitem-badge{margin-left:auto;background:var(--gold);color:#06080d;font-size:7.5px;font-weight:800;padding:2px 6px;border-radius:20px;}
+.nitem-badge.red{background:var(--red);color:#fff;}
+.nitem-badge.green{background:var(--green);color:#080b10;}
+.sidebar-footer{margin-top:auto;padding-top:12px;border-top:1px solid var(--b1);}
+.sys-status{background:var(--card);border:1px solid var(--b1);border-radius:8px;padding:10px;}
+.sys-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.sys-row:last-child{margin-bottom:0;}
+.sys-label{font-size:9px;color:var(--muted);}
+.sys-dot{width:6px;height:6px;border-radius:50%;}
+.sys-dot.ok{background:var(--green);}
+.sys-dot.warn{background:var(--gold);}
+.sys-dot.err{background:var(--red);}
+
+/* ── MAIN ── */
+.main{overflow-y:auto;background:var(--bg);}
+.main::-webkit-scrollbar{width:4px;}
+.main::-webkit-scrollbar-thumb{background:rgba(255,255,255,.05);}
+.page{display:none;padding:24px;}
+.page.on{display:block;}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+.ph-title{font-family:var(--font-head);font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1;}
+.ph-title em{color:var(--gold);font-style:normal;}
+.ph-sub{font-size:11px;color:var(--muted2);margin-top:5px;}
+.ph-actions{display:flex;gap:8px;}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font-body);font-size:11px;font-weight:600;transition:.15s;}
+.btn-gold{background:linear-gradient(135deg,#c89000,var(--gold));color:#06080d;}
+.btn-gold:hover{opacity:.88;transform:translateY(-1px);}
+.btn-ghost{background:var(--card);border:1px solid var(--b1);color:var(--muted2);}
+.btn-ghost:hover{border-color:var(--b2);color:var(--text);}
+.btn-red{background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.2);color:var(--red);}
+.btn-green{background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.2);color:var(--green);}
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-bottom:22px;}
+.kpi{background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:14px 16px;position:relative;overflow:hidden;}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.kpi.g::before{background:var(--green);}
+.kpi.gold::before{background:var(--gold);}
+.kpi.b::before{background:var(--blue);}
+.kpi.r::before{background:var(--red);}
+.kpi.p::before{background:var(--purple);}
+.kpi-val{font-family:var(--font-mono);font-size:28px;font-weight:500;line-height:1;margin-bottom:4px;}
+.kpi.g .kpi-val{color:var(--green);}
+.kpi.gold .kpi-val{color:var(--gold);}
+.kpi.b .kpi-val{color:var(--blue);}
+.kpi.r .kpi-val{color:var(--red);}
+.kpi.p .kpi-val{color:var(--purple);}
+.kpi-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.kpi-delta{font-size:9px;margin-top:3px;}
+.kpi-delta.up{color:var(--green);}
+.kpi-delta.down{color:var(--red);}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:20px;}
+.card-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted2);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:8px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+
+/* ── FORM FIELDS ── */
+.field{margin-bottom:14px;}
+.field-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.field-input{width:100%;background:var(--card2);border:1px solid var(--b1);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:12px;padding:9px 12px;outline:none;transition:.2s;}
+.field-input:focus{border-color:rgba(245,200,66,.4);}
+.field-input::placeholder{color:var(--muted);}
+.field-input.mono{font-family:var(--font-mono);letter-spacing:1px;}
+.select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%235a6a80'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+.save-btn{padding:9px 18px;background:linear-gradient(135deg,#c89000,var(--gold));border:none;border-radius:8px;font-family:var(--font-head);font-size:13px;font-weight:800;letter-spacing:1.5px;color:#06080d;cursor:pointer;transition:.2s;}
+.save-btn:hover{opacity:.88;}
+
+/* ── API KEY BLOCK ── */
+.api-block{background:rgba(245,200,66,.04);border:1px solid rgba(245,200,66,.2);border-radius:12px;padding:16px;margin-bottom:16px;}
+.api-block-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.api-block-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);}
+.api-status-badge{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;}
+.api-pw-wrap{position:relative;}
+.api-pw-wrap .field-input{padding-right:90px;}
+.api-pw-actions{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;gap:4px;}
+.api-mini-btn{padding:3px 8px;border-radius:5px;font-size:9px;font-weight:700;cursor:pointer;border:none;font-family:var(--font-body);transition:.15s;}
+.api-mini-btn.reveal{background:rgba(245,200,66,.1);color:var(--gold);}
+.api-mini-btn.copy{background:rgba(0,229,160,.1);color:var(--green);}
+.api-test-row{display:flex;gap:6px;margin-top:8px;align-items:center;}
+.api-test-result{font-size:9px;font-weight:600;padding:3px 9px;border-radius:5px;}
+.api-test-result.ok{background:rgba(0,229,160,.08);color:var(--green);}
+.api-test-result.err{background:rgba(255,77,106,.08);color:var(--red);}
+.api-hint{font-size:8.5px;color:var(--muted);margin-top:6px;}
+.api-hint a{color:var(--gold);text-decoration:none;}
+
+/* ── USERS TABLE ── */
+.users-filters{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+.uf-input{background:var(--card2);border:1px solid var(--b1);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:11px;padding:7px 12px;outline:none;transition:.2s;width:220px;}
+.uf-input:focus{border-color:rgba(245,200,66,.3);}
+.uf-select{background:var(--card2);border:1px solid var(--b1);border-radius:8px;color:var(--muted2);font-family:var(--font-body);font-size:11px;padding:7px 10px;outline:none;}
+.users-table{background:var(--card);border:1px solid var(--b1);border-radius:var(--r);overflow:hidden;}
+.ut-head{display:grid;grid-template-columns:2fr 1.2fr 1fr 1fr 1fr 1.2fr;background:rgba(255,255,255,.03);border-bottom:1px solid var(--b1);padding:10px 14px;gap:8px;}
+.ut-th{font-size:8.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
+.ut-row{display:grid;grid-template-columns:2fr 1.2fr 1fr 1fr 1fr 1.2fr;padding:10px 14px;gap:8px;border-bottom:1px solid rgba(255,255,255,.04);align-items:center;transition:.12s;cursor:default;}
+.ut-row:last-child{border-bottom:none;}
+.ut-row:hover{background:rgba(255,255,255,.02);}
+.ut-name{font-weight:600;font-size:12px;}
+.ut-email{font-size:9px;color:var(--muted);margin-top:2px;}
+.plan-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:8px;font-weight:700;letter-spacing:.5px;}
+.plan-badge.free{background:rgba(255,255,255,.06);color:var(--muted2);}
+.plan-badge.starter{background:rgba(61,158,255,.1);color:var(--blue);}
+.plan-badge.pro{background:rgba(0,229,160,.1);color:var(--green);}
+.plan-badge.demo{background:rgba(168,85,247,.1);color:var(--purple);}
+.status-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:8px;font-weight:700;}
+.status-badge.active{background:rgba(0,229,160,.1);color:var(--green);}
+.status-badge.banned{background:rgba(255,77,106,.1);color:var(--red);}
+.quota-bar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:4px;overflow:hidden;}
+.quota-fill{height:4px;border-radius:2px;}
+.quota-fill.green{background:var(--green);}
+.quota-fill.gold{background:var(--gold);}
+.quota-fill.red{background:var(--red);}
+.ut-actions{display:flex;gap:4px;}
+.ut-btn{padding:4px 8px;border-radius:5px;font-size:8px;font-weight:700;cursor:pointer;border:none;font-family:var(--font-body);transition:.15s;}
+.ut-btn.edit{background:rgba(61,158,255,.1);color:var(--blue);}
+.ut-btn.ban{background:rgba(255,77,106,.1);color:var(--red);}
+.ut-btn.unban{background:rgba(0,229,160,.1);color:var(--green);}
+.ut-btn.reset{background:rgba(245,200,66,.1);color:var(--gold);}
+.ut-tickets{font-family:var(--font-mono);font-size:12px;}
+
+/* ── USAGE CHART ── */
+.usage-item{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.usage-label{font-size:10px;color:var(--muted2);min-width:90px;}
+.usage-track{flex:1;height:6px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;}
+.usage-fill{height:6px;border-radius:3px;transition:width 1s;}
+.usage-val{font-family:var(--font-mono);font-size:10px;min-width:50px;text-align:right;color:var(--muted2);}
+
+/* ── ALERT ── */
+.toastbox{position:fixed;top:70px;right:20px;z-index:999;display:flex;flex-direction:column;gap:6px;}
+.toast{background:var(--card);border-radius:9px;padding:10px 16px;font-size:11px;border-left:3px solid;animation:toastin .25s ease;box-shadow:0 8px 24px rgba(0,0,0,.4);max-width:300px;}
+@keyframes toastin{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+.toast.ok{border-color:var(--green);color:var(--green);}
+.toast.err{border-color:var(--red);color:var(--red);}
+.toast.info{border-color:var(--blue);color:var(--blue);}
+
+/* ── TOGGLE ── */
+.toggle{position:relative;width:36px;height:20px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.08);border-radius:20px;cursor:pointer;transition:.25s;}
+.toggle-slider::before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:var(--muted);border-radius:50%;transition:.25s;}
+.toggle input:checked+.toggle-slider{background:rgba(0,229,160,.25);}
+.toggle input:checked+.toggle-slider::before{transform:translateX(16px);background:var(--green);}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--surf);border:1px solid var(--b1);border-radius:16px;padding:28px;width:400px;max-width:94vw;}
+.modal-title{font-family:var(--font-head);font-size:18px;font-weight:800;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;}
+.modal-close{cursor:pointer;color:var(--muted);font-size:18px;}
+.modal-close:hover{color:var(--text);}
+
+/* ── LOG TABLE ── */
+.log-row{display:flex;gap:12px;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;}
+.log-row:last-child{border-bottom:none;}
+.log-time{font-family:var(--font-mono);color:var(--muted);min-width:80px;font-size:9px;}
+.log-user{color:var(--blue);font-weight:600;}
+.log-action{color:var(--muted2);}
+.log-badge{padding:1px 6px;border-radius:3px;font-size:8px;font-weight:700;}
+.log-badge.ticket{background:rgba(0,229,160,.08);color:var(--green);}
+.log-badge.login{background:rgba(61,158,255,.08);color:var(--blue);}
+.log-badge.admin{background:rgba(245,200,66,.08);color:var(--gold);}
+
+/* ── REVENUE ── */
+.rev-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.rev-item:last-child{border-bottom:none;}
+.rev-label{font-size:11px;color:var(--muted2);}
+.rev-val{font-family:var(--font-mono);font-size:16px;color:var(--green);}
+
 </style>
 </head>
 <body>
+
+<!-- ══ VIEW: AUTH ══ -->
+<div id="view-auth" class="spa-view">
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="top-logo">
+  <div class="logo-mark">BA</div>
+  <div class="logo-name">Bet<em>AI</em></div>
+</div>
+
+<div class="page-wrap">
+  <div class="auth-card">
+    <div class="auth-hero">
+      <div class="auth-hero-icon">⚡</div>
+      <div class="auth-hero-title">Bet<em>AI</em></div>
+      <div class="auth-hero-sub">Intelligence artificielle pour les paris football<br>Analyse temps réel · xG · Value Bets · Dropping Odds</div>
+    </div>
+
+    <div class="auth-tabs">
+      <div class="auth-tab on" id="tabLogin" onclick="setTab('login')">Connexion</div>
+      <div class="auth-tab" id="tabRegister" onclick="setTab('register')">Créer un compte</div>
+    </div>
+
+    <div class="alert" id="alertBox"></div>
+
+    <!-- LOGIN FORM -->
+    <div id="formLogin">
+      <div class="field">
+        <div class="field-label">Email</div>
+        <input type="email" class="field-input" id="loginEmail" placeholder="votre@email.com" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div class="field">
+        <div class="field-label">Mot de passe</div>
+        <div class="field-pw">
+          <input type="password" class="field-input" id="loginPwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+          <span class="pw-toggle" onclick="togglePw('loginPwd',this)">👁</span>
+        </div>
+      </div>
+      <div style="text-align:right;margin-bottom:12px">
+        <a style="font-size:10px;color:var(--green);cursor:pointer;text-decoration:none" onclick="forgotPw()">Mot de passe oublié ?</a>
+      </div>
+      <button class="auth-btn" id="loginBtn" onclick="doLogin()">SE CONNECTER</button>
+      <div class="auth-sep"><div class="auth-sep-line"></div><div class="auth-sep-txt">OU</div><div class="auth-sep-line"></div></div>
+      <button class="auth-btn ghost" onclick="demoLogin()">🎮 Essayer en démo</button>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="formRegister" style="display:none">
+      <div class="field-row">
+        <div class="field">
+          <div class="field-label">Prénom</div>
+          <input type="text" class="field-input" id="regFirst" placeholder="Mohamed">
+        </div>
+        <div class="field">
+          <div class="field-label">Nom</div>
+          <input type="text" class="field-input" id="regLast" placeholder="Koné">
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Email</div>
+        <input type="email" class="field-input" id="regEmail" placeholder="votre@email.com">
+      </div>
+      <div class="field">
+        <div class="field-label">Mot de passe</div>
+        <div class="field-pw">
+          <input type="password" class="field-input" id="regPwd" placeholder="8 caractères minimum">
+          <span class="pw-toggle" onclick="togglePw('regPwd',this)">👁</span>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Choisir un plan</div>
+        <div class="plan-grid">
+          <div class="plan-card on" id="plan-free" onclick="selPlan('free',this)">
+            <div class="plan-icon">🆓</div>
+            <div class="plan-name">Gratuit</div>
+            <div class="plan-price">0 FCFA</div>
+            <div class="plan-perks">5 tickets/mois</div>
+          </div>
+          <div class="plan-card" id="plan-starter" onclick="selPlan('starter',this)">
+            <div class="plan-icon">🚀</div>
+            <div class="plan-name">Starter</div>
+            <div class="plan-price">2 000 F</div>
+            <div class="plan-perks">25 tickets/mois</div>
+          </div>
+          <div class="plan-card" id="plan-pro" onclick="selPlan('pro',this)">
+            <div class="plan-icon">💎</div>
+            <div class="plan-name">Pro</div>
+            <div class="plan-price">5 000 F</div>
+            <div class="plan-perks">Illimité + Value Bets</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+          <input type="checkbox" id="regTerms" style="margin-top:2px;accent-color:var(--green)">
+          <span style="font-size:10px;color:var(--muted2);line-height:1.5">J'accepte les <a style="color:var(--green)" href="#">conditions d'utilisation</a> et comprends que BetAI est un outil d'aide à la décision</span>
+        </label>
+      </div>
+      <button class="auth-btn" id="regBtn" onclick="doRegister()">CRÉER MON COMPTE</button>
+    </div>
+
+    <div class="auth-footer">
+      Problème de connexion ? <a onclick="goAdmin()">Contacter le support</a>
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="feat"><div class="feat-dot"></div>Analyse IA en temps réel</div>
+    <div class="feat"><div class="feat-dot"></div>60+ ligues africaines & européennes</div>
+    <div class="feat"><div class="feat-dot"></div>xG · Kelly · Dropping Odds</div>
+  </div>
+</div>
+
+<div class="admin-hint" onclick="goAdmin()" title="Accès administrateur">⚙ ADMIN</div>
+</div>
+
+<!-- ══ VIEW: ADMIN ══ -->
+<div id="view-admin" class="spa-view">
+<!-- ══ LOCK SCREEN ══ -->
+<div class="lock" id="lockScreen">
+  <div class="lock-card">
+    <div class="lock-icon">🔐</div>
+    <div class="lock-title"><em>Admin</em> BetAI</div>
+    <div class="lock-sub">Accès réservé à l'administrateur</div>
+    <input type="password" class="lock-input" id="lockPwd" placeholder="••••••" onkeydown="if(event.key==='Enter')unlock()">
+    <button class="lock-btn" onclick="unlock()">ACCÉDER</button>
+    <div class="lock-err" id="lockErr"></div>
+    <div class="lock-back" onclick="showView('auth')">← Retour à l'accueil</div>
+  </div>
+</div>
+
+<div class="toastbox" id="toastBox"></div>
+
+<!-- ══ SHELL ══ -->
+<div class="shell" id="adminShell" style="display:none">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-mark">BA</div>
+      <div>
+        <div class="logo-name">Bet<em>AI</em></div>
+      </div>
+      <span class="logo-badge">ADMIN</span>
+    </div>
+    <div class="live-indicator"><div class="live-dot"></div>Système opérationnel</div>
+    <div class="topbar-right">
+      <div class="topbar-admin" id="adminName">⚙️ Administrateur</div>
+      <button class="topbar-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="nav-sect">Vue d'ensemble</div>
+    <div class="nitem on" onclick="goPage('dashboard',this)"><div class="nitem-icon">📊</div><div class="nitem-label">Dashboard</div></div>
+    <div class="nitem" onclick="goPage('users',this)"><div class="nitem-icon">👥</div><div class="nitem-label">Utilisateurs</div><div class="nitem-badge" id="badgeUsers">0</div></div>
+    <div class="nitem" onclick="goPage('revenue',this)"><div class="nitem-icon">💰</div><div class="nitem-label">Revenus</div></div>
+
+    <div class="nav-sect">Configuration</div>
+    <div class="nitem" onclick="goPage('api',this)"><div class="nitem-icon">🔑</div><div class="nitem-label">Clés API</div></div>
+    <div class="nitem" onclick="goPage('plans',this)"><div class="nitem-icon">💎</div><div class="nitem-label">Plans & Quotas</div></div>
+    <div class="nitem" onclick="goPage('settings',this)"><div class="nitem-icon">⚙️</div><div class="nitem-label">Paramètres</div></div>
+
+    <div class="nav-sect">Monitoring</div>
+    <div class="nitem" onclick="goPage('logs',this)"><div class="nitem-icon">📋</div><div class="nitem-label">Logs d'activité</div></div>
+    <div class="nitem" onclick="goPage('usage',this)"><div class="nitem-icon">📈</div><div class="nitem-label">Utilisation API</div></div>
+
+    <div class="sidebar-footer">
+      <div class="sys-status">
+        <div class="sys-row"><div class="sys-label">API Anthropic</div><div class="sys-dot" id="sysDotAI"></div></div>
+        <div class="sys-row"><div class="sys-label">Utilisateurs actifs</div><div class="sys-dot ok"></div></div>
+        <div class="sys-row"><div class="sys-label">Stockage</div><div class="sys-dot ok"></div></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page on" id="page-dashboard">
+      <div class="ph">
+        <div>
+          <div class="ph-title">📊 <em>Dashboard</em> Admin</div>
+          <div class="ph-sub" id="dashDate">—</div>
+        </div>
+        <div class="ph-actions">
+          <button class="btn btn-ghost" onclick="refreshDash()">🔄 Actualiser</button>
+          <button class="btn btn-gold" onclick="goPage('users',null)">👥 Gérer utilisateurs</button>
+        </div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi g"><div class="kpi-val" id="kpiUsers">0</div><div class="kpi-label">Utilisateurs total</div></div>
+        <div class="kpi gold"><div class="kpi-val" id="kpiActive">0</div><div class="kpi-label">Actifs ce mois</div></div>
+        <div class="kpi b"><div class="kpi-val" id="kpiTickets">0</div><div class="kpi-label">Tickets générés</div></div>
+        <div class="kpi p"><div class="kpi-val" id="kpiPro">0</div><div class="kpi-label">Comptes Pro</div></div>
+        <div class="kpi r"><div class="kpi-val" id="kpiBanned">0</div><div class="kpi-label">Comptes suspendus</div></div>
+      </div>
+      <div class="grid2" style="margin-bottom:14px">
+        <div class="card">
+          <div class="card-title">📊 RÉPARTITION DES PLANS</div>
+          <div id="planChart"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">💰 REVENUS ESTIMÉS (FCFA)</div>
+          <div id="revenueChart"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📋 ACTIVITÉ RÉCENTE</div>
+        <div id="recentLogs"></div>
+      </div>
+    </div>
+
+    <!-- ── USERS ── -->
+    <div class="page" id="page-users">
+      <div class="ph">
+        <div>
+          <div class="ph-title">👥 <em>Utilisateurs</em></div>
+          <div class="ph-sub" id="usersSub">Chargement…</div>
+        </div>
+        <div class="ph-actions">
+          <button class="btn btn-ghost" onclick="exportUsers()">📤 Export CSV</button>
+          <button class="btn btn-gold" onclick="openAddUser()">➕ Ajouter</button>
+        </div>
+      </div>
+      <div class="users-filters">
+        <input type="text" class="uf-input" id="userSearch" placeholder="🔍 Chercher par nom ou email…" oninput="renderUsers()">
+        <select class="uf-select" id="planFilter" onchange="renderUsers()">
+          <option value="all">Tous les plans</option>
+          <option value="free">Gratuit</option>
+          <option value="starter">Starter</option>
+          <option value="pro">Pro</option>
+        </select>
+        <select class="uf-select" id="statusFilter" onchange="renderUsers()">
+          <option value="all">Tous les statuts</option>
+          <option value="active">Actifs</option>
+          <option value="banned">Suspendus</option>
+        </select>
+      </div>
+      <div class="users-table" id="usersTable">
+        <div class="ut-head">
+          <div class="ut-th">Utilisateur</div>
+          <div class="ut-th">Email</div>
+          <div class="ut-th">Plan</div>
+          <div class="ut-th">Tickets restants</div>
+          <div class="ut-th">Statut</div>
+          <div class="ut-th">Actions</div>
+        </div>
+        <div id="usersBody"></div>
+      </div>
+    </div>
+
+    <!-- ── API KEYS ── -->
+    <div class="page" id="page-api">
+      <div class="ph">
+        <div>
+          <div class="ph-title">🔑 <em>Clés API</em></div>
+          <div class="ph-sub">Configuration sécurisée — clés jamais exposées aux utilisateurs</div>
+        </div>
+      </div>
+
+      <!-- Anthropic -->
+      <div class="api-block" style="margin-bottom:14px">
+        <div class="api-block-hd">
+          <div class="api-block-title">🤖 ANTHROPIC CLAUDE</div>
+          <div class="api-status-badge" id="aiStatusBadge">
+            <div class="sys-dot" id="aiDot"></div>
+            <span id="aiStatusTxt">Non configuré</span>
+          </div>
+        </div>
+        <div class="api-pw-wrap">
+          <input type="password" class="field-input mono" id="aiKeyInput" placeholder="sk-ant-api03-XXXXXXXXXXXXXXXXXXXX" autocomplete="off">
+          <div class="api-pw-actions">
+            <button class="api-mini-btn reveal" onclick="toggleApiVis('aiKeyInput',this)">👁 Voir</button>
+            <button class="api-mini-btn copy" onclick="copyApiKey('aiKeyInput')">📋</button>
+          </div>
+        </div>
+        <div class="api-test-row">
+          <button class="btn btn-ghost" style="font-size:10px;padding:6px 12px" onclick="testApiKey()">⚡ Tester la clé</button>
+          <button class="save-btn" style="font-size:11px;padding:7px 14px" onclick="saveApiKey()">💾 Sauvegarder</button>
+          <div id="aiTestResult" class="api-test-result" style="display:none"></div>
+        </div>
+        <div class="api-hint">🔑 Obtenez votre clé sur <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> · La clé est chiffrée et jamais visible dans l'application utilisateur</div>
+      </div>
+
+      <!-- Football Data -->
+      <div class="grid2">
+        <div class="api-block" style="border-color:rgba(0,229,160,.2)">
+          <div class="api-block-hd">
+            <div class="api-block-title" style="color:var(--green)">📊 FOOTBALL-DATA.ORG</div>
+            <span style="font-size:8px;background:rgba(0,229,160,.1);color:var(--green);padding:2px 6px;border-radius:4px;font-weight:700">GRATUIT</span>
+          </div>
+          <div class="api-pw-wrap">
+            <input type="password" class="field-input mono" id="fdKeyInput" placeholder="Token football-data.org" autocomplete="off">
+            <div class="api-pw-actions">
+              <button class="api-mini-btn reveal" onclick="toggleApiVis('fdKeyInput',this)">👁</button>
+            </div>
+          </div>
+          <div style="margin-top:8px"><button class="save-btn" style="font-size:10px;padding:6px 12px" onclick="saveFdKey()">💾 Sauvegarder</button></div>
+          <div class="api-hint"><a href="https://www.football-data.org/client/register" target="_blank">football-data.org/register</a></div>
+        </div>
+        <div class="api-block" style="border-color:rgba(61,158,255,.2)">
+          <div class="api-block-hd">
+            <div class="api-block-title" style="color:var(--blue)">🏟️ API-FOOTBALL</div>
+            <span style="font-size:8px;background:rgba(61,158,255,.1);color:var(--blue);padding:2px 6px;border-radius:4px;font-weight:700">GRATUIT</span>
+          </div>
+          <div class="api-pw-wrap">
+            <input type="password" class="field-input mono" id="afKeyInput" placeholder="Token api-football.com" autocomplete="off">
+            <div class="api-pw-actions">
+              <button class="api-mini-btn reveal" onclick="toggleApiVis('afKeyInput',this)">👁</button>
+            </div>
+          </div>
+          <div style="margin-top:8px"><button class="save-btn" style="font-size:10px;padding:6px 12px" onclick="saveAfKey()">💾 Sauvegarder</button></div>
+          <div class="api-hint"><a href="https://dashboard.api-football.com/register" target="_blank">api-football.com/register</a></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <div class="card-title">🔒 SÉCURITÉ DES CLÉS</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+          <div style="background:rgba(0,229,160,.04);border:1px solid rgba(0,229,160,.1);border-radius:8px;padding:12px">
+            <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--green);margin-bottom:6px">✅ CE QUI EST PROTÉGÉ</div>
+            <div style="font-size:10px;color:var(--muted2);line-height:1.7">Les clés API sont chiffrées avec obfuscation Base64+XOR<br>Jamais exposées dans le code visible par l'utilisateur<br>L'utilisateur utilise BetAI sans jamais voir la clé</div>
+          </div>
+          <div style="background:rgba(245,200,66,.04);border:1px solid rgba(245,200,66,.1);border-radius:8px;padding:12px">
+            <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--gold);margin-bottom:6px">⚠️ RECOMMANDATION</div>
+            <div style="font-size:10px;color:var(--muted2);line-height:1.7">Pour une sécurité maximale en production, utilisez un backend (Node.js / Flask) comme proxy API<br>Cette version utilise le localStorage avec obfuscation</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PLANS & QUOTAS ── -->
+    <div class="page" id="page-plans">
+      <div class="ph">
+        <div>
+          <div class="ph-title">💎 <em>Plans</em> & Quotas</div>
+          <div class="ph-sub">Configuration des accès et tickets mensuels par plan</div>
+        </div>
+        <div class="ph-actions">
+          <button class="btn btn-gold" onclick="savePlans()">💾 Sauvegarder tout</button>
+        </div>
+      </div>
+      <div class="grid3">
+        <div class="card">
+          <div class="card-title" style="color:var(--muted2)">🆓 PLAN GRATUIT</div>
+          <div class="field"><div class="field-label">Tickets/mois</div><input type="number" class="field-input" id="planFreeTickets" value="5" min="0" max="100"></div>
+          <div class="field"><div class="field-label">Value Bets</div>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <label class="toggle"><input type="checkbox" id="planFreeValue"><span class="toggle-slider"></span></label>
+              <span style="font-size:10px;color:var(--muted2)">Activé</span>
+            </label>
+          </div>
+          <div class="field"><div class="field-label">Dropping Odds</div>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <label class="toggle"><input type="checkbox" id="planFreeDrop"><span class="toggle-slider"></span></label>
+              <span style="font-size:10px;color:var(--muted2)">Activé</span>
+            </label>
+          </div>
+          <div class="field"><div class="field-label">Picks max par ticket</div><input type="number" class="field-input" id="planFreePicks" value="5" min="1" max="20"></div>
+        </div>
+        <div class="card" style="border-color:rgba(61,158,255,.15)">
+          <div class="card-title" style="color:var(--blue)">🚀 PLAN STARTER</div>
+          <div class="field"><div class="field-label">Tickets/mois</div><input type="number" class="field-input" id="planStarterTickets" value="25" min="0" max="500"></div>
+          <div class="field"><div class="field-label">Prix (FCFA)</div><input type="number" class="field-input" id="planStarterPrice" value="2000" min="0"></div>
+          <div class="field"><div class="field-label">Value Bets</div>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <label class="toggle"><input type="checkbox" id="planStarterValue" checked><span class="toggle-slider"></span></label>
+              <span style="font-size:10px;color:var(--muted2)">Activé</span>
+            </label>
+          </div>
+          <div class="field"><div class="field-label">Picks max par ticket</div><input type="number" class="field-input" id="planStarterPicks" value="10" min="1" max="20"></div>
+        </div>
+        <div class="card" style="border-color:rgba(0,229,160,.15)">
+          <div class="card-title" style="color:var(--green)">💎 PLAN PRO</div>
+          <div class="field"><div class="field-label">Tickets/mois</div><input type="number" class="field-input" id="planProTickets" value="9999" min="0"></div>
+          <div class="field"><div class="field-label">Prix (FCFA)</div><input type="number" class="field-input" id="planProPrice" value="5000" min="0"></div>
+          <div class="field"><div class="field-label">Value Bets</div>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <label class="toggle"><input type="checkbox" id="planProValue" checked><span class="toggle-slider"></span></label>
+              <span style="font-size:10px;color:var(--muted2)">Activé</span>
+            </label>
+          </div>
+          <div class="field"><div class="field-label">Picks max par ticket</div><input type="number" class="field-input" id="planProPicks" value="20" min="1" max="20"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div class="page" id="page-settings">
+      <div class="ph">
+        <div>
+          <div class="ph-title">⚙️ <em>Paramètres</em></div>
+          <div class="ph-sub">Configuration globale de BetAI</div>
+        </div>
+        <div class="ph-actions">
+          <button class="btn btn-gold" onclick="saveSettings()">💾 Sauvegarder</button>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">🔐 ACCÈS ADMIN</div>
+          <div class="field"><div class="field-label">Mot de passe admin actuel</div>
+            <div style="position:relative"><input type="password" class="field-input mono" id="curAdminPwd" placeholder="Mot de passe actuel"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--muted)" onclick="toggleApiVis('curAdminPwd',this)">👁</span></div>
+          </div>
+          <div class="field"><div class="field-label">Nouveau mot de passe</div>
+            <div style="position:relative"><input type="password" class="field-input mono" id="newAdminPwd" placeholder="Min. 8 caractères"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--muted)" onclick="toggleApiVis('newAdminPwd',this)">👁</span></div>
+          </div>
+          <button class="save-btn" onclick="changeAdminPwd()">🔒 Changer le mot de passe</button>
+        </div>
+        <div class="card">
+          <div class="card-title">⚙️ CONFIGURATION APP</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div><div style="font-size:11px;font-weight:600">Mode maintenance</div><div style="font-size:9px;color:var(--muted)">Bloque les connexions utilisateurs</div></div>
+              <label class="toggle"><input type="checkbox" id="setMaintenance" onchange="saveSetting('maintenance',this.checked)"><span class="toggle-slider"></span></label>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div><div style="font-size:11px;font-weight:600">Inscriptions ouvertes</div><div style="font-size:9px;color:var(--muted)">Autoriser les nouveaux comptes</div></div>
+              <label class="toggle"><input type="checkbox" id="setRegistration" checked onchange="saveSetting('registration',this.checked)"><span class="toggle-slider"></span></label>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div><div style="font-size:11px;font-weight:600">Mode démo</div><div style="font-size:9px;color:var(--muted)">Activer le bouton demo sur la page login</div></div>
+              <label class="toggle"><input type="checkbox" id="setDemo" checked onchange="saveSetting('demo',this.checked)"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LOGS ── -->
+    <div class="page" id="page-logs">
+      <div class="ph">
+        <div>
+          <div class="ph-title">📋 <em>Logs</em> d'activité</div>
+          <div class="ph-sub">Toutes les actions utilisateurs</div>
+        </div>
+        <div class="ph-actions">
+          <button class="btn btn-red" onclick="clearLogs()">🗑️ Effacer</button>
+          <button class="btn btn-ghost" onclick="renderLogs()">🔄 Actualiser</button>
+        </div>
+      </div>
+      <div class="card"><div id="logsContainer"></div></div>
+    </div>
+
+    <!-- ── USAGE ── -->
+    <div class="page" id="page-usage">
+      <div class="ph">
+        <div>
+          <div class="ph-title">📈 <em>Utilisation</em> API</div>
+          <div class="ph-sub">Consommation de tokens Anthropic par type d'opération</div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">🤖 ANTHROPIC — TOKENS CONSOMMÉS</div>
+          <div id="usageAnthropicChart"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">💰 COÛT ESTIMÉ</div>
+          <div id="usageCostChart"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REVENUE ── -->
+    <div class="page" id="page-revenue">
+      <div class="ph">
+        <div>
+          <div class="ph-title">💰 <em>Revenus</em></div>
+          <div class="ph-sub">Abonnements actifs et projections</div>
+        </div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi g"><div class="kpi-val" id="revMRR">0</div><div class="kpi-label">MRR (FCFA)</div></div>
+        <div class="kpi gold"><div class="kpi-val" id="revPaying">0</div><div class="kpi-label">Abonnés payants</div></div>
+        <div class="kpi b"><div class="kpi-val" id="revARPU">0</div><div class="kpi-label">ARPU (FCFA)</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">💰 DÉTAIL DES REVENUS</div>
+        <div id="revDetailList"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL: Add/Edit User -->
+<div class="modal-overlay" id="modalUser">
+  <div class="modal">
+    <div class="modal-title">👤 <span id="modalUserTitle">Ajouter un utilisateur</span><span class="modal-close" onclick="closeModal()">✕</span></div>
+    <div class="field"><div class="field-label">Prénom & Nom</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <input type="text" class="field-input" id="muFirst" placeholder="Prénom">
+        <input type="text" class="field-input" id="muLast" placeholder="Nom">
+      </div>
+    </div>
+    <div class="field"><div class="field-label">Email</div><input type="email" class="field-input" id="muEmail" placeholder="email@exemple.com"></div>
+    <div class="field"><div class="field-label">Mot de passe</div><input type="password" class="field-input" id="muPwd" placeholder="Laisser vide pour garder l'actuel"></div>
+    <div class="field"><div class="field-label">Plan</div>
+      <select class="field-input select" id="muPlan">
+        <option value="free">Gratuit (5 tickets)</option>
+        <option value="starter">Starter (25 tickets / 2000 FCFA)</option>
+        <option value="pro">Pro (Illimité / 5000 FCFA)</option>
+      </select>
+    </div>
+    <div class="field"><div class="field-label">Tickets restants</div><input type="number" class="field-input" id="muTickets" min="0" value="5"></div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-gold" style="flex:1" onclick="saveUser()">💾 Sauvegarder</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ VIEW: APP ══ -->
+<div id="view-app" class="spa-view">
 <div class="shell">
 
 <!-- ══════════════ TOPBAR ══════════════ -->
@@ -663,7 +1519,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 
   <div class="topbar-right">
     <div class="live-badge"><div class="live-dot"></div>LIVE</div>
-    <div style="font-size:10px;font-weight:600;color:var(--muted2);background:var(--card);border:1px solid var(--b1);border-radius:20px;padding:5px 12px;cursor:pointer" onclick="showOverlay('admin-overlay')" title="Accès admin">👤 <span id="userName">—</span></div>
+    <div style="font-size:10px;font-weight:600;color:var(--muted2);background:var(--card);border:1px solid var(--b1);border-radius:20px;padding:5px 12px;">👤 <span id="userNameDisplay">—</span></div>
     <div class="date-display" id="dateDisplay">—</div>
   </div>
 </div>
@@ -982,21 +1838,20 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
           </div>
         </div>
 
-        <!-- Quota Display -->
-        <div style="background:rgba(0,229,160,.04);border:1px solid rgba(0,229,160,.15);border-radius:9px;padding:14px;">
-          <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">MON QUOTA</div>
+        <!-- User Quota Display -->
+        <div id="quotaBlock" style="background:var(--card2);border:1px solid var(--b1);border-radius:9px;padding:12px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">VOTRE QUOTA</div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
             <div style="font-size:11px;color:var(--muted2)">Tickets restants</div>
-            <div id="quotaLeft" style="font-family:var(--font-mono);font-size:26px;color:var(--green)">—</div>
+            <div id="quotaLeft" style="font-family:var(--font-mono);font-size:22px;color:var(--green)">—</div>
           </div>
-          <div style="height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:8px">
-            <div id="quotaBar" style="height:5px;border-radius:3px;background:linear-gradient(90deg,var(--green2),var(--green));width:100%;transition:width .6s"></div>
+          <div style="height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-bottom:8px">
+            <div id="quotaBar" style="height:4px;border-radius:2px;background:linear-gradient(90deg,var(--green2),var(--green));transition:width .6s"></div>
           </div>
-          <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted)">
-            <span id="quotaPlanLabel">Plan gratuit</span>
-            <span id="aiStatusLabel" style="color:var(--green)">IA prête ✓</span>
+          <div style="font-size:9px;color:var(--muted);display:flex;justify-content:space-between">
+            <span id="quotaPlan" style="text-transform:capitalize"></span>
+            <span id="quotaReset">Se renouvelle chaque mois</span>
           </div>
-          <div style="margin-top:6px;font-size:8.5px;color:var(--muted2)" id="fdStatusLabel">Football-Data non configuré</div>
         </div>
 
         <button class="gen-btn" id="genBtn" onclick="generate()">⚡ GÉNÉRER LE TICKET</button>
@@ -1144,18 +1999,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
       <div class="settings-card">
         <div class="settings-title">MON COMPTE</div>
         <div class="setting-row">
-          <div><div class="setting-label">Plan actif</div><div class="setting-sub">Votre abonnement</div></div>
-          <span id="settingPlan" style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;background:rgba(0,229,160,.1);color:var(--green)">gratuit</span>
+          <div><div class="setting-label">Plan actif</div><div class="setting-sub">Votre abonnement actuel</div></div>
+          <span id="settingPlan" style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;background:rgba(0,229,160,.1);color:var(--green)">—</span>
         </div>
         <div class="setting-row">
-          <div><div class="setting-label">Email</div><div class="setting-sub">Identifiant de connexion</div></div>
+          <div><div class="setting-label">Email</div><div class="setting-sub">Votre adresse email</div></div>
           <span id="settingEmail" style="font-size:10px;color:var(--muted2)">—</span>
         </div>
         <div class="setting-row">
-          <div><div class="setting-label">Statut IA</div><div id="settingAiSub" class="setting-sub">Vérification…</div></div>
+          <div><div class="setting-label">Intelligence IA</div><div class="setting-sub" id="settingAiStatus">Vérification…</div></div>
           <div id="settingAiDot" style="width:8px;height:8px;border-radius:50%;background:var(--gold)"></div>
         </div>
-        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--b1)">
+        <div style="margin-top:12px">
           <button class="btn btn-red" style="width:100%;justify-content:center" onclick="doLogout()">🚪 Se déconnecter</button>
         </div>
       </div>
@@ -1197,6 +2052,11 @@ const sSet = (k,v) => { try { localStorage.setItem(k,v) } catch {} };
 const sGetJSON = (k, def) => { try { return JSON.parse(localStorage.getItem(k)) || def } catch { return def } };
 const sSetJSON = (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch {} };
 
+// ─── Key Management (admin-stored, never exposed to users) ───
+function dec(str) { try{ return decodeURIComponent(escape(atob(str))).split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)^(42+i%13))).join(''); }catch{return '';} }
+function enc(str) { return btoa(unescape(encodeURIComponent(str.split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)^(42+i%13))).join('')))); }
+function claudeKey() { return dec(sGet('_betai_ak_app')) || dec(sGet('_betai_ak')); }
+
 // ─── State ───
 let curMode = 'safe';
 const activeBets = new Set(['result','double','double12','goals','btts','corners','cards','winbtts']);
@@ -1208,58 +2068,68 @@ let perfData = sGetJSON('betai_perf_v2', []);
 let hist = sGetJSON('betai_hist_v2', []);
 let _lastMatches = [];
 let usedSrc = { fd: false, bz: false, af: false };
-// claudeKey reads from admin-stored obfuscated key
-function _dec(s){try{return decodeURIComponent(escape(atob(s))).split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)^(42+i%13))).join('');}catch{return '';}}
-const claudeKey = () => _dec(sGet('_betai_ak_app'))||_dec(sGet('_betai_ak'));
+// claudeKey is now defined above using admin-stored obfuscated key
 
 // ─── Init ───
+function doLogout() { sSet('betai_session',''); showView('auth'); }
+
 document.addEventListener('DOMContentLoaded', () => {
-  // ── App init (called after auth) ──
-});
-function _initApp() {
-  const sess = JSON.parse(localStorage.getItem('betai_session')||'null');
-  if (!sess || !sess.email) { showOverlay('auth-overlay'); return; }
-  const uname=$('userName');if(uname)uname.textContent=sess.firstName||sess.email.split('@')[0];
-  const sp=$('settingPlan');if(sp)sp.textContent=sess.plan||'gratuit';
-  const se=$('settingEmail');if(se)se.textContent=sess.email;
-  $('dateDisplay').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+  // Auth
+  const sess = sGetJSON('betai_session', null);
+  if (!sess || !sess.email) { showView('auth'); return; }
+  
+  $('dateDisplay').textContent = new Date().toLocaleDateString('fr-FR', { weekday:'short', day:'2-digit', month:'short', year:'numeric' });
+  
+  // Show user info
+  const uName = sess.firstName || sess.email.split('@')[0];
+  const nameEl = document.getElementById('userNameDisplay');
+  if (nameEl) nameEl.textContent = uName;
+  
+  // Update quota display
+  updateQuotaDisplay(sess);
+  
+  // Settings page
+  const spEl=$('settingPlan'); if(spEl)spEl.textContent=sess.plan||'free';
+  const seEl=$('settingEmail'); if(seEl)seEl.textContent=sess.email;
+  
   checkApiStatus();
-  _updateQuota();
   updHistBadge();
   renderTracker();
   renderHistPage();
   updateDashKPIs();
+  
+  // Log login
+  const logs=sGetJSON('betai_logs',[]); logs.unshift({user:sess.email,action:'Connexion',type:'login',time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}); if(logs.length>200)logs.splice(200); sSetJSON('betai_logs',logs);
+});
+
+function updateQuotaDisplay(sess) {
+  if (!sess) return;
+  const users = sGetJSON('betai_users', []);
+  const user = users.find(u => u.email === sess.email);
+  const quotas = {free:5,starter:25,pro:9999,demo:25};
+  const tot = user ? (user.ticketsTotal||quotas[user.plan]||5) : quotas[sess.plan]||5;
+  const left = user ? (user.ticketsLeft!=null?user.ticketsLeft:tot) : tot;
+  const pct = tot>=9999?100:Math.round(left/tot*100);
+  const ql=$('quotaLeft'); if(ql)ql.textContent=tot>=9999?'∞':left;
+  const qb=$('quotaBar'); if(qb)qb.style.width=pct+'%';
+  if(qb){qb.style.background=pct>60?'linear-gradient(90deg,var(--green2),var(--green))':pct>30?'linear-gradient(90deg,#c89000,var(--gold))':'linear-gradient(90deg,#c03030,var(--red))';}
+  const qp=$('quotaPlan'); if(qp)qp.textContent='Plan '+(user?.plan||sess.plan||'free');
 }
-function _updateQuota() {
-  const sess=JSON.parse(localStorage.getItem('betai_session')||'null');if(!sess)return;
-  const users=JSON.parse(localStorage.getItem('betai_users')||'[]');
-  const u=users.find(x=>x.email===sess.email);
-  const quotas={free:5,starter:25,pro:9999,demo:25};
-  const tot=u?(u.ticketsTotal||quotas[u.plan]||5):quotas[sess.plan]||5;
-  const left=u?(u.ticketsLeft!=null?u.ticketsLeft:tot):tot;
-  const pct=tot>=9999?100:Math.round(left/tot*100);
-  const ql=$('quotaLeft');if(ql)ql.textContent=tot>=9999?'∞':left;
-  const qb=$('quotaBar');if(qb){qb.style.width=pct+'%';qb.style.background=pct>60?'linear-gradient(90deg,#00b87a,#00e5a0)':pct>30?'linear-gradient(90deg,#c89000,#f5c842)':'linear-gradient(90deg,#c03030,#ff4d6a)';}
-  const qp=$('quotaPlanLabel');if(qp)qp.textContent='Plan '+(u?.plan||sess.plan||'gratuit');
-}
-function _consumeTicket(){
-  const sess=JSON.parse(localStorage.getItem('betai_session')||'null');if(!sess)return true;
-  if(sess.role==='admin'||sess.role==='demo')return true;
-  const users=JSON.parse(localStorage.getItem('betai_users')||'[]');
-  const idx=users.findIndex(u=>u.email===sess.email);
-  if(idx<0)return true;
-  if(users[idx].plan==='pro'||users[idx].ticketsLeft>=9990)return true;
-  if((users[idx].ticketsLeft||0)<=0){showErr('Quota épuisé. Passez au plan supérieur.');return false;}
+
+function consumeTicket() {
+  const sess = sGetJSON('betai_session',null); if(!sess)return true;
+  const users = sGetJSON('betai_users',[]);
+  const idx = users.findIndex(u=>u.email===sess.email);
+  if(idx<0)return true; // demo user
+  if(users[idx].plan==='pro'||users[idx].ticketsLeft>=9990)return true; // unlimited
+  if((users[idx].ticketsLeft||0)<=0){showErr('Quota épuisé — votre limite mensuelle de tickets est atteinte. Passez au plan supérieur.');return false;}
   users[idx].ticketsLeft=Math.max(0,(users[idx].ticketsLeft||1)-1);
-  localStorage.setItem('betai_users',JSON.stringify(users));
-  _updateQuota();
-  const logs=JSON.parse(localStorage.getItem('betai_logs')||'[]');
-  logs.unshift({user:sess.email,action:'ticket_generated',type:'ticket',time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});
-  if(logs.length>200)logs.splice(200);
-  localStorage.setItem('betai_logs',JSON.stringify(logs));
+  sSetJSON('betai_users',users);
+  updateQuotaDisplay(sess);
+  // Log ticket generation
+  const logs=sGetJSON('betai_logs',[]); logs.unshift({user:sess.email,action:'ticket_generated',type:'ticket',time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}); if(logs.length>200)logs.splice(200); sSetJSON('betai_logs',logs);
   return true;
 }
-function doLogout(){localStorage.removeItem('betai_session');showOverlay('auth-overlay');}
 
 // ─── Navigation ───
 function goPage(id, el) {
@@ -1279,27 +2149,20 @@ function goPage(id, el) {
 // ─── API Status ───
 function checkApiStatus() {
   const k = claudeKey();
-  const dot=$('apiDot'),lbl=$('apiLabel'),sub=$('apiSub');
-  const aiDot2=$('settingAiDot'),aiSub2=$('settingAiSub'),aiLbl=$('aiStatusLabel');
+  const dot = $('apiDot'), lbl = $('apiLabel'), sub = $('apiSub');
+  const aiDot2 = $('settingAiDot'), aiSub2 = $('settingAiStatus');
   if (k && k.startsWith('sk-ant')) {
-    if(dot)dot.className='api-dot ok';
-    if(lbl)lbl.style.color='var(--green)';
-    if(sub)sub.textContent='IA opérationnelle ✓';
-    if(aiDot2)aiDot2.style.background='var(--green)';
-    if(aiSub2)aiSub2.textContent='API Anthropic connectée ✓';
-    if(aiLbl)aiLbl.textContent='IA prête ✓';
-    const gb=$('genBtn');if(gb)gb.disabled=false;
-    const ib=$('importBtn');if(ib)ib.disabled=false;
-    const cb=$('chatSendBtn');if(cb)cb.disabled=false;
-    const fds=$('fdStatusLabel');if(fds)fds.textContent=fdKey()?'Football-Data ✓':'Football-Data non config';
+    if(dot){dot.className='api-dot ok';lbl.style.color='var(--green)';sub.textContent='Connecté ✓';}
+    if(aiDot2){aiDot2.style.background='var(--green)';}
+    if(aiSub2){aiSub2.textContent='API Anthropic — Opérationnelle ✓';}
+    const genBtn=$('genBtn'); if(genBtn)genBtn.disabled=false;
+    const impBtn=$('importBtn'); if(impBtn)impBtn.disabled=false;
+    const chatBtn=$('chatSendBtn'); if(chatBtn)chatBtn.disabled=false;
   } else {
-    if(dot)dot.className='api-dot warn';
-    if(lbl)lbl.style.color='var(--gold)';
-    if(sub)sub.textContent='Configurée par admin';
-    if(aiDot2)aiDot2.style.background='var(--red)';
-    if(aiSub2)aiSub2.textContent='IA non disponible — Contacter admin';
-    if(aiLbl){aiLbl.textContent='IA indisponible';aiLbl.style.color='var(--red)';}
-    const gb=$('genBtn');if(gb)gb.disabled=true;
+    if(dot){dot.className='api-dot warn';lbl.style.color='var(--gold)';sub.textContent='Service IA indisponible';}
+    if(aiDot2){aiDot2.style.background='var(--red)';}
+    if(aiSub2){aiSub2.textContent="API non configurée — Contactez l'admin";}
+    const genBtn=$('genBtn'); if(genBtn)genBtn.disabled=true;
   }
 }
 
@@ -1387,7 +2250,7 @@ async function qFetch(mode, arg) {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
       headers:{ 'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
-      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:2000, tools:[{type:'web_search_20250305',name:'web_search',max_uses:3}], messages:[{role:'user',content:finalPrompt}] })
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:2000, tools:[{type:'web_search_20250305',name:'web_search',max_uses:3}], messages:[{role:'user',content:prompt}] })
     });
     let data = await res.json();
     let msgs = [{role:'user',content:prompt}], loops=0;
@@ -1442,8 +2305,8 @@ function sCur(i){const e=$('ls'+i);if(e)e.classList.add('cur');}
 
 async function generate() {
   const key = claudeKey();
-  if (!key) { showErr("Service IA indisponible. Contactez l'administrateur."); return; }
-  if (!_consumeTicket()) return;
+  if (!key) { showErr("Service IA temporairement indisponible — contactez l'administrateur."); return; }
+  if (!consumeTicket()) return;
   const raw = $('matchInput').value.trim();
   if (!raw) { showErr('Entrez au moins un match ou utilisez les boutons de chargement automatique.'); return; }
   const matches = raw.split('\n').filter(l=>l.trim());
@@ -1455,7 +2318,7 @@ async function generate() {
   $('ticketResult').style.display = 'none';
   $('ticketLoading').classList.add('show');
 
-  mkSteps(['Connexion API Anthropic','Football-Data.org (classements, forme, H2H)','Recherche web (xG, blessés, cotes)','Analyse multi-facteurs','Génération du ticket']);
+  mkSteps(['Connexion API Anthropic','Recherche web stats & blessés','Analyse multi-facteurs (xG, forme, H2H)','Calcul probabilités & Kelly','Génération du ticket']);
   setLoaderMsg('INITIALISATION', 'Connexion à l\'API Anthropic…');
   sCur(0);
 
@@ -1504,20 +2367,6 @@ CHAMPS JSON REQUIS: num, match, league, home, away, bet_type, bet_label, bet_val
 
 Réponds UNIQUEMENT avec ce JSON valide, sans texte ni backticks:
 {"ticket":[{"num":1,"match":"PSG vs Monaco","league":"Ligue 1","home":"PSG","away":"Monaco","bet_type":"result","bet_label":"RÉSULTAT","bet_value":"Victoire PSG","probability":72,"cote":1.45,"confidence":"high","reason":"Forme 13/15pts, classement +8, Monaco 2/5W ext.","tag_type":"result","is_value_bet":false,"value_edge":0,"reliability_score":82,"reliability_label":"Très fiable","is_trap":false,"trap_reason":null,"xg_home":1.82,"xg_away":0.91,"dropping_odds":false,"dropping_note":null,"kelly_pct":8.2,"ev":0.04,"correct_scores":null,"real_data":{"form_home":"WWWDW","form_away":"DWLWL","h2h":"4V-2N-1D","rank_home":"1er","rank_away":"3ème","ml_home":72,"ml_draw":18,"ml_away":10,"injuries":null}}],"summary":{"total":1,"avg_prob":72,"total_cote":1.45,"high_conf":1,"value_bets":0}}`;
-
-  // ── Football-Data.org pre-load ──
-  let fdData = null;
-  if (fdKey()) {
-    try {
-      fdData = await fdPreload(matches);
-      if (fdData) console.log('[BetAI] FD data loaded ✓');
-    } catch(e) { console.warn('[BetAI] FD preload failed:', e); }
-  }
-
-  // Inject FD data into prompt if available
-  const finalPrompt = fdData
-    ? prompt + '\n\n' + fdData + '\n\nUTILISE CES DONNÉES RÉELLES EN PRIORITÉ pour calibrer les probabilités. La recherche web complète uniquement ce qui manque (xG Understat, blessés, cotes).'
-    : prompt;
 
   try {
     sDone(0); sCur(1);
@@ -2028,1039 +2877,441 @@ async function sendChat() {
 }
 function chatQ(el){$('chatInput').value=el.textContent.replace(/^[^\w]/,'').trim();sendChat();}
 function clearChat(){chatHistory=[];$('chatBody').innerHTML='<div class="chat-msg ai"><div class="thinking">BetAI Assistant</div>Bonjour ! Je peux analyser n\'importe quel match avec des stats en temps réel. Que souhaitez-vous savoir ?</div>';}
-</script>
 
-<style>
-/* ════ OVERLAYS (Auth & Admin) ════ */
-.overlay{position:fixed;inset:0;z-index:9999;background:#080b10;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;}
-.overlay.hidden{display:none!important;}
-
-/* ── AUTH ── */
-.ov-card{background:#0d1117;border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:40px;width:100%;max-width:420px;margin:16px;box-shadow:0 32px 80px rgba(0,0,0,.6);}
-.ov-logo{text-align:center;margin-bottom:28px;}
-.ov-logo-mark{width:56px;height:56px;background:linear-gradient(135deg,#00e5a0,#06d6e8);border-radius:16px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:#080b10;margin:0 auto 12px;}
-.ov-logo-name{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.5px;}
-.ov-logo-name em{color:#00e5a0;font-style:normal;}
-.ov-logo-sub{font-size:11px;color:#5a6a80;margin-top:6px;line-height:1.6;}
-.ov-tabs{display:flex;background:#111820;border-radius:10px;padding:4px;margin-bottom:24px;}
-.ov-tab{flex:1;padding:9px;text-align:center;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;color:#5a6a80;transition:.2s;}
-.ov-tab.on{background:#161e28;color:#e8edf5;}
-.ov-field{margin-bottom:14px;}
-.ov-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#5a6a80;margin-bottom:5px;}
-.ov-input{width:100%;background:#111820;border:1px solid rgba(255,255,255,.07);border-radius:9px;color:#e8edf5;font-size:13px;padding:11px 14px;outline:none;transition:.2s;font-family:'Inter',sans-serif;}
-.ov-input:focus{border-color:rgba(0,229,160,.4);box-shadow:0 0 0 3px rgba(0,229,160,.06);}
-.ov-input::placeholder{color:#5a6a80;}
-.ov-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.ov-btn{width:100%;padding:13px;background:linear-gradient(135deg,#00b87a,#00e5a0);border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;letter-spacing:2px;color:#080b10;cursor:pointer;transition:.2s;margin-top:6px;}
-.ov-btn:hover{opacity:.88;transform:translateY(-1px);}
-.ov-btn.ghost{background:#111820;border:1px solid rgba(255,255,255,.08);color:#8a9ab0;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;letter-spacing:.5px;}
-.ov-btn.ghost:hover{border-color:rgba(255,255,255,.13);color:#e8edf5;transform:none;}
-.ov-sep{display:flex;align-items:center;gap:10px;margin:14px 0;}
-.ov-sep-line{flex:1;height:1px;background:rgba(255,255,255,.07);}
-.ov-sep-txt{font-size:10px;color:#5a6a80;}
-.ov-alert{border-radius:8px;padding:9px 12px;font-size:11px;margin-bottom:12px;display:none;line-height:1.5;}
-.ov-alert.show{display:block;}
-.ov-alert.err{background:rgba(255,77,106,.07);border:1px solid rgba(255,77,106,.2);color:#ff7888;}
-.ov-alert.ok{background:rgba(0,229,160,.07);border:1px solid rgba(0,229,160,.2);color:#00e5a0;}
-.ov-plans{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:14px;}
-.ov-plan{background:#111820;border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:10px 6px;text-align:center;cursor:pointer;transition:.2s;}
-.ov-plan.on{border-color:rgba(0,229,160,.35);background:rgba(0,229,160,.05);}
-.ov-plan-icon{font-size:18px;margin-bottom:4px;}
-.ov-plan-name{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#5a6a80;margin-bottom:3px;}
-.ov-plan-price{font-family:'DM Mono',monospace;font-size:14px;color:#e8edf5;}
-.ov-plan.on .ov-plan-price{color:#00e5a0;}
-.ov-plan-note{font-size:7.5px;color:#5a6a80;margin-top:3px;}
-.ov-admin-link{position:absolute;bottom:16px;right:20px;font-size:9px;color:rgba(255,255,255,.1);cursor:pointer;letter-spacing:1px;}
-.ov-admin-link:hover{color:#5a6a80;}
-.ov-spin{width:14px;height:14px;border:2px solid rgba(0,0,0,.2);border-top:2px solid #080b10;border-radius:50%;animation:ovspin .6s linear infinite;display:inline-block;vertical-align:middle;margin-right:5px;}
-@keyframes ovspin{to{transform:rotate(360deg)}}
-
-/* ── ADMIN ── */
-.adm-lock{background:#0a0e16;border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:40px;width:100%;max-width:360px;margin:16px;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,.7);}
-.adm-icon{font-size:44px;margin-bottom:14px;}
-.adm-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px;}
-.adm-title em{color:#f5c842;font-style:normal;}
-.adm-sub{font-size:11px;color:#5a6a80;margin-bottom:22px;}
-.adm-input{width:100%;background:#0f1520;border:1px solid rgba(255,255,255,.08);border-radius:9px;color:#e8edf5;font-size:16px;padding:12px;outline:none;text-align:center;letter-spacing:5px;font-family:'DM Mono',monospace;margin-bottom:12px;transition:.2s;}
-.adm-input:focus{border-color:rgba(245,200,66,.4);}
-.adm-btn{width:100%;padding:12px;background:linear-gradient(135deg,#c89000,#f5c842);border:none;border-radius:9px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;letter-spacing:2px;color:#06080d;cursor:pointer;transition:.2s;}
-.adm-btn:hover{opacity:.88;}
-.adm-err{font-size:10px;color:#ff4d6a;min-height:16px;margin-top:8px;}
-.adm-back{font-size:10px;color:#5a6a80;margin-top:12px;cursor:pointer;}
-.adm-back:hover{color:#8a9ab0;}
-/* Admin dashboard (after unlock) */
-.adm-shell{position:fixed;inset:0;z-index:10000;background:#06080d;display:none;flex-direction:column;font-family:'Inter',sans-serif;overflow:hidden;}
-.adm-topbar{background:#0a0e16;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:14px;padding:0 20px;height:52px;flex-shrink:0;}
-.adm-logo{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-.5px;display:flex;align-items:center;gap:8px;}
-.adm-logo em{color:#f5c842;font-style:normal;}
-.adm-badge{background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.25);border-radius:4px;padding:2px 7px;font-size:7.5px;font-weight:700;color:#f5c842;letter-spacing:1.5px;}
-.adm-topbar-right{margin-left:auto;display:flex;gap:8px;}
-.adm-tbtn{padding:6px 12px;border-radius:7px;font-size:10px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:.15s;}
-.adm-tbtn.ghost{background:rgba(255,255,255,.05);color:#8a9ab0;}
-.adm-tbtn.ghost:hover{background:rgba(255,255,255,.08);color:#e8edf5;}
-.adm-tbtn.danger{background:rgba(255,77,106,.08);color:#ff4d6a;border:1px solid rgba(255,77,106,.15);}
-.adm-body{display:flex;flex:1;overflow:hidden;}
-.adm-nav{background:#0a0e16;border-right:1px solid rgba(255,255,255,.07);width:200px;flex-shrink:0;padding:12px 8px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
-.adm-nav-sect{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#5a6a80;padding:10px 8px 4px;margin-top:4px;}
-.adm-nitem{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;transition:.15s;border:1px solid transparent;color:#8a9ab0;}
-.adm-nitem:hover{background:#0f1520;color:#e8edf5;}
-.adm-nitem.on{background:rgba(245,200,66,.06);border-color:rgba(245,200,66,.15);color:#f5c842;}
-.adm-nitem-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
-.adm-nitem-label{font-size:11px;font-weight:600;}
-.adm-main{flex:1;overflow-y:auto;padding:22px;}
-.adm-main::-webkit-scrollbar{width:3px;}
-.adm-page{display:none;}
-.adm-page.on{display:block;}
-.adm-ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
-.adm-ph-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.5px;}
-.adm-ph-title em{color:#f5c842;font-style:normal;}
-.adm-ph-sub{font-size:11px;color:#8a9ab0;margin-top:4px;}
-.adm-kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:18px;}
-.adm-kpi{background:#0f1520;border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:12px 14px;position:relative;overflow:hidden;}
-.adm-kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
-.adm-kpi.g::before{background:#00e5a0;}.adm-kpi.gold::before{background:#f5c842;}.adm-kpi.b::before{background:#3d9eff;}.adm-kpi.r::before{background:#ff4d6a;}.adm-kpi.p::before{background:#a855f7;}
-.adm-kval{font-family:'DM Mono',monospace;font-size:26px;font-weight:500;line-height:1;margin-bottom:3px;}
-.adm-kpi.g .adm-kval{color:#00e5a0;}.adm-kpi.gold .adm-kval{color:#f5c842;}.adm-kpi.b .adm-kval{color:#3d9eff;}.adm-kpi.r .adm-kval{color:#ff4d6a;}.adm-kpi.p .adm-kval{color:#a855f7;}
-.adm-klabel{font-size:8.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#5a6a80;}
-.adm-card{background:#0f1520;border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:18px;margin-bottom:14px;}
-.adm-card-title{font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8a9ab0;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.06);}
-.adm-g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.adm-field{margin-bottom:12px;}
-.adm-flabel{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#5a6a80;margin-bottom:5px;}
-.adm-finput{width:100%;background:#141c28;border:1px solid rgba(255,255,255,.07);border-radius:8px;color:#e8edf5;font-size:12px;padding:9px 12px;outline:none;transition:.2s;font-family:'Inter',sans-serif;}
-.adm-finput:focus{border-color:rgba(245,200,66,.4);}
-.adm-finput::placeholder{color:#5a6a80;}
-.adm-finput.mono{font-family:'DM Mono',monospace;letter-spacing:1px;}
-.adm-key-block{background:rgba(245,200,66,.03);border:1px solid rgba(245,200,66,.15);border-radius:10px;padding:14px;margin-bottom:12px;}
-.adm-key-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-.adm-key-title{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#f5c842;}
-.adm-key-wrap{position:relative;}
-.adm-key-wrap .adm-finput{padding-right:85px;}
-.adm-key-actions{position:absolute;right:5px;top:50%;transform:translateY(-50%);display:flex;gap:4px;}
-.adm-mini-btn{padding:3px 8px;border-radius:5px;font-size:9px;font-weight:700;cursor:pointer;border:none;transition:.15s;}
-.adm-mini-btn.show{background:rgba(245,200,66,.1);color:#f5c842;}
-.adm-mini-btn.copy{background:rgba(0,229,160,.1);color:#00e5a0;}
-.adm-save-btn{padding:8px 16px;background:linear-gradient(135deg,#c89000,#f5c842);border:none;border-radius:7px;font-family:'Syne',sans-serif;font-size:12px;font-weight:800;letter-spacing:1.5px;color:#06080d;cursor:pointer;transition:.2s;margin-top:8px;}
-.adm-save-btn:hover{opacity:.88;}
-.adm-test-result{font-size:9px;font-weight:600;padding:3px 9px;border-radius:5px;display:none;}
-.adm-test-result.ok{background:rgba(0,229,160,.08);color:#00e5a0;display:inline-block;}
-.adm-test-result.err{background:rgba(255,77,106,.08);color:#ff4d6a;display:inline-block;}
-.adm-hint{font-size:8.5px;color:#5a6a80;margin-top:6px;line-height:1.5;}
-.adm-hint a{color:#f5c842;text-decoration:none;}
-/* Users table */
-.adm-usearch{background:#141c28;border:1px solid rgba(255,255,255,.07);border-radius:8px;color:#e8edf5;font-size:11px;padding:7px 12px;outline:none;width:240px;font-family:'Inter',sans-serif;}
-.adm-ufilter{background:#141c28;border:1px solid rgba(255,255,255,.07);border-radius:8px;color:#8a9ab0;font-size:11px;padding:7px 10px;outline:none;}
-.adm-table{background:#0f1520;border:1px solid rgba(255,255,255,.07);border-radius:9px;overflow:hidden;}
-.adm-thead{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 1.2fr;background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.06);padding:8px 12px;gap:8px;}
-.adm-th{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#5a6a80;}
-.adm-trow{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 1.2fr;padding:9px 12px;gap:8px;border-bottom:1px solid rgba(255,255,255,.04);align-items:center;transition:.1s;}
-.adm-trow:hover{background:rgba(255,255,255,.02);}
-.adm-trow:last-child{border-bottom:none;}
-.adm-u-name{font-weight:600;font-size:11px;}
-.adm-u-email{font-size:9px;color:#5a6a80;margin-top:2px;}
-.adm-plan-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:7.5px;font-weight:700;}
-.adm-plan-badge.free{background:rgba(255,255,255,.06);color:#8a9ab0;}
-.adm-plan-badge.starter{background:rgba(61,158,255,.1);color:#3d9eff;}
-.adm-plan-badge.pro{background:rgba(0,229,160,.1);color:#00e5a0;}
-.adm-status-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:7.5px;font-weight:700;}
-.adm-status-badge.active{background:rgba(0,229,160,.1);color:#00e5a0;}
-.adm-status-badge.banned{background:rgba(255,77,106,.1);color:#ff4d6a;}
-.adm-ubtn{padding:3px 8px;border-radius:5px;font-size:8px;font-weight:700;cursor:pointer;border:none;transition:.15s;}
-.adm-ubtn.edit{background:rgba(61,158,255,.1);color:#3d9eff;}
-.adm-ubtn.ban{background:rgba(255,77,106,.1);color:#ff4d6a;}
-.adm-ubtn.unban{background:rgba(0,229,160,.1);color:#00e5a0;}
-.adm-ubtn.reset{background:rgba(245,200,66,.1);color:#f5c842;}
-.adm-quota-bar{height:3px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:3px;overflow:hidden;}
-.adm-quota-fill{height:3px;border-radius:2px;}
-.adm-tickets-val{font-family:'DM Mono',monospace;font-size:11px;}
-/* Admin toast */
-.adm-toasts{position:fixed;top:60px;right:16px;z-index:10001;display:flex;flex-direction:column;gap:5px;}
-.adm-toast{background:#0f1520;border-radius:8px;padding:9px 14px;font-size:11px;border-left:3px solid;animation:admtin .2s ease;box-shadow:0 6px 20px rgba(0,0,0,.5);}
-@keyframes admtin{from{opacity:0;transform:translateX(15px)}to{opacity:1;transform:none}}
-.adm-toast.ok{border-color:#00e5a0;color:#00e5a0;}
-.adm-toast.err{border-color:#ff4d6a;color:#ff4d6a;}
-/* Modal */
-.adm-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10002;align-items:center;justify-content:center;}
-.adm-modal.show{display:flex;}
-.adm-modal-box{background:#0a0e16;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:26px;width:380px;max-width:94vw;}
-.adm-modal-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;}
-.adm-modal-close{cursor:pointer;color:#5a6a80;font-size:16px;}
-.adm-modal-close:hover{color:#e8edf5;}
-.adm-toggle{position:relative;width:34px;height:18px;flex-shrink:0;}
-.adm-toggle input{opacity:0;width:0;height:0;}
-.adm-toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.08);border-radius:18px;cursor:pointer;transition:.25s;}
-.adm-toggle-slider::before{content:'';position:absolute;width:12px;height:12px;left:3px;top:3px;background:#5a6a80;border-radius:50%;transition:.25s;}
-.adm-toggle input:checked+.adm-toggle-slider{background:rgba(0,229,160,.2);}
-.adm-toggle input:checked+.adm-toggle-slider::before{transform:translateX(16px);background:#00e5a0;}
-/* Revenue */
-.adm-rev-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);}
-.adm-rev-item:last-child{border-bottom:none;}
-.adm-rev-label{font-size:11px;color:#8a9ab0;}
-.adm-rev-val{font-family:'DM Mono',monospace;font-size:15px;color:#00e5a0;}
-.adm-usage-item{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-.adm-usage-label{font-size:10px;color:#8a9ab0;min-width:100px;}
-.adm-usage-track{flex:1;height:5px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;}
-.adm-usage-fill{height:5px;border-radius:3px;transition:width .8s;}
-.adm-usage-val{font-family:'DM Mono',monospace;font-size:9px;min-width:55px;text-align:right;color:#8a9ab0;}
-.adm-log-row{display:flex;gap:10px;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;}
-.adm-log-time{font-family:'DM Mono',monospace;color:#5a6a80;min-width:65px;font-size:9px;}
-.adm-log-user{color:#3d9eff;font-weight:600;min-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.adm-log-action{color:#8a9ab0;flex:1;}
-.adm-log-badge{padding:1px 6px;border-radius:3px;font-size:7.5px;font-weight:700;}
-.adm-log-badge.ticket{background:rgba(0,229,160,.08);color:#00e5a0;}
-.adm-log-badge.login{background:rgba(61,158,255,.08);color:#3d9eff;}
-.adm-log-badge.admin{background:rgba(245,200,66,.08);color:#f5c842;}
-.adm-sys-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;}
-.adm-sys-dot{width:6px;height:6px;border-radius:50%;}
-.adm-sys-dot.ok{background:#00e5a0;}.adm-sys-dot.warn{background:#f5c842;}.adm-sys-dot.err{background:#ff4d6a;}
-</style>
-
-<!-- ════ AUTH OVERLAY ════ -->
-<div class="overlay" id="auth-overlay">
-  <div class="ov-card">
-    <div class="ov-logo">
-      <div class="ov-logo-mark">BA</div>
-      <div class="ov-logo-name">Bet<em>AI</em></div>
-      <div class="ov-logo-sub">Intelligence artificielle pour les paris football<br>xG · Value Bets · Dropping Odds · Kelly</div>
-    </div>
-
-    <div class="ov-tabs">
-      <div class="ov-tab on" id="ovTabLogin" onclick="ovSetTab('login')">Connexion</div>
-      <div class="ov-tab" id="ovTabRegister" onclick="ovSetTab('register')">Créer un compte</div>
-    </div>
-
-    <div class="ov-alert" id="ovAlert"></div>
-
-    <!-- LOGIN -->
-    <div id="ovFormLogin">
-      <div class="ov-field">
-        <div class="ov-label">Email</div>
-        <input type="email" class="ov-input" id="ovEmail" placeholder="votre@email.com" onkeydown="if(event.key==='Enter')ovLogin()">
-      </div>
-      <div class="ov-field">
-        <div class="ov-label">Mot de passe</div>
-        <input type="password" class="ov-input" id="ovPwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')ovLogin()">
-      </div>
-      <button class="ov-btn" id="ovLoginBtn" onclick="ovLogin()">SE CONNECTER</button>
-      <div class="ov-sep"><div class="ov-sep-line"></div><div class="ov-sep-txt">OU</div><div class="ov-sep-line"></div></div>
-      <button class="ov-btn ghost" onclick="ovDemo()">🎮 Accès démo gratuit</button>
-    </div>
-
-    <!-- REGISTER -->
-    <div id="ovFormRegister" style="display:none">
-      <div class="ov-row2">
-        <div class="ov-field"><div class="ov-label">Prénom</div><input type="text" class="ov-input" id="ovFirst" placeholder="Mohamed"></div>
-        <div class="ov-field"><div class="ov-label">Nom</div><input type="text" class="ov-input" id="ovLast" placeholder="Koné"></div>
-      </div>
-      <div class="ov-field"><div class="ov-label">Email</div><input type="email" class="ov-input" id="ovRegEmail" placeholder="votre@email.com"></div>
-      <div class="ov-field"><div class="ov-label">Mot de passe</div><input type="password" class="ov-input" id="ovRegPwd" placeholder="8 caractères minimum"></div>
-      <div class="ov-field">
-        <div class="ov-label">Choisir un plan</div>
-        <div class="ov-plans">
-          <div class="ov-plan on" id="ovPlanFree" onclick="ovSelPlan('free',this)"><div class="ov-plan-icon">🆓</div><div class="ov-plan-name">Gratuit</div><div class="ov-plan-price">0 F</div><div class="ov-plan-note">5 tickets/mois</div></div>
-          <div class="ov-plan" id="ovPlanStarter" onclick="ovSelPlan('starter',this)"><div class="ov-plan-icon">🚀</div><div class="ov-plan-name">Starter</div><div class="ov-plan-price">2 000 F</div><div class="ov-plan-note">25 tickets/mois</div></div>
-          <div class="ov-plan" id="ovPlanPro" onclick="ovSelPlan('pro',this)"><div class="ov-plan-icon">💎</div><div class="ov-plan-name">Pro</div><div class="ov-plan-price">5 000 F</div><div class="ov-plan-note">Illimité</div></div>
-        </div>
-      </div>
-      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-bottom:12px">
-        <input type="checkbox" id="ovTerms" style="margin-top:2px;accent-color:#00e5a0">
-        <span style="font-size:9.5px;color:#5a6a80;line-height:1.5">J'accepte les conditions d'utilisation et je comprends que BetAI est un outil d'aide à la décision</span>
-      </label>
-      <button class="ov-btn" id="ovRegBtn" onclick="ovRegister()">CRÉER MON COMPTE</button>
-    </div>
-  </div>
-  <div class="ov-admin-link" onclick="showOverlay('admin-lock')">⚙ ADMIN</div>
-</div>
-
-<!-- ════ ADMIN LOCK ════ -->
-<div class="overlay hidden" id="admin-lock">
-  <div class="adm-lock">
-    <div class="adm-icon">🔐</div>
-    <div class="adm-title"><em>Admin</em> BetAI</div>
-    <div class="adm-sub">Accès réservé à l'administrateur</div>
-    <input type="password" class="adm-input" id="admLockPwd" placeholder="••••••" onkeydown="if(event.key==='Enter')admUnlock()">
-    <button class="adm-btn" onclick="admUnlock()">ACCÉDER</button>
-    <div class="adm-err" id="admLockErr"></div>
-    <div class="adm-back" onclick="showOverlay('auth-overlay')">← Retour à l'accueil</div>
-  </div>
-</div>
-
-<!-- ════ ADMIN SHELL ════ -->
-<div class="adm-shell" id="adm-shell">
-  <div class="adm-toasts" id="admToasts"></div>
-  <div class="adm-topbar">
-    <div class="adm-logo">Bet<em>AI</em> <span class="adm-badge">ADMIN</span></div>
-    <div style="font-size:10px;color:#5a6a80;margin-left:12px" id="admDate">—</div>
-    <div class="adm-topbar-right">
-      <button class="adm-tbtn ghost" onclick="admRefresh()">🔄 Actualiser</button>
-      <button class="adm-tbtn ghost" onclick="admClose()">✕ Fermer</button>
-    </div>
-  </div>
-  <div class="adm-body">
-    <nav class="adm-nav">
-      <div class="adm-nav-sect">Général</div>
-      <div class="adm-nitem on" onclick="admPage('dashboard',this)"><div class="adm-nitem-icon">📊</div><div class="adm-nitem-label">Dashboard</div></div>
-      <div class="adm-nitem" onclick="admPage('users',this)"><div class="adm-nitem-icon">👥</div><div class="adm-nitem-label">Utilisateurs</div></div>
-      <div class="adm-nitem" onclick="admPage('revenue',this)"><div class="adm-nitem-icon">💰</div><div class="adm-nitem-label">Revenus</div></div>
-      <div class="adm-nav-sect">Config</div>
-      <div class="adm-nitem" onclick="admPage('apikeys',this)"><div class="adm-nitem-icon">🔑</div><div class="adm-nitem-label">Clés API</div></div>
-      <div class="adm-nitem" onclick="admPage('plans',this)"><div class="adm-nitem-icon">💎</div><div class="adm-nitem-label">Plans & Quotas</div></div>
-      <div class="adm-nitem" onclick="admPage('settings',this)"><div class="adm-nitem-icon">⚙️</div><div class="adm-nitem-label">Paramètres</div></div>
-      <div class="adm-nav-sect">Monitoring</div>
-      <div class="adm-nitem" onclick="admPage('logs',this)"><div class="adm-nitem-icon">📋</div><div class="adm-nitem-label">Logs</div></div>
-    </nav>
-    <div class="adm-main">
-
-      <!-- DASHBOARD -->
-      <div class="adm-page on" id="adm-page-dashboard">
-        <div class="adm-ph"><div><div class="adm-ph-title">📊 <em>Dashboard</em></div><div class="adm-ph-sub" id="admDashDate">—</div></div></div>
-        <div class="adm-kgrid">
-          <div class="adm-kpi g"><div class="adm-kval" id="admKpiUsers">0</div><div class="adm-klabel">Utilisateurs</div></div>
-          <div class="adm-kpi gold"><div class="adm-kval" id="admKpiActive">0</div><div class="adm-klabel">Actifs</div></div>
-          <div class="adm-kpi b"><div class="adm-kval" id="admKpiTickets">0</div><div class="adm-klabel">Tickets générés</div></div>
-          <div class="adm-kpi p"><div class="adm-kval" id="admKpiPro">0</div><div class="adm-klabel">Comptes Pro</div></div>
-          <div class="adm-kpi r"><div class="adm-kval" id="admKpiBanned">0</div><div class="adm-klabel">Suspendus</div></div>
-        </div>
-        <div class="adm-g2">
-          <div class="adm-card"><div class="adm-card-title">📊 RÉPARTITION DES PLANS</div><div id="admPlanChart"></div></div>
-          <div class="adm-card"><div class="adm-card-title">📋 ACTIVITÉ RÉCENTE</div><div id="admRecentLogs"></div></div>
-        </div>
-      </div>
-
-      <!-- USERS -->
-      <div class="adm-page" id="adm-page-users">
-        <div class="adm-ph">
-          <div><div class="adm-ph-title">👥 <em>Utilisateurs</em></div><div class="adm-ph-sub" id="admUsersSub">—</div></div>
-          <div style="display:flex;gap:8px">
-            <button class="adm-save-btn" style="font-size:10px;padding:7px 14px" onclick="admExportUsers()">📤 Export</button>
-            <button class="adm-save-btn" onclick="admOpenAddUser()">➕ Ajouter</button>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-          <input type="text" class="adm-usearch" id="admUserSearch" placeholder="🔍 Chercher…" oninput="admRenderUsers()">
-          <select class="adm-ufilter" id="admPlanFilter" onchange="admRenderUsers()"><option value="all">Tous les plans</option><option value="free">Gratuit</option><option value="starter">Starter</option><option value="pro">Pro</option></select>
-          <select class="adm-ufilter" id="admStatusFilter" onchange="admRenderUsers()"><option value="all">Tous</option><option value="active">Actifs</option><option value="banned">Suspendus</option></select>
-        </div>
-        <div class="adm-table">
-          <div class="adm-thead"><div class="adm-th">Utilisateur</div><div class="adm-th">Email</div><div class="adm-th">Plan</div><div class="adm-th">Tickets</div><div class="adm-th">Statut</div><div class="adm-th">Actions</div></div>
-          <div id="admUsersBody"></div>
-        </div>
-      </div>
-
-      <!-- API KEYS -->
-      <div class="adm-page" id="adm-page-apikeys">
-        <div class="adm-ph"><div><div class="adm-ph-title">🔑 <em>Clés API</em></div><div class="adm-ph-sub">Sécurisées — jamais exposées aux utilisateurs</div></div></div>
-        <div class="adm-key-block">
-          <div class="adm-key-hd">
-            <div class="adm-key-title">🤖 ANTHROPIC CLAUDE</div>
-            <span id="admAiStatus" style="font-size:9px;font-weight:700;color:#f5c842">Non configuré</span>
-          </div>
-          <div class="adm-key-wrap">
-            <input type="password" class="adm-finput mono" id="admAiKey" placeholder="sk-ant-api03-XXXXXX" autocomplete="off">
-            <div class="adm-key-actions">
-              <button class="adm-mini-btn show" onclick="admToggleKey('admAiKey',this)">👁 Voir</button>
-              <button class="adm-mini-btn copy" onclick="admCopyKey('admAiKey')">📋</button>
-            </div>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
-            <button class="adm-save-btn" style="font-size:10px;padding:7px 14px" onclick="admTestKey()">⚡ Tester</button>
-            <button class="adm-save-btn" onclick="admSaveAiKey()">💾 Sauvegarder</button>
-            <span id="admTestResult" class="adm-test-result"></span>
-          </div>
-          <div class="adm-hint">🔑 <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> · Chiffrée XOR+Base64 · Invisible côté utilisateur</div>
-        </div>
-        <div class="adm-g2">
-          <div class="adm-key-block" style="border-color:rgba(0,229,160,.15)">
-            <div class="adm-key-hd"><div class="adm-key-title" style="color:#00e5a0">📊 FOOTBALL-DATA.ORG</div><div style="display:flex;gap:6px;align-items:center"><span id="admFdStatus" style="font-size:9px;font-weight:700;color:#f5c842">Non configuré</span><span style="font-size:8px;background:rgba(0,229,160,.1);color:#00e5a0;padding:2px 6px;border-radius:4px;font-weight:700">GRATUIT</span></div></div>
-            <div class="adm-key-wrap"><input type="password" class="adm-finput mono" id="admFdKey" placeholder="Token football-data.org" autocomplete="off"><div class="adm-key-actions"><button class="adm-mini-btn show" onclick="admToggleKey('admFdKey',this)">👁</button></div></div>
-            <button class="adm-save-btn" style="font-size:10px;padding:6px 12px;margin-top:8px" onclick="admSaveFdKey()">💾 Sauvegarder</button>
-            <div class="adm-hint"><a href="https://www.football-data.org/client/register" target="_blank">football-data.org/register</a></div>
-          </div>
-          <div class="adm-key-block" style="border-color:rgba(61,158,255,.15)">
-            <div class="adm-key-hd"><div class="adm-key-title" style="color:#3d9eff">🏟️ API-FOOTBALL</div><span style="font-size:8px;background:rgba(61,158,255,.1);color:#3d9eff;padding:2px 6px;border-radius:4px;font-weight:700">GRATUIT</span></div>
-            <div class="adm-key-wrap"><input type="password" class="adm-finput mono" id="admAfKey" placeholder="Token api-football.com" autocomplete="off"><div class="adm-key-actions"><button class="adm-mini-btn show" onclick="admToggleKey('admAfKey',this)">👁</button></div></div>
-            <button class="adm-save-btn" style="font-size:10px;padding:6px 12px;margin-top:8px" onclick="admSaveAfKey()">💾 Sauvegarder</button>
-            <div class="adm-hint"><a href="https://dashboard.api-football.com/register" target="_blank">api-football.com/register</a></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- PLANS -->
-      <div class="adm-page" id="adm-page-plans">
-        <div class="adm-ph"><div><div class="adm-ph-title">💎 <em>Plans</em> & Quotas</div></div><button class="adm-save-btn" onclick="admSavePlans()">💾 Sauvegarder tout</button></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
-          <div class="adm-card"><div class="adm-card-title" style="color:#8a9ab0">🆓 GRATUIT</div>
-            <div class="adm-field"><div class="adm-flabel">Tickets/mois</div><input type="number" class="adm-finput" id="pFreeTickets" value="5" min="0"></div>
-            <div class="adm-field"><div class="adm-flabel">Picks max/ticket</div><input type="number" class="adm-finput" id="pFreePicks" value="5" min="1"></div>
-          </div>
-          <div class="adm-card" style="border-color:rgba(61,158,255,.12)"><div class="adm-card-title" style="color:#3d9eff">🚀 STARTER</div>
-            <div class="adm-field"><div class="adm-flabel">Tickets/mois</div><input type="number" class="adm-finput" id="pStarterTickets" value="25" min="0"></div>
-            <div class="adm-field"><div class="adm-flabel">Prix (FCFA)</div><input type="number" class="adm-finput" id="pStarterPrice" value="2000"></div>
-          </div>
-          <div class="adm-card" style="border-color:rgba(0,229,160,.12)"><div class="adm-card-title" style="color:#00e5a0">💎 PRO</div>
-            <div class="adm-field"><div class="adm-flabel">Tickets/mois</div><input type="number" class="adm-finput" id="pProTickets" value="9999" min="0"></div>
-            <div class="adm-field"><div class="adm-flabel">Prix (FCFA)</div><input type="number" class="adm-finput" id="pProPrice" value="5000"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SETTINGS -->
-      <div class="adm-page" id="adm-page-settings">
-        <div class="adm-ph"><div><div class="adm-ph-title">⚙️ <em>Paramètres</em></div></div></div>
-        <div class="adm-g2">
-          <div class="adm-card"><div class="adm-card-title">🔐 MOT DE PASSE ADMIN</div>
-            <div class="adm-field"><div class="adm-flabel">Mot de passe actuel</div><input type="password" class="adm-finput" id="admCurPwd" placeholder="Mot de passe actuel"></div>
-            <div class="adm-field"><div class="adm-flabel">Nouveau (8 min)</div><input type="password" class="adm-finput" id="admNewPwd" placeholder="Nouveau mot de passe"></div>
-            <button class="adm-save-btn" onclick="admChangePwd()">🔒 Changer</button>
-          </div>
-          <div class="adm-card"><div class="adm-card-title">⚙️ APP SETTINGS</div>
-            <div style="display:flex;flex-direction:column;gap:12px">
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <div><div style="font-size:11px;font-weight:600;color:#e8edf5">Inscriptions ouvertes</div><div style="font-size:9px;color:#5a6a80">Autoriser nouveaux comptes</div></div>
-                <label class="adm-toggle"><input type="checkbox" id="setReg" checked onchange="admSaveSetting('registration',this.checked)"><span class="adm-toggle-slider"></span></label>
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <div><div style="font-size:11px;font-weight:600;color:#e8edf5">Mode démo</div><div style="font-size:9px;color:#5a6a80">Bouton démo sur login</div></div>
-                <label class="adm-toggle"><input type="checkbox" id="setDemo" checked onchange="admSaveSetting('demo',this.checked)"><span class="adm-toggle-slider"></span></label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- REVENUE -->
-      <div class="adm-page" id="adm-page-revenue">
-        <div class="adm-ph"><div><div class="adm-ph-title">💰 <em>Revenus</em></div></div></div>
-        <div class="adm-kgrid">
-          <div class="adm-kpi g"><div class="adm-kval" id="admRevMRR">0</div><div class="adm-klabel">MRR (FCFA)</div></div>
-          <div class="adm-kpi gold"><div class="adm-kval" id="admRevPaying">0</div><div class="adm-klabel">Abonnés payants</div></div>
-          <div class="adm-kpi b"><div class="adm-kval" id="admRevARPU">0</div><div class="adm-klabel">ARPU (FCFA)</div></div>
-        </div>
-        <div class="adm-card"><div class="adm-card-title">💰 DÉTAIL</div><div id="admRevDetail"></div></div>
-      </div>
-
-      <!-- LOGS -->
-      <div class="adm-page" id="adm-page-logs">
-        <div class="adm-ph"><div><div class="adm-ph-title">📋 <em>Logs</em></div></div>
-          <div style="display:flex;gap:8px">
-            <button class="adm-save-btn" style="background:rgba(255,77,106,.15);color:#ff4d6a;font-size:10px;padding:7px 14px" onclick="admClearLogs()">🗑️ Effacer</button>
-            <button class="adm-save-btn" style="font-size:10px;padding:7px 14px" onclick="admRenderLogs()">🔄 Actualiser</button>
-          </div>
-        </div>
-        <div class="adm-card"><div id="admLogsContainer"></div></div>
-      </div>
-
-    </div><!-- adm-main -->
-  </div><!-- adm-body -->
-</div><!-- adm-shell -->
-
-<!-- MODAL: Add/Edit User -->
-<div class="adm-modal" id="admModalUser">
-  <div class="adm-modal-box">
-    <div class="adm-modal-title">👤 <span id="admModalUserTitle">Ajouter</span><span class="adm-modal-close" onclick="admCloseModal()">✕</span></div>
-    <div class="adm-g2">
-      <div class="adm-field"><div class="adm-flabel">Prénom</div><input type="text" class="adm-finput" id="muFirst" placeholder="Prénom"></div>
-      <div class="adm-field"><div class="adm-flabel">Nom</div><input type="text" class="adm-finput" id="muLast" placeholder="Nom"></div>
-    </div>
-    <div class="adm-field"><div class="adm-flabel">Email</div><input type="email" class="adm-finput" id="muEmail" placeholder="email@exemple.com"></div>
-    <div class="adm-field"><div class="adm-flabel">Mot de passe</div><input type="password" class="adm-finput" id="muPwd" placeholder="Laisser vide pour garder"></div>
-    <div class="adm-field"><div class="adm-flabel">Plan</div>
-      <select class="adm-finput" id="muPlan"><option value="free">Gratuit (5 tickets)</option><option value="starter">Starter (25 / 2000 FCFA)</option><option value="pro">Pro (Illimité / 5000 FCFA)</option></select>
-    </div>
-    <div class="adm-field"><div class="adm-flabel">Tickets restants</div><input type="number" class="adm-finput" id="muTickets" value="5" min="0"></div>
-    <div style="display:flex;gap:8px;margin-top:6px">
-      <button class="adm-save-btn" style="flex:1;text-align:center" onclick="admSaveUser()">💾 Sauvegarder</button>
-      <button class="adm-save-btn" style="background:rgba(255,255,255,.05);color:#8a9ab0" onclick="admCloseModal()">Annuler</button>
-    </div>
-  </div>
-</div>
-
-<script>
-
-// ════════════════════════════════════════════════════════
-//  FOOTBALL-DATA.ORG — Pré-chargement données réelles
-// ════════════════════════════════════════════════════════
-
-// Competition ID mapping (Football-Data.org)
-const FD_COMPS = {
-  'Premier League':2021,'PL':2021,'England':2021,
-  'La Liga':2014,'LaLiga':2014,'Spain':2014,
-  'Bundesliga':2002,'BL1':2002,'Germany':2002,
-  'Serie A':2019,'SA':2019,'Italy':2019,
-  'Ligue 1':2015,'FL1':2015,'France':2015,
-  'Champions League':2001,'UCL':2001,'CL':2001,
-  'Championship':2016,'ELC':2016,
-  'Ligue 2':2016, // approx
-  'Eredivisie':2003,'DED':2003,'Netherlands':2003,
-  'Primeira Liga':2017,'PPL':2017,'Portugal':2017,
-  'World Cup':2000,'WC':2000,
-};
-const FD_ALL_COMPS = [2021,2014,2002,2019,2015,2001,2003,2017];
-
-// Normalize team name for fuzzy match
-function fdNorm(s){return s.toLowerCase().replace(/[^a-z0-9]/g,' ').replace(/\s+/g,' ').trim();}
-function fdMatch(a,b){
-  const na=fdNorm(a),nb=fdNorm(b);
-  if(na===nb)return true;
-  if(na.includes(nb)||nb.includes(na))return true;
-  // Check first word match
-  const wa=na.split(' ')[0],wb=nb.split(' ')[0];
-  if(wa.length>3&&wa===wb)return true;
-  return false;
+/* ════════════════════════════════════════
+   SPA ROUTER
+════════════════════════════════════════ */
+function showView(v) {
+  document.querySelectorAll('.spa-view').forEach(el => el.classList.remove('active'));
+  const target = document.getElementById('view-' + v);
+  if (target) target.classList.add('active');
+  if (history.pushState) history.pushState(null, null, '#' + v);
 }
+function showAdmin() { showView('admin'); }
 
-// Parse "League: TeamA vs TeamB" or "TeamA vs TeamB"  
-function fdParseMatch(line){
-  const clean=line.trim();
-  let league='',home='',away='';
-  const colonIdx=clean.indexOf(':');
-  let rest=clean;
-  if(colonIdx>0&&colonIdx<25){league=clean.substring(0,colonIdx).trim();rest=clean.substring(colonIdx+1).trim();}
-  const sep=rest.match(/\s+(?:vs?\.?|–|-)\s+/i);
-  if(sep){home=rest.substring(0,sep.index).trim();away=rest.substring(sep.index+sep[0].length).trim();}
-  else{const p=rest.split(' ');home=p.slice(0,Math.ceil(p.length/2)).join(' ');away=p.slice(Math.ceil(p.length/2)).join(' ');}
-  return{league,home,away};
-}
+/* ════════════════════════════════════════
+   AUTH LOGIC
+════════════════════════════════════════ */
+// session managed by SPA router
 
-function fdKey(){return _dec2(localStorage.getItem('_betai_fk')||'');}
-function fdAfKey(){return _dec2(localStorage.getItem('_betai_afk')||'');}
+let selectedPlan = 'free';
 
-// Fetch from Football-Data.org with rate-limit-safe queue
-let _fdQueue=Promise.resolve();
-function fdFetch(path){
-  const key=fdKey();
-  if(!key)return Promise.resolve(null);
-  _fdQueue=_fdQueue.then(()=>new Promise(r=>setTimeout(r,120))).then(()=>
-    fetch('https://api.football-data.org/v4'+path,{headers:{'X-Auth-Token':key}})
-      .then(r=>r.ok?r.json():null).catch(()=>null)
-  );
-  return _fdQueue;
-}
-
-// Get upcoming matches for a competition
-async function fdGetMatches(compId,days=4){
-  const t=new Date(),tf=new Date(t.getTime()+days*86400000);
-  const fmt=d=>d.toISOString().split('T')[0];
-  const data=await fdFetch(`/v4/competitions/${compId}/matches?status=SCHEDULED&dateFrom=${fmt(t)}&dateTo=${fmt(tf)}`);
-  return data?.matches||[];
-}
-
-// Get standings for a competition
-async function fdGetStandings(compId){
-  const data=await fdFetch(`/v4/competitions/${compId}/standings`);
-  if(!data?.standings)return null;
-  const table=data.standings.find(s=>s.type==='TOTAL');
-  return table?.table||[];
-}
-
-// Get last N matches for a team
-async function fdGetTeamForm(teamId,n=6){
-  const data=await fdFetch(`/v4/teams/${teamId}/matches?limit=${n}&status=FINISHED`);
-  return data?.matches||[];
-}
-
-// Format form string: W/D/L from matches (most recent first)
-function fdFormStr(matches,teamId){
-  return matches.slice(0,5).map(m=>{
-    const isHome=m.homeTeam.id===teamId;
-    const gs=isHome?m.score.fullTime.home:m.score.fullTime.away;
-    const gc=isHome?m.score.fullTime.away:m.score.fullTime.home;
-    if(gs==null)return'?';
-    return gs>gc?'W':gs<gc?'L':'D';
-  }).join('');
-}
-function fdGoals(matches,teamId){
-  let gf=0,ga=0,n=0;
-  matches.slice(0,5).forEach(m=>{
-    const isHome=m.homeTeam.id===teamId;
-    const gs=isHome?m.score.fullTime.home:m.score.fullTime.away;
-    const gc=isHome?m.score.fullTime.away:m.score.fullTime.home;
-    if(gs!=null){gf+=gs;ga+=gc;n++;}
+function setTab(t) {
+  clearAlert();
+  ['login','register'].forEach(x => {
+    $('tab'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('on', x===t);
+    $('form'+x.charAt(0).toUpperCase()+x.slice(1)).style.display = x===t ? 'block' : 'none';
   });
-  return n?{gf:(gf/n).toFixed(1),ga:(ga/n).toFixed(1)}:null;
 }
 
-// Main pre-loader: returns structured data block for Claude
-async function fdPreload(matchLines){
-  const key=fdKey();
-  if(!key)return null;
-
-  setLoaderMsg('FOOTBALL-DATA', 'Chargement classements & forme via Football-Data.org…');
-
-  const parsed=matchLines.map(fdParseMatch);
-  const results=[];
-
-  // Determine which comps to query
-  const compIds=new Set();
-  parsed.forEach(({league})=>{
-    for(const[k,v] of Object.entries(FD_COMPS)){
-      if(league&&(fdNorm(league).includes(fdNorm(k))||fdNorm(k).includes(fdNorm(league))))compIds.add(v);
-    }
-  });
-  // Always fetch top comps if none matched
-  if(!compIds.size)FD_ALL_COMPS.forEach(id=>compIds.add(id));
-
-  // Fetch upcoming matches for each comp
-  const allFdMatches=[];
-  for(const compId of [...compIds].slice(0,6)){
-    const ms=await fdGetMatches(compId,7);
-    allFdMatches.push(...ms.map(m=>({...m,_compId:compId})));
-  }
-
-  // Match user teams to FD fixtures + enrich
-  const standings={};
-  for(const {home,away,league} of parsed){
-    // Find FD fixture
-    const fdm=allFdMatches.find(m=>fdMatch(home,m.homeTeam.name)&&fdMatch(away,m.awayTeam.name))
-           ||allFdMatches.find(m=>fdMatch(home,m.homeTeam.shortName||'')&&fdMatch(away,m.awayTeam.shortName||''));
-    
-    let block={match:`${home} vs ${away}`,source:'web_search_only'};
-
-    if(fdm){
-      const compId=fdm._compId;
-      block.source='football-data.org';
-      block.fixture={
-        date:fdm.utcDate?.substring(0,10),
-        competition:fdm.competition?.name,
-        matchday:fdm.matchday,
-        venue:fdm.venue||'N/A'
-      };
-
-      // Standings
-      if(!standings[compId]){standings[compId]=await fdGetStandings(compId);}
-      const table=standings[compId]||[];
-      const hRow=table.find(r=>r.team.id===fdm.homeTeam.id);
-      const aRow=table.find(r=>r.team.id===fdm.awayTeam.id);
-
-      if(hRow)block.home_standing={rank:hRow.position,pts:hRow.points,played:hRow.playedGames,won:hRow.won,draw:hRow.draw,lost:hRow.lost,gf:hRow.goalsFor,ga:hRow.goalsAgainst,gd:hRow.goalDifference,form:hRow.form};
-      if(aRow)block.away_standing={rank:aRow.position,pts:aRow.points,played:aRow.playedGames,won:aRow.won,draw:aRow.draw,lost:aRow.lost,gf:aRow.goalsFor,ga:aRow.goalsAgainst,gd:aRow.goalDifference,form:aRow.form};
-
-      // Form (recent matches)
-      const [hForm,aForm]=await Promise.all([
-        fdGetTeamForm(fdm.homeTeam.id,6),
-        fdGetTeamForm(fdm.awayTeam.id,6)
-      ]);
-      if(hForm.length){block.home_form=fdFormStr(hForm,fdm.homeTeam.id);block.home_goals=fdGoals(hForm,fdm.homeTeam.id);}
-      if(aForm.length){block.away_form=fdFormStr(aForm,fdm.awayTeam.id);block.away_goals=fdGoals(aForm,fdm.awayTeam.id);}
-
-      // H2H from combined form
-      const h2hMatches=[...hForm,...aForm].filter(m=>
-        (m.homeTeam.id===fdm.homeTeam.id&&m.awayTeam.id===fdm.awayTeam.id)||
-        (m.homeTeam.id===fdm.awayTeam.id&&m.awayTeam.id===fdm.homeTeam.id)
-      );
-      if(h2hMatches.length){
-        let hw=0,d=0,aw=0;
-        h2hMatches.forEach(m=>{
-          const hg=m.score.fullTime.home,ag=m.score.fullTime.away;
-          if(hg==null)return;
-          if(m.homeTeam.id===fdm.homeTeam.id){hg>ag?hw++:hg<ag?aw++:d++;}
-          else{ag>hg?hw++:ag<hg?aw++:d++;}
-        });
-        block.h2h={matches:h2hMatches.length,home_wins:hw,draws:d,away_wins:aw};
-      }
-    }
-    results.push(block);
-  }
-
-  // Format as text block for Claude
-  if(!results.some(r=>r.source==='football-data.org'))return null;
-
-  let txt='━━━ DONNÉES RÉELLES — FOOTBALL-DATA.ORG ━━━\n';
-  results.forEach(r=>{
-    if(r.source!=='football-data.org')return;
-    txt+=`\n📊 ${r.match}`;
-    if(r.fixture)txt+=` | ${r.fixture.competition} J${r.fixture.matchday} | ${r.fixture.date}`;
-    if(r.home_standing)txt+=`\n  🏠 Domicile: ${r.home_standing.rank}e (${r.home_standing.pts}pts, ${r.home_standing.won}V-${r.home_standing.draw}N-${r.home_standing.lost}D, xG±: ${r.home_standing.gf}/${r.home_standing.ga})`;
-    if(r.home_form)txt+=` | Forme: ${r.home_form} | Moy buts: ${r.home_goals?.gf}m/${r.home_goals?.ga}e`;
-    if(r.away_standing)txt+=`\n  ✈️ Extérieur: ${r.away_standing.rank}e (${r.away_standing.pts}pts, ${r.away_standing.won}V-${r.away_standing.draw}N-${r.away_standing.lost}D, xG±: ${r.away_standing.gf}/${r.away_standing.ga})`;
-    if(r.away_form)txt+=` | Forme: ${r.away_form} | Moy buts: ${r.away_goals?.gf}m/${r.away_goals?.ga}e`;
-    if(r.h2h)txt+=`\n  ⚔️ H2H (${r.h2h.matches} matchs): ${r.h2h.home_wins}V-${r.h2h.draws}N-${r.h2h.away_wins}D`;
-    txt+='\n';
-  });
-  txt+='━━━ (Priorité à ces données sur la recherche web) ━━━';
-  return txt;
-}
-
-
-// ════════════════════════════════════
-// SPA — OVERLAY ROUTER
-// ════════════════════════════════════
-function showOverlay(id){
-  ['auth-overlay','admin-lock'].forEach(v=>{
-    const el=document.getElementById(v);
-    if(el)el.classList.toggle('hidden',v!==id);
-  });
-  // adm-shell managed separately
-  const as=document.getElementById('adm-shell');
-  if(as)as.style.display='none';
-}
-function hideAllOverlays(){
-  document.getElementById('auth-overlay').classList.add('hidden');
-  document.getElementById('admin-lock').classList.add('hidden');
-  const as=document.getElementById('adm-shell');if(as)as.style.display='none';
-}
-
-// ═══ AUTH LOGIC ═══
-let _ovPlan='free';
-function ovSetTab(t){
-  document.getElementById('ovFormLogin').style.display=t==='login'?'block':'none';
-  document.getElementById('ovFormRegister').style.display=t==='register'?'block':'none';
-  document.getElementById('ovTabLogin').classList.toggle('on',t==='login');
-  document.getElementById('ovTabRegister').classList.toggle('on',t==='register');
-  document.getElementById('ovAlert').className='ov-alert';
-}
-function ovSelPlan(p,el){
-  _ovPlan=p;
-  document.querySelectorAll('.ov-plan').forEach(c=>c.classList.remove('on'));
+function selPlan(p, el) {
+  selectedPlan = p;
+  document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('on'));
   el.classList.add('on');
 }
-function ovAlert(msg,type='err'){const b=document.getElementById('ovAlert');b.textContent=msg;b.className='ov-alert show '+type;}
-function ovClearAlert(){document.getElementById('ovAlert').className='ov-alert';}
 
-function ovLogin(){
-  const email=(document.getElementById('ovEmail')||{}).value?.trim().toLowerCase();
-  const pwd=(document.getElementById('ovPwd')||{}).value;
-  if(!email||!pwd){ovAlert('Remplissez tous les champs.');return;}
-  const users=JSON.parse(localStorage.getItem('betai_users')||'[]');
-  const user=users.find(u=>u.email===email&&u.pwd===btoa(pwd));
-  if(!user){ovAlert('Email ou mot de passe incorrect.');return;}
-  if(user.banned){ovAlert('Compte suspendu. Contactez le support.');return;}
-  localStorage.setItem('betai_session',JSON.stringify({email:user.email,firstName:user.firstName,lastName:user.lastName,plan:user.plan,role:user.role||'user',loginAt:Date.now()}));
-  const btn=document.getElementById('ovLoginBtn');
-  if(btn){btn.innerHTML='<span class="ov-spin"></span>Connexion…';btn.disabled=true;}
-  // Log
-  const logs=JSON.parse(localStorage.getItem('betai_logs')||'[]');
-  logs.unshift({user:user.email,action:'Connexion',type:'login',time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});
-  if(logs.length>200)logs.splice(200);
-  localStorage.setItem('betai_logs',JSON.stringify(logs));
-  setTimeout(()=>{
-    if(user.role==='admin'){hideAllOverlays();admOpen();}
-    else{hideAllOverlays();_initApp();}
-    if(btn){btn.innerHTML='SE CONNECTER';btn.disabled=false;}
-  },600);
+function showAlert(msg, type='err') {
+  const b = $('alertBox');
+  b.textContent = msg; b.className = 'alert '+type+' show';
+}
+function clearAlert() { $('alertBox').className = 'alert'; }
+
+function togglePw(id, el) {
+  const inp = $(id);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  el.textContent = inp.type === 'password' ? '👁' : '🙈';
 }
 
-function ovRegister(){
-  const first=(document.getElementById('ovFirst')||{}).value?.trim();
-  const last=(document.getElementById('ovLast')||{}).value?.trim();
-  const email=(document.getElementById('ovRegEmail')||{}).value?.trim().toLowerCase();
-  const pwd=(document.getElementById('ovRegPwd')||{}).value;
-  if(!first||!last||!email||!pwd){ovAlert('Remplissez tous les champs.');return;}
-  if(pwd.length<8){ovAlert('Mot de passe trop court (8 min).');return;}
-  if(!email.includes('@')){ovAlert('Email invalide.');return;}
-  const terms=document.getElementById('ovTerms');
-  if(terms&&!terms.checked){ovAlert("Acceptez les conditions d'utilisation.");return;}
-  const users=JSON.parse(localStorage.getItem('betai_users')||'[]');
-  if(users.find(u=>u.email===email)){ovAlert('Email déjà utilisé.');return;}
-  const quotas={free:5,starter:25,pro:9999};
-  const nu={email,firstName:first,lastName:last,pwd:btoa(pwd),plan:_ovPlan,role:'user',ticketsLeft:quotas[_ovPlan],ticketsTotal:quotas[_ovPlan],registeredAt:new Date().toISOString(),lastLogin:null,banned:false};
-  users.push(nu);
-  localStorage.setItem('betai_users',JSON.stringify(users));
-  ovAlert('✅ Compte créé ! Bienvenue '+first+' !','ok');
-  const btn=document.getElementById('ovRegBtn');if(btn)btn.disabled=true;
-  localStorage.setItem('betai_session',JSON.stringify({email:nu.email,firstName:first,lastName:last,plan:_ovPlan,role:'user',loginAt:Date.now()}));
-  setTimeout(()=>{hideAllOverlays();_initApp();if(btn)btn.disabled=false;},1200);
+// ─── LOGIN ───
+function doLogin() {
+  const email = $('loginEmail').value.trim().toLowerCase();
+  const pwd   = $('loginPwd').value;
+  if (!email || !pwd) { showAlert('Remplissez tous les champs.'); return; }
+
+  const users = sGetJSON('betai_users', []);
+  const user  = users.find(u => u.email === email && u.pwd === btoa(pwd));
+  if (!user) { showAlert('Email ou mot de passe incorrect.'); return; }
+  if (user.banned) { showAlert('Votre compte a été suspendu. Contactez le support.'); return; }
+
+  sSetJSON('betai_session', { email:user.email, firstName:user.firstName, lastName:user.lastName, plan:user.plan, role:user.role||'user', loginAt: Date.now() });
+  $('loginBtn').innerHTML = '<span class="spin"></span>Connexion…';
+  setTimeout(() => { if(user.role==='admin'){showView('admin');initAdmin();}else{initApp();showView('app');} }, 800);
 }
 
-function ovDemo(){
-  localStorage.setItem('betai_session',JSON.stringify({email:'demo@betai.app',firstName:'Demo',lastName:'',plan:'starter',role:'demo',loginAt:Date.now()}));
-  hideAllOverlays();
-  _initApp();
+// ─── REGISTER ───
+function doRegister() {
+  const first = $('regFirst').value.trim();
+  const last  = $('regLast').value.trim();
+  const email = $('regEmail').value.trim().toLowerCase();
+  const pwd   = $('regPwd').value;
+
+  if (!first||!last||!email||!pwd) { showAlert('Remplissez tous les champs.'); return; }
+  if (pwd.length < 8) { showAlert('Le mot de passe doit faire au moins 8 caractères.'); return; }
+  if (!email.includes('@')) { showAlert('Email invalide.'); return; }
+  if (!$('regTerms').checked) { showAlert('Acceptez les conditions d\'utilisation.'); return; }
+
+  const users = sGetJSON('betai_users', []);
+  if (users.find(u => u.email === email)) { showAlert('Un compte existe déjà avec cet email.'); return; }
+
+  // Determine free tickets based on plan
+  const quotas = { free:5, starter:25, pro:9999 };
+
+  const newUser = { email, firstName:first, lastName:last, pwd:btoa(pwd), plan:selectedPlan, role:'user', ticketsLeft:quotas[selectedPlan], ticketsTotal:quotas[selectedPlan], registeredAt:new Date().toISOString(), lastLogin:null, banned:false };
+  users.push(newUser);
+  sSetJSON('betai_users', users);
+
+  showAlert(`✅ Compte créé ! Bienvenue ${first} 🎉`, 'ok');
+  $('regBtn').disabled = true;
+
+  // Auto-login
+  setTimeout(() => {
+    sSetJSON('betai_session', { email:newUser.email, firstName:first, lastName:last, plan:selectedPlan, role:'user', loginAt: Date.now() });
+    initApp(); showView('app');
+  }, 1200);
 }
 
-function doLogout(){localStorage.removeItem('betai_session');showOverlay('auth-overlay');}
+// ─── DEMO ───
+function demoLogin() {
+  sSetJSON('betai_session', { email:'demo@betai.app', firstName:'Demo', lastName:'', plan:'starter', role:'demo', loginAt: Date.now() });
+  initApp(); showView('app');
+}
 
-// ═══ ADMIN LOCK ═══
-const _ADM_DEFAULT='admin2024';
-function admUnlock(){
-  const pwd=document.getElementById('admLockPwd')?.value;
-  const stored=localStorage.getItem('betai_admin_pwd')||_ADM_DEFAULT;
-  if(pwd===stored){
-    document.getElementById('admin-lock').classList.add('hidden');
-    admOpen();
+function forgotPw() { showAlert('Fonctionnalité disponible prochainement. Contactez l\'admin.', 'ok'); }
+function goAdmin() { showView('admin');initAdmin(); }
+
+/* ════════════════════════════════════════
+   ADMIN LOGIC
+════════════════════════════════════════ */
+// ── Obfuscation for API key storage ──
+function enc(str) { return btoa(unescape(encodeURIComponent(str.split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)^(42+i%13))).join('')))); }
+function dec(str) { try{ return decodeURIComponent(escape(atob(str))).split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)^(42+i%13))).join(''); }catch{return '';} }
+
+
+let editingUserEmail = null;
+
+// ── LOCK / UNLOCK ──
+function unlock() {
+  const pwd = $('lockPwd').value;
+  const stored = sGet('betai_admin_pwd') || DEFAULT_ADMIN_PWD;
+  if (pwd === stored) {
+    $('lockScreen').style.display = 'none';
+    $('adminShell').style.display = 'grid';
+    initAdmin();
   } else {
-    const e=document.getElementById('admLockErr');
-    if(e){e.textContent='Mot de passe incorrect.';setTimeout(()=>e.textContent='',2500);}
-    document.getElementById('admLockPwd').value='';
+    $('lockErr').textContent = 'Mot de passe incorrect.';
+    $('lockPwd').value = '';
+    setTimeout(() => $('lockErr').textContent = '', 2500);
   }
 }
-function admOpen(){
-  const s=document.getElementById('adm-shell');if(s)s.style.display='flex';
-  admRefresh();
-  document.getElementById('admDate').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-  admLoadKeys();admLoadPlans();admLoadSettings();admRenderUsers();admRenderLogs();setTimeout(admCheckFdStatus,500);
-}
-function admClose(){
-  const s=document.getElementById('adm-shell');if(s)s.style.display='none';
-  const sess=JSON.parse(localStorage.getItem('betai_session')||'null');
-  if(!sess||!sess.email){showOverlay('auth-overlay');}
+const _lp = $('lockPwd'); if(_lp) _lp.addEventListener('keydown', e => { if(e.key==='Enter') unlock(); });
+
+function logout() {
+  $('adminShell').style.display = 'none';
+  $('lockScreen').style.display = 'flex';
+  $('lockPwd').value = '';
 }
 
-// ═══ ADMIN NAVIGATION ═══
-function admPage(id,el){
-  document.querySelectorAll('.adm-page').forEach(p=>p.classList.remove('on'));
-  const pg=document.getElementById('adm-page-'+id);if(pg)pg.classList.add('on');
-  document.querySelectorAll('.adm-nitem').forEach(n=>n.classList.remove('on'));
-  if(el)el.classList.add('on');
-  if(id==='revenue')admRenderRevenue();
-  if(id==='logs')admRenderLogs();
-  if(id==='users')admRenderUsers();
+// ── INIT ──
+function initAdmin() {
+  $('dashDate').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  refreshDash();
+  loadApiKeys();
+  loadPlanSettings();
+  loadAppSettings();
+  renderUsers();
+  renderLogs();
+  renderUsage();
+  updateSysDot();
 }
 
-// ═══ TOAST ═══
-function admToast(msg,type='ok'){
-  const b=document.getElementById('admToasts');if(!b)return;
-  const t=document.createElement('div');t.className='adm-toast '+type;t.textContent=msg;
-  b.appendChild(t);setTimeout(()=>t.remove(),3000);
+// ── NAVIGATION ──
+function goPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  $('page-'+id).classList.add('on');
+  document.querySelectorAll('.nitem').forEach(n => n.classList.remove('on'));
+  if (el) el.classList.add('on');
+  else document.querySelectorAll('.nitem').forEach(n => { if(n.onclick&&String(n.onclick).includes("'"+id+"'")) n.classList.add('on'); });
+  if (id==='users') renderUsers();
+  if (id==='logs') renderLogs();
+  if (id==='revenue') renderRevenue();
 }
 
-// ═══ HELPERS ═══
-function _enc(s){return btoa(unescape(encodeURIComponent(s.split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)^(42+i%13))).join(''))));}
-function _dec2(s){try{return decodeURIComponent(escape(atob(s))).split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)^(42+i%13))).join('');}catch{return '';}}
-function admGetUsers(){return JSON.parse(localStorage.getItem('betai_users')||'[]');}
-function admSaveUsers(u){localStorage.setItem('betai_users',JSON.stringify(u));}
-
-// ═══ DASHBOARD ═══
-function admRefresh(){
-  const u=admGetUsers();
-  const el=id=>document.getElementById(id);
-  if(el('admKpiUsers'))el('admKpiUsers').textContent=u.length;
-  if(el('admKpiActive'))el('admKpiActive').textContent=u.filter(x=>!x.banned).length;
-  if(el('admKpiPro'))el('admKpiPro').textContent=u.filter(x=>x.plan==='pro').length;
-  if(el('admKpiBanned'))el('admKpiBanned').textContent=u.filter(x=>x.banned).length;
-  const logs=JSON.parse(localStorage.getItem('betai_logs')||'[]');
-  if(el('admKpiTickets'))el('admKpiTickets').textContent=logs.filter(l=>l.type==='ticket').length;
-  if(el('admDashDate'))el('admDashDate').textContent=new Date().toLocaleString('fr-FR');
-  admRenderPlanChart(u);admRenderRecentLogs();
-}
-function admRenderPlanChart(users){
-  const el=document.getElementById('admPlanChart');if(!el)return;
-  const c={free:0,starter:0,pro:0};users.forEach(u=>c[u.plan]=(c[u.plan]||0)+1);
-  const tot=users.length||1;
-  const colors={free:'#5a6a80',starter:'#3d9eff',pro:'#00e5a0'};
-  el.innerHTML=Object.entries(c).filter(([,v])=>v>0).map(([p,v])=>`
-    <div class="adm-usage-item">
-      <div class="adm-usage-label" style="color:${colors[p]||'#8a9ab0'}">Plan ${p}</div>
-      <div class="adm-usage-track"><div class="adm-usage-fill" style="width:${Math.round(v/tot*100)}%;background:${colors[p]}"></div></div>
-      <div class="adm-usage-val">${v} (${Math.round(v/tot*100)}%)</div>
-    </div>`).join('');
-}
-function admRenderRecentLogs(){
-  const el=document.getElementById('admRecentLogs');if(!el)return;
-  const logs=JSON.parse(localStorage.getItem('betai_logs')||'[]');
-  if(!logs.length){el.innerHTML='<div style="color:#5a6a80;font-size:11px;padding:10px 0">Aucune activité</div>';return;}
-  el.innerHTML=logs.slice(0,8).map(l=>`<div class="adm-log-row"><div class="adm-log-time">${l.time}</div><div class="adm-log-user">${l.user}</div><div class="adm-log-action">${l.action}</div><span class="adm-log-badge ${l.type||'login'}">${l.type||'login'}</span></div>`).join('');
+// ── TOAST ──
+function toast(msg, type='ok') {
+  const b = $('toastBox');
+  const t = document.createElement('div');
+  t.className = 'toast '+type; t.textContent = msg;
+  b.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
 }
 
-// ═══ USERS ═══
-let _editEmail=null;
-function admRenderUsers(){
-  const users=admGetUsers();
-  const q=(document.getElementById('admUserSearch')?.value||'').toLowerCase();
-  const pf=document.getElementById('admPlanFilter')?.value||'all';
-  const sf=document.getElementById('admStatusFilter')?.value||'all';
-  let fl=users.filter(u=>{
-    const mq=!q||u.email.includes(q)||(u.firstName+' '+u.lastName).toLowerCase().includes(q);
-    const mp=pf==='all'||u.plan===pf;
-    const ms=sf==='all'||(sf==='banned'?u.banned:!u.banned);
-    return mq&&mp&&ms;
+// ── API KEYS ──
+function loadApiKeys() {
+  const aiKey = dec(sGet('_betai_ak'));
+  const fdKey = dec(sGet('_betai_fk'));
+  const afKey = dec(sGet('_betai_afk'));
+  if (aiKey) $('aiKeyInput').value = aiKey;
+  if (fdKey) $('fdKeyInput').value = fdKey;
+  if (afKey) $('afKeyInput').value = afKey;
+  updateAiDot(aiKey);
+}
+function saveApiKey() {
+  const key = $('aiKeyInput').value.trim();
+  if (!key) { toast('Entrez une clé API', 'err'); return; }
+  sSet('_betai_ak', enc(key));
+  toast('✅ Clé Anthropic sauvegardée et chiffrée', 'ok');
+  updateAiDot(key);
+  // Also save decoded version for the app to use (obfuscated)
+  sSet('_betai_ak_app', enc(key)); // app will decode this
+}
+function saveFdKey() { const k=$('fdKeyInput').value.trim(); if(k){sSet('_betai_fk',enc(k));toast('✅ Clé Football-Data sauvegardée','ok');} }
+function saveAfKey() { const k=$('afKeyInput').value.trim(); if(k){sSet('_betai_afk',enc(k));toast('✅ Clé API-Football sauvegardée','ok');} }
+
+function updateAiDot(key) {
+  const ok = key && key.startsWith('sk-ant');
+  $('aiDot').className = 'sys-dot '+(ok?'ok':'warn');
+  $('aiStatusTxt').textContent = ok ? 'Connecté ✓' : 'Non configuré';
+  $('aiStatusTxt').style.color = ok ? 'var(--green)' : 'var(--gold)';
+  $('sysDotAI').className = 'sys-dot '+(ok?'ok':'warn');
+}
+function updateSysDot() { updateAiDot(dec(sGet('_betai_ak'))); }
+
+async function testApiKey() {
+  const key = $('aiKeyInput').value.trim();
+  if (!key) { toast('Entrez une clé', 'err'); return; }
+  const r = $('aiTestResult');
+  r.style.display='flex'; r.textContent='⏳ Test…'; r.className='api-test-result';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:20,messages:[{role:'user',content:'Réponds "OK" uniquement.'}]})
+    });
+    const d = await res.json();
+    if (d.content) { r.textContent='✅ Clé valide — '+d.model; r.className='api-test-result ok'; updateAiDot(key); }
+    else { r.textContent='❌ '+(d.error?.message||'Erreur'); r.className='api-test-result err'; }
+  } catch(e) { r.textContent='❌ '+e.message.substring(0,40); r.className='api-test-result err'; }
+}
+
+function toggleApiVis(id, btn) {
+  const inp = $(id); if(!inp)return;
+  inp.type = inp.type==='password'?'text':'password';
+  btn.textContent = inp.type==='password'?'👁 Voir':'🙈 Masquer';
+}
+function copyApiKey(id) {
+  const inp=$(id); if(!inp||!inp.value)return;
+  navigator.clipboard.writeText(inp.value).then(()=>toast('Clé copiée','ok'));
+}
+
+// ── USERS ──
+function getUsers() { return sGetJSON('betai_users', []); }
+function saveUsers(users) { sSetJSON('betai_users', users); }
+
+function renderUsers() {
+  const users = getUsers();
+  const q = ($('userSearch')?.value||'').toLowerCase();
+  const pf = $('planFilter')?.value||'all';
+  const sf = $('statusFilter')?.value||'all';
+  let filtered = users.filter(u => {
+    const matchQ = !q || u.email.includes(q) || (u.firstName+' '+u.lastName).toLowerCase().includes(q);
+    const matchP = pf==='all' || u.plan===pf;
+    const matchS = sf==='all' || (sf==='banned'?u.banned:!u.banned);
+    return matchQ && matchP && matchS;
   });
-  const sub=document.getElementById('admUsersSub');
-  if(sub)sub.textContent=`${fl.length} utilisateur${fl.length>1?'s':''} sur ${users.length}`;
-  const quotas={free:5,starter:25,pro:9999,demo:25};
-  const body=document.getElementById('admUsersBody');if(!body)return;
-  if(!fl.length){body.innerHTML='<div style="padding:24px;text-align:center;color:#5a6a80;font-size:11px">Aucun utilisateur</div>';return;}
-  body.innerHTML=fl.map(u=>{
-    const tot=quotas[u.plan]||5;const left=u.ticketsLeft||0;
-    const pct=tot>=9999?100:Math.round(left/tot*100);
-    const barCol=pct>60?'#00e5a0':pct>30?'#f5c842':'#ff4d6a';
-    return `<div class="adm-trow">
-      <div><div class="adm-u-name">${u.firstName} ${u.lastName}</div></div>
-      <div style="font-size:9px;color:#5a6a80">${u.email}</div>
-      <div><span class="adm-plan-badge ${u.plan}">${u.plan}</span></div>
-      <div><div class="adm-tickets-val">${tot>=9999?'∞':left+'/'+(tot)}</div><div class="adm-quota-bar"><div class="adm-quota-fill" style="width:${pct}%;background:${barCol}"></div></div></div>
-      <div><span class="adm-status-badge ${u.banned?'banned':'active'}">${u.banned?'🚫 Suspendu':'✅ Actif'}</span></div>
-      <div style="display:flex;gap:4px">
-        <button class="adm-ubtn edit" onclick="admEditUser('${u.email}')">✏️</button>
-        ${u.banned?`<button class="adm-ubtn unban" onclick="admToggleBan('${u.email}',false)">✅</button>`:`<button class="adm-ubtn ban" onclick="admToggleBan('${u.email}',true)">🚫</button>`}
-        <button class="adm-ubtn reset" onclick="admResetQuota('${u.email}')">🔄</button>
+  $('usersSub').textContent = `${filtered.length} utilisateur${filtered.length>1?'s':''} sur ${users.length} total`;
+  $('badgeUsers').textContent = users.length;
+  if (!filtered.length) { $('usersBody').innerHTML = '<div style="padding:30px;text-align:center;color:var(--muted);font-size:11px">Aucun utilisateur trouvé</div>'; return; }
+  const quotas = { free:5, starter:25, pro:9999, demo:25 };
+  $('usersBody').innerHTML = filtered.map(u => {
+    const tot = quotas[u.plan]||5;
+    const left = u.ticketsLeft||0;
+    const pct = tot>=9999?100:Math.max(0,Math.round(left/tot*100));
+    const barCol = pct>60?'green':pct>30?'gold':'red';
+    return `<div class="ut-row">
+      <div><div class="ut-name">${u.firstName} ${u.lastName}</div></div>
+      <div style="font-size:10px;color:var(--muted2)">${u.email}</div>
+      <div><span class="plan-badge ${u.plan}">${u.plan}</span></div>
+      <div><div class="ut-tickets" style="color:${pct<30?'var(--red)':'var(--text)'}">${tot>=9999?'∞':left+'/'+(tot||5)}</div><div class="quota-bar"><div class="quota-fill ${barCol}" style="width:${pct}%"></div></div></div>
+      <div><span class="status-badge ${u.banned?'banned':'active'}">${u.banned?'🚫 Suspendu':'✅ Actif'}</span></div>
+      <div class="ut-actions">
+        <button class="ut-btn edit" onclick="openEditUser('${u.email}')">✏️</button>
+        ${u.banned?`<button class="ut-btn unban" onclick="toggleBan('${u.email}',false)">✅</button>`:`<button class="ut-btn ban" onclick="toggleBan('${u.email}',true)">🚫</button>`}
+        <button class="ut-btn reset" onclick="resetQuota('${u.email}')">🔄</button>
       </div>
     </div>`;
   }).join('');
 }
-function admOpenAddUser(){_editEmail=null;document.getElementById('admModalUserTitle').textContent='Ajouter';['muFirst','muLast','muEmail','muPwd'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});document.getElementById('muPlan').value='free';document.getElementById('muTickets').value=5;document.getElementById('admModalUser').classList.add('show');}
-function admEditUser(email){
-  const u=admGetUsers().find(x=>x.email===email);if(!u)return;
-  _editEmail=email;
-  document.getElementById('admModalUserTitle').textContent='Modifier';
-  document.getElementById('muFirst').value=u.firstName||'';
-  document.getElementById('muLast').value=u.lastName||'';
-  document.getElementById('muEmail').value=u.email;
-  document.getElementById('muPwd').value='';
-  document.getElementById('muPlan').value=u.plan||'free';
-  document.getElementById('muTickets').value=u.ticketsLeft||0;
-  document.getElementById('admModalUser').classList.add('show');
+
+function openAddUser() { editingUserEmail=null; $('modalUserTitle').textContent='Ajouter un utilisateur'; $('muFirst').value=''; $('muLast').value=''; $('muEmail').value=''; $('muPwd').value=''; $('muPlan').value='free'; $('muTickets').value='5'; $('modalUser').classList.add('show'); }
+function openEditUser(email) {
+  const users=getUsers(); const u=users.find(x=>x.email===email); if(!u)return;
+  editingUserEmail=email;
+  $('modalUserTitle').textContent='Modifier l\'utilisateur';
+  $('muFirst').value=u.firstName||''; $('muLast').value=u.lastName||''; $('muEmail').value=u.email; $('muPwd').value=''; $('muPlan').value=u.plan||'free'; $('muTickets').value=u.ticketsLeft||0;
+  $('modalUser').classList.add('show');
 }
-function admCloseModal(){document.getElementById('admModalUser').classList.remove('show');}
-function admSaveUser(){
-  const first=document.getElementById('muFirst').value.trim();
-  const last=document.getElementById('muLast').value.trim();
-  const email=document.getElementById('muEmail').value.trim().toLowerCase();
-  const pwd=document.getElementById('muPwd').value;
-  const plan=document.getElementById('muPlan').value;
-  const tickets=+document.getElementById('muTickets').value;
-  if(!first||!email){admToast('Remplissez prénom et email','err');return;}
-  const users=admGetUsers();
-  if(_editEmail){
-    const idx=users.findIndex(u=>u.email===_editEmail);
-    if(idx<0)return;
+function closeModal() { $('modalUser').classList.remove('show'); }
+function saveUser() {
+  const users=getUsers();
+  const first=$('muFirst').value.trim(), last=$('muLast').value.trim(), email=$('muEmail').value.trim().toLowerCase(), pwd=$('muPwd').value, plan=$('muPlan').value, tickets=+$('muTickets').value;
+  if(!first||!email){toast('Remplissez prénom et email','err');return;}
+  if (editingUserEmail) {
+    const idx=users.findIndex(u=>u.email===editingUserEmail);
+    if(idx<0){toast('Utilisateur introuvable','err');return;}
     users[idx]={...users[idx],firstName:first,lastName:last,email,plan,ticketsLeft:tickets};
-    if(pwd)users[idx].pwd=btoa(pwd);
+    if(pwd) users[idx].pwd=btoa(pwd);
   } else {
-    if(users.find(u=>u.email===email)){admToast('Email déjà utilisé','err');return;}
-    const quotas={free:5,starter:25,pro:9999};
+    if(users.find(u=>u.email===email)){toast('Email déjà utilisé','err');return;}
     users.push({email,firstName:first,lastName:last,pwd:btoa(pwd||'betai2024'),plan,role:'user',ticketsLeft:tickets,ticketsTotal:tickets,registeredAt:new Date().toISOString(),banned:false});
   }
-  admSaveUsers(users);admCloseModal();admRenderUsers();admRefresh();admToast('✅ Utilisateur sauvegardé','ok');
+  saveUsers(users); closeModal(); renderUsers(); refreshDash(); addLog(email,'Profil modifié par admin','admin'); toast('✅ Utilisateur sauvegardé','ok');
 }
-function admToggleBan(email,ban){const u=admGetUsers();const x=u.find(v=>v.email===email);if(x){x.banned=ban;admSaveUsers(u);admRenderUsers();admToast(ban?'Compte suspendu':'Compte réactivé','ok');}}
-function admResetQuota(email){const u=admGetUsers();const x=u.find(v=>v.email===email);if(x){const q={free:5,starter:25,pro:9999};x.ticketsLeft=q[x.plan]||5;admSaveUsers(u);admRenderUsers();admToast('Quota réinitialisé','ok');}}
-function admExportUsers(){
-  const u=admGetUsers();
-  const header='Prenom,Nom,Email,Plan,Tickets,Statut';
-  const rows=u.map(x=>[x.firstName,x.lastName,x.email,x.plan,x.ticketsLeft||0,x.banned?'suspendu':'actif'].join(','));
-  const csv=[header,...rows].join('\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='betai_users.csv';a.click();admToast('Export CSV telecharge','ok');
+function toggleBan(email, ban) {
+  const users=getUsers(); const u=users.find(x=>x.email===email); if(!u)return;
+  u.banned=ban; saveUsers(users); renderUsers(); addLog(email,ban?'Compte suspendu':'Compte réactivé','admin'); toast(ban?'Compte suspendu':'Compte réactivé','ok');
 }
-
-// ═══ API KEYS ═══
-function admLoadKeys(){
-  const ak=_dec2(localStorage.getItem('_betai_ak')||'');
-  const fk=_dec2(localStorage.getItem('_betai_fk')||'');
-  const afk=_dec2(localStorage.getItem('_betai_afk')||'');
-  const ki=document.getElementById('admAiKey');if(ki&&ak)ki.value=ak;
-  const fi=document.getElementById('admFdKey');if(fi&&fk)fi.value=fk;
-  const ai=document.getElementById('admAfKey');if(ai&&afk)ai.value=afk;
-  admUpdateAiStatus(ak);
+function resetQuota(email) {
+  const users=getUsers(); const u=users.find(x=>x.email===email); if(!u)return;
+  const quotas={free:5,starter:25,pro:9999}; u.ticketsLeft=quotas[u.plan]||5; saveUsers(users); renderUsers(); addLog(email,'Quota réinitialisé','admin'); toast('✅ Quota réinitialisé','ok');
 }
-function admSaveAiKey(){
-  const k=(document.getElementById('admAiKey')||{}).value?.trim();
-  if(!k){admToast('Entrez une clé','err');return;}
-  localStorage.setItem('_betai_ak',_enc(k));
-  localStorage.setItem('_betai_ak_app',_enc(k));
-  admToast('✅ Clé Anthropic sauvegardée et chiffrée','ok');
-  admUpdateAiStatus(k);
-  if(typeof checkApiStatus==='function')checkApiStatus();
-}
-function admSaveFdKey(){const k=(document.getElementById('admFdKey')||{}).value?.trim();if(k){localStorage.setItem('_betai_fk',_enc(k));admToast('✅ Clé Football-Data sauvegardée','ok');setTimeout(admCheckFdStatus,300);}}
-function admSaveAfKey(){const k=(document.getElementById('admAfKey')||{}).value?.trim();if(k){localStorage.setItem('_betai_afk',_enc(k));admToast('✅ Clé API-Football sauvegardée','ok');}}
-function admUpdateAiStatus(key){
-  const ok=key&&key.startsWith('sk-ant');
-  const s=document.getElementById('admAiStatus');
-  if(s){s.textContent=ok?'Connecté ✓':'Non configuré';s.style.color=ok?'#00e5a0':'#f5c842';}
-}
-function admCheckFdStatus(){
-  const k=fdKey();
-  const el=document.getElementById('admFdStatus');
-  if(!el)return;
-  if(!k){el.textContent='Non configuré';el.style.color='#f5c842';return;}
-  el.textContent='Test…';el.style.color='#f5c842';
-  fetch('https://api.football-data.org/v4/competitions',{headers:{'X-Auth-Token':k}})
-    .then(r=>r.ok?r.json():null)
-    .then(d=>{
-      if(d?.competitions){el.textContent='Connecté ✓ ('+d.competitions.length+' comps)';el.style.color='#00e5a0';}
-      else{el.textContent='Clé invalide';el.style.color='#ff4d6a';}
-    }).catch(()=>{el.textContent='Erreur réseau';el.style.color='#ff4d6a';});
-}
-function admToggleKey(id,btn){
-  const inp=document.getElementById(id);if(!inp)return;
-  inp.type=inp.type==='password'?'text':'password';
-  btn.textContent=inp.type==='password'?'👁 Voir':'🙈';
-}
-function admCopyKey(id){const inp=document.getElementById(id);if(inp&&inp.value)navigator.clipboard.writeText(inp.value).then(()=>admToast('Clé copiée','ok'));}
-async function admTestKey(){
-  const k=(document.getElementById('admAiKey')||{}).value?.trim();if(!k){admToast('Entrez une clé','err');return;}
-  const r=document.getElementById('admTestResult');if(r){r.textContent='⏳ Test…';r.className='adm-test-result ok';}
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:10,messages:[{role:'user',content:'OK'}]})});
-    const d=await res.json();
-    if(d.content){if(r){r.textContent='✅ Clé valide';r.className='adm-test-result ok';}admUpdateAiStatus(k);}
-    else{if(r){r.textContent='❌ '+(d.error?.message||'Erreur').substring(0,40);r.className='adm-test-result err';}}
-  }catch(e){if(r){r.textContent='❌ Erreur réseau';r.className='adm-test-result err';}}
+function exportUsers() {
+  const users=getUsers();
+  const rows=['Prénom,Nom,Email,Plan,Tickets restants,Statut,Inscription',...users.map(u=>`"${u.firstName}","${u.lastName}","${u.email}","${u.plan}",${u.ticketsLeft||0},"${u.banned?'suspendu':'actif'}","${u.registeredAt||''}"`)].join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([rows],{type:'text/csv'})); a.download='betai_users.csv'; a.click(); toast('Export CSV téléchargé','ok');
 }
 
-// ═══ PLANS ═══
-function admLoadPlans(){
-  const p=JSON.parse(localStorage.getItem('betai_plans')||'{}');
-  const g=id=>document.getElementById(id);
-  if(g('pFreeTickets'))g('pFreeTickets').value=p.freeTickets||5;
-  if(g('pFreePicks'))g('pFreePicks').value=p.freePicks||5;
-  if(g('pStarterTickets'))g('pStarterTickets').value=p.starterTickets||25;
-  if(g('pStarterPrice'))g('pStarterPrice').value=p.starterPrice||2000;
-  if(g('pProTickets'))g('pProTickets').value=p.proTickets||9999;
-  if(g('pProPrice'))g('pProPrice').value=p.proPrice||5000;
-}
-function admSavePlans(){
-  const g=id=>{const e=document.getElementById(id);return e?+e.value:0;};
-  localStorage.setItem('betai_plans',JSON.stringify({freeTickets:g('pFreeTickets'),freePicks:g('pFreePicks'),starterTickets:g('pStarterTickets'),starterPrice:g('pStarterPrice'),proTickets:g('pProTickets'),proPrice:g('pProPrice')}));
-  admToast('✅ Plans sauvegardés','ok');
+// ── DASHBOARD REFRESH ──
+function refreshDash() {
+  const users=getUsers();
+  $('kpiUsers').textContent=users.length;
+  $('kpiActive').textContent=users.filter(u=>!u.banned).length;
+  $('kpiPro').textContent=users.filter(u=>u.plan==='pro').length;
+  $('kpiBanned').textContent=users.filter(u=>u.banned).length;
+  const logs=sGetJSON('betai_logs',[]);
+  $('kpiTickets').textContent=logs.filter(l=>l.action==='ticket_generated').length;
+  $('badgeUsers').textContent=users.length;
+  renderPlanChart(users);
+  renderRevChart(users);
+  renderRecentLogs();
 }
 
-// ═══ SETTINGS ═══
-function admLoadSettings(){
-  const s=JSON.parse(localStorage.getItem('betai_settings')||'{}');
-  const sr=document.getElementById('setReg');if(sr)sr.checked=s.registration!==false;
-  const sd=document.getElementById('setDemo');if(sd)sd.checked=s.demo!==false;
-}
-function admSaveSetting(k,v){const s=JSON.parse(localStorage.getItem('betai_settings')||'{}');s[k]=v;localStorage.setItem('betai_settings',JSON.stringify(s));admToast('Paramètre mis à jour','ok');}
-function admChangePwd(){
-  const cur=document.getElementById('admCurPwd')?.value;
-  const nw=document.getElementById('admNewPwd')?.value;
-  const stored=localStorage.getItem('betai_admin_pwd')||_ADM_DEFAULT;
-  if(cur!==stored){admToast('Mot de passe actuel incorrect','err');return;}
-  if(!nw||nw.length<8){admToast('Nouveau mot de passe trop court','err');return;}
-  localStorage.setItem('betai_admin_pwd',nw);
-  document.getElementById('admCurPwd').value='';document.getElementById('admNewPwd').value='';
-  admToast('✅ Mot de passe admin changé','ok');
+function renderPlanChart(users) {
+  const counts={free:0,starter:0,pro:0,demo:0};
+  users.forEach(u=>counts[u.plan]=(counts[u.plan]||0)+1);
+  const total=users.length||1;
+  const colors={free:'var(--muted)',starter:'var(--blue)',pro:'var(--green)',demo:'var(--purple)'};
+  $('planChart').innerHTML=Object.entries(counts).filter(([,v])=>v>0).map(([p,v])=>`
+    <div class="usage-item">
+      <div class="usage-label" style="color:${colors[p]||'var(--muted2)'}">Plan ${p}</div>
+      <div class="usage-track"><div class="usage-fill" style="width:${Math.round(v/total*100)}%;background:${colors[p]}"></div></div>
+      <div class="usage-val">${v} (${Math.round(v/total*100)}%)</div>
+    </div>`).join('');
 }
 
-// ═══ REVENUE ═══
-function admRenderRevenue(){
-  const u=admGetUsers();const prices={starter:2000,pro:5000};
-  let mrr=0;u.forEach(x=>mrr+=(prices[x.plan]||0));
-  const paying=u.filter(x=>x.plan==='starter'||x.plan==='pro').length;
-  const g=id=>document.getElementById(id);
-  if(g('admRevMRR'))g('admRevMRR').textContent=mrr.toLocaleString('fr-FR');
-  if(g('admRevPaying'))g('admRevPaying').textContent=paying;
-  if(g('admRevARPU'))g('admRevARPU').textContent=paying>0?Math.round(mrr/paying).toLocaleString('fr-FR'):'0';
-  const d=g('admRevDetail');if(!d)return;
-  const ns=u.filter(x=>x.plan==='starter').length,np=u.filter(x=>x.plan==='pro').length;
-  d.innerHTML=`
-    <div class="adm-rev-item"><div class="adm-rev-label">Comptes Starter (2 000 FCFA/mois)</div><div class="adm-rev-val">${ns} × 2 000 = ${(ns*2000).toLocaleString()} FCFA</div></div>
-    <div class="adm-rev-item"><div class="adm-rev-label">Comptes Pro (5 000 FCFA/mois)</div><div class="adm-rev-val">${np} × 5 000 = ${(np*5000).toLocaleString()} FCFA</div></div>
-    <div class="adm-rev-item" style="border-top:2px solid #f5c842;margin-top:4px;padding-top:12px"><div class="adm-rev-label" style="font-weight:700;color:#f5c842">TOTAL MRR</div><div class="adm-rev-val">${mrr.toLocaleString()} FCFA</div></div>`;
+function renderRevChart(users) {
+  const prices={starter:2000,pro:5000};
+  let mrr=0; users.forEach(u=>mrr+=(prices[u.plan]||0));
+  const paying=users.filter(u=>u.plan==='starter'||u.plan==='pro').length;
+  $('revenueChart').innerHTML=`
+    <div class="rev-item"><div class="rev-label">MRR estimé</div><div class="rev-val">${mrr.toLocaleString('fr-FR')} FCFA</div></div>
+    <div class="rev-item"><div class="rev-label">Abonnés payants</div><div class="rev-val">${paying}</div></div>
+    <div class="rev-item"><div class="rev-label">Starters (2 000 FCFA)</div><div class="rev-val">${users.filter(u=>u.plan==='starter').length}</div></div>
+    <div class="rev-item"><div class="rev-label">Pro (5 000 FCFA)</div><div class="rev-val">${users.filter(u=>u.plan==='pro').length}</div></div>`;
 }
 
-// ═══ LOGS ═══
-function admRenderLogs(){
-  const el=document.getElementById('admLogsContainer');if(!el)return;
-  const logs=JSON.parse(localStorage.getItem('betai_logs')||'[]');
-  if(!logs.length){el.innerHTML='<div style="text-align:center;padding:24px;color:#5a6a80">Aucun log</div>';return;}
-  el.innerHTML=logs.slice(0,100).map(l=>`<div class="adm-log-row"><div class="adm-log-time">${l.time}</div><div class="adm-log-user">${l.user}</div><div class="adm-log-action">${l.action}</div><span class="adm-log-badge ${l.type||'login'}">${l.type||'login'}</span></div>`).join('');
+// ── REVENUE PAGE ──
+function renderRevenue() {
+  const users=getUsers();
+  const prices={starter:2000,pro:5000};
+  let mrr=0; users.forEach(u=>mrr+=(prices[u.plan]||0));
+  const paying=users.filter(u=>u.plan==='starter'||u.plan==='pro').length;
+  $('revMRR').textContent=mrr.toLocaleString('fr-FR');
+  $('revPaying').textContent=paying;
+  $('revARPU').textContent=paying>0?Math.round(mrr/paying).toLocaleString('fr-FR'):'0';
+  $('revDetailList').innerHTML=`
+    <div class="rev-item"><div class="rev-label">Comptes Starter (2 000 FCFA/mois)</div><div class="rev-val">${users.filter(u=>u.plan==='starter').length} × 2 000 = ${(users.filter(u=>u.plan==='starter').length*2000).toLocaleString()} FCFA</div></div>
+    <div class="rev-item"><div class="rev-label">Comptes Pro (5 000 FCFA/mois)</div><div class="rev-val">${users.filter(u=>u.plan==='pro').length} × 5 000 = ${(users.filter(u=>u.plan==='pro').length*5000).toLocaleString()} FCFA</div></div>
+    <div class="rev-item" style="border-top:2px solid var(--gold)"><div class="rev-label" style="font-weight:700;color:var(--gold)">TOTAL MRR</div><div class="rev-val">${mrr.toLocaleString()} FCFA</div></div>`;
 }
-function admClearLogs(){if(!confirm('Effacer tous les logs ?'))return;localStorage.setItem('betai_logs','[]');admRenderLogs();admToast('Logs effacés','ok');}
 
-// ═══ INITIAL ROUTE ═══
-(function(){
-  const sess=JSON.parse(localStorage.getItem('betai_session')||'null');
-  if(sess&&sess.email){
-    if(sess.role==='admin'){hideAllOverlays();admOpen();}
-    else{hideAllOverlays();_initApp();}
-  } else {
-    showOverlay('auth-overlay');
-  }
-})();
+// ── LOGS ──
+function addLog(user, action, type='login') {
+  const logs=sGetJSON('betai_logs',[]);
+  logs.unshift({user,action,type,time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})});
+  if(logs.length>200)logs.splice(200);
+  sSetJSON('betai_logs',logs);
+}
+function renderLogs() {
+  const logs=sGetJSON('betai_logs',[]);
+  if(!logs.length){$('logsContainer').innerHTML='<div style="text-align:center;padding:30px;color:var(--muted)">Aucun log disponible</div>';return;}
+  $('logsContainer').innerHTML=logs.slice(0,80).map(l=>`
+    <div class="log-row">
+      <div class="log-time">${l.time}</div>
+      <div class="log-user">${l.user}</div>
+      <div class="log-action">${l.action}</div>
+      <span class="log-badge ${l.type}">${l.type}</span>
+    </div>`).join('');
+}
+function renderRecentLogs() { const logs=sGetJSON('betai_logs',[]); if(!logs.length){$('recentLogs').innerHTML='<div style="color:var(--muted);font-size:11px;padding:10px 0">Aucune activité enregistrée</div>';return;} $('recentLogs').innerHTML=logs.slice(0,8).map(l=>`<div class="log-row"><div class="log-time">${l.time}</div><div class="log-user">${l.user}</div><div class="log-action">${l.action}</div><span class="log-badge ${l.type}">${l.type}</span></div>`).join(''); }
+function clearLogs() { if(!confirm('Effacer tous les logs ?'))return; sSetJSON('betai_logs',[]); renderLogs(); toast('Logs effacés','ok'); }
+
+// ── USAGE ──
+function renderUsage() {
+  const logs=sGetJSON('betai_logs',[]);
+  const tickets=logs.filter(l=>l.action==='ticket_generated').length;
+  const chats=logs.filter(l=>l.action==='chat_message').length;
+  const vb=logs.filter(l=>l.action==='value_bets_scan').length;
+  const totCalls=tickets+chats+vb||1;
+  const costEst=(tickets*0.15+chats*0.04+vb*0.10).toFixed(2);
+  $('usageAnthropicChart').innerHTML=`
+    <div class="usage-item"><div class="usage-label">Tickets générés</div><div class="usage-track"><div class="usage-fill" style="width:${Math.round(tickets/totCalls*100)}%;background:var(--green)"></div></div><div class="usage-val">${tickets} appels</div></div>
+    <div class="usage-item"><div class="usage-label">Chat messages</div><div class="usage-track"><div class="usage-fill" style="width:${Math.round(chats/totCalls*100)}%;background:var(--blue)"></div></div><div class="usage-val">${chats} appels</div></div>
+    <div class="usage-item"><div class="usage-label">Value Bets scan</div><div class="usage-track"><div class="usage-fill" style="width:${Math.round(vb/totCalls*100)}%;background:var(--gold)"></div></div><div class="usage-val">${vb} appels</div></div>`;
+  $('usageCostChart').innerHTML=`
+    <div class="rev-item"><div class="rev-label">Coût estimé tickets</div><div class="rev-val" style="color:var(--green)">~$${(tickets*0.15).toFixed(2)}</div></div>
+    <div class="rev-item"><div class="rev-label">Coût estimé chats</div><div class="rev-val" style="color:var(--blue)">~$${(chats*0.04).toFixed(2)}</div></div>
+    <div class="rev-item"><div class="rev-label">Total estimé</div><div class="rev-val" style="color:var(--gold)">~$${costEst}</div></div>`;
+}
+
+// ── PLANS & SETTINGS ──
+function loadPlanSettings() {
+  const p=sGetJSON('betai_plans',{freeTickets:5,starterTickets:25,proTickets:9999,starterPrice:2000,proPrice:5000,freePicks:5,starterPicks:10,proPicks:20});
+  $('planFreeTickets').value=p.freeTickets; $('planStarterTickets').value=p.starterTickets; $('planProTickets').value=p.proTickets;
+  $('planStarterPrice').value=p.starterPrice; $('planProPrice').value=p.proPrice;
+  $('planFreePicks').value=p.freePicks; $('planStarterPicks').value=p.starterPicks; $('planProPicks').value=p.proPicks;
+}
+function savePlans() {
+  sSetJSON('betai_plans',{freeTickets:+$('planFreeTickets').value,starterTickets:+$('planStarterTickets').value,proTickets:+$('planProTickets').value,starterPrice:+$('planStarterPrice').value,proPrice:+$('planProPrice').value,freePicks:+$('planFreePicks').value,starterPicks:+$('planStarterPicks').value,proPicks:+$('planProPicks').value});
+  toast('✅ Plans sauvegardés','ok');
+}
+function loadAppSettings() {
+  const s=sGetJSON('betai_settings',{maintenance:false,registration:true,demo:true});
+  if($('setMaintenance'))$('setMaintenance').checked=s.maintenance;
+  if($('setRegistration'))$('setRegistration').checked=s.registration;
+  if($('setDemo'))$('setDemo').checked=s.demo;
+}
+function saveSetting(key,val) { const s=sGetJSON('betai_settings',{}); s[key]=val; sSetJSON('betai_settings',s); toast(`Paramètre mis à jour`,'ok'); }
+function saveSettings() { toast('✅ Paramètres sauvegardés','ok'); }
+function changeAdminPwd() {
+  const cur=$('curAdminPwd').value, newp=$('newAdminPwd').value;
+  const stored=sGet('betai_admin_pwd')||DEFAULT_ADMIN_PWD;
+  if(cur!==stored){toast('Mot de passe actuel incorrect','err');return;}
+  if(newp.length<8){toast('Nouveau mot de passe trop court (8 min)','err');return;}
+  sSet('betai_admin_pwd',newp); $('curAdminPwd').value=''; $('newAdminPwd').value=''; toast('✅ Mot de passe admin changé','ok');
+}
+
+/* ════════════════════════════════════════
+   SPA BOOT
+════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  const hash = window.location.hash.replace('#','');
+  if (hash === 'admin') { showView('admin'); return; }
+  const sess = sGetJSON('betai_session', null);
+  if (sess && sess.email) { initApp(); showView('app'); }
+  else { showView('auth'); }
+});
+
 </script>
-
+</div><!-- end view-app -->
 </body>
 </html>
