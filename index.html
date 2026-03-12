@@ -542,6 +542,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
   </div>
 
   <button class="gen-btn" id="genBtn" onclick="generate()">⚡ GÉNÉRER LE TICKET</button>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:7px;padding:7px 10px;background:var(--card);border:1px solid var(--b1);border-radius:8px;">
+  <div style="font-size:9px;color:var(--muted2)" id="prevTeamsLbl">🔄 Rotation : aucun ticket précédent</div>
+  <button onclick="resetPrevTeams()" style="background:none;border:none;cursor:pointer;font-size:8.5px;color:var(--muted);font-family:'Outfit',sans-serif;padding:2px 6px;border-radius:4px;transition:.15s" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'">✕ Reset</button>
+</div>
 
 </div>
 
@@ -665,6 +669,8 @@ let curMode  = 'safe';
 let curTicket = null;
 let usedSrc  = { fd:false, bz:false, af:false };
 let hist     = sGetJSON('betai_hist', []);
+// Mémoire anti-répétition : équipes sélectionnées dans les 3 derniers tickets
+let _prevTeams = sGetJSON('betai_prev_teams', []);  // ex: ["PSG","Monaco","Real Madrid"]
 
 const activeOpts  = new Set(['result','double','double12','goals','btts','corners','cards','winbtts']);
 const activeFeats = new Set(['val','rel','trap','best']);
@@ -682,7 +688,27 @@ window.addEventListener('DOMContentLoaded', () => {
   renderSugg();
   updHistCt();
   updSrc();
+  updPrevTeamsLbl();
 });
+
+function updPrevTeamsLbl() {
+  const el = $('prevTeamsLbl');
+  if (!el) return;
+  if (!_prevTeams.length) {
+    el.textContent = '🔄 Rotation : aucun ticket précédent';
+    el.style.color = 'var(--muted2)';
+  } else {
+    const shown = _prevTeams.slice(0, 4).join(', ') + (_prevTeams.length > 4 ? ` +${_prevTeams.length-4}` : '');
+    el.textContent = `🔄 Éviter : ${shown}`;
+    el.style.color = 'var(--teal)';
+  }
+}
+
+function resetPrevTeams() {
+  _prevTeams = [];
+  sSetJSON('betai_prev_teams', []);
+  updPrevTeamsLbl();
+}
 
 // ═══════════════════════════════════════════
 //  UI HELPERS
@@ -1017,6 +1043,13 @@ async function generate() {
   const matches = raw.split('\n').map(l => l.trim()).filter(Boolean);
   if (!matches.length) return;
 
+  // CAP AUTOMATIQUE : impossible d'avoir plus de picks que de matchs
+  const maxPicksAllowed = matches.length;
+  if (selCount > maxPicksAllowed) {
+    selCount = maxPicksAllowed;
+    $('countVal').textContent = selCount;
+  }
+
   // Read config
   const thresh   = $('threshSlider').value;
   const optList  = [...activeOpts].join(', ');
@@ -1141,20 +1174,10 @@ async function generate() {
 
   // Build instruction blocks
   const bestInstr = wantBest ? `
-BEST PICK MODE — ACTIF (PRIORITÉ ABSOLUE):
-Pour chaque match, tu DOIS évaluer TOUS ces types de paris et choisir LE MEILLEUR :
-1. Résultat (1/N/2) — quelle proba de victoire/nul ?
-2. Double chance 1X, X2, 12 — lequel est le plus solide ?
-3. Plus/Moins buts — tendance offensive/défensive des 2 équipes ?
-4. BTTS OUI/NON — les 2 défenses sont-elles poreuses ou solides ?
-5. Win + BTTS — équipe dominante qui prend des buts ?
-6. Double chance + BTTS — pari combiné très solide ?
-7. Résultat + buts — confirment-ils la même chose ?
-8. Corners — équipes qui jouent en largeur ?
-9. Cartons — match physique ou derby ?
-10. Draw No Bet — si victoire probable mais nul possible ?
-→ Compare toutes les probas, choisis UNE SEULE option : la plus probable et la plus cohérente avec les données.
-→ Dans "reason" explique pourquoi cette option est meilleure que les autres.` : '';
+BEST PICK MODE — ACTIF :
+Pour chaque match, évalue UNIQUEMENT les types cochés par l'utilisateur : ${optList}
+Choisis LE MEILLEUR parmi ces types uniquement — celui le plus probable et cohérent avec les données.
+→ Dans "reason" explique pourquoi ce type est le meilleur parmi les options disponibles.` : '';
 
   const valInstr = wantVal ? `
 VALUE BET:
@@ -1184,22 +1207,25 @@ ${dataCtx}
 MATCHS:
 ${matches.map((m, i) => `${i+1}. ${m}`).join('\n')}
 
+${_prevTeams.length > 0 ? `ROTATION ANTI-RÉPÉTITION (OBLIGATOIRE):
+Les équipes suivantes ont déjà été sélectionnées dans les tickets précédents.
+Tu DOIS les éviter ou les minimiser dans ce ticket (max 1 pick avec ces équipes si vraiment incontournable) :
+${_prevTeams.join(', ')}
+Si les matchs fournis ne contiennent QUE ces équipes, alors tu peux les utiliser mais avec des types de paris différents.` : ''}
+
 CONFIGURATION:
-- Sélections demandées: ${selCount}
+- Matchs fournis: ${matches.length} → tu dois générer EXACTEMENT ${Math.min(selCount, matches.length)} picks (1 par match)
+- RAPPEL : si l'utilisateur demande ${selCount} picks mais qu'il n'y a que ${matches.length} matchs, le maximum est ${matches.length}
 - Seuil minimum de probabilité: ${thresh}%
 - Mode: ${curMode} — ${modeDesc}
 
-RÈGLE ABSOLUE SUR LES TYPES DE PARIS:
+TYPES DE PARIS AUTORISÉS (RÈGLE ABSOLUE — INVIOLABLE) :
+Tu ne peux utiliser QUE ces types : ${optList}
+INTERDIT ABSOLU d'utiliser tout autre type de pari.
 ${wantBest
-  ? `Best Pick ACTIVÉ — pour chaque match, évalue tous les types et choisis UN SEUL : le plus pertinent selon les données.
-  MAIS tu dois obligatoirement varier les types sur l'ensemble du ticket.
-  INTERDIT : plus de 40% des picks avec le même bet_type (ex: pas plus de 4 "result" sur 10 picks).
-  Répartition cible : 3-4 types différents minimum sur l'ensemble du ticket.`
-  : `Best Pick DÉSACTIVÉ — tu dois IMPÉRATIVEMENT utiliser UNIQUEMENT ces types: ${optList}
-  INTERDIT ABSOLU : utiliser un type de pari qui n'est PAS dans cette liste.
-  Si "result" n'est pas dans la liste, ne génère AUCUN pick de type "result".
-  Si seul "btts" est sélectionné, TOUS les picks doivent être de type "btts".
-  Répartis équitablement entre les types disponibles.`
+  ? `Best Pick ACTIVÉ : pour chaque match, compare ces types entre eux et choisis LE MEILLEUR selon les données.
+INTERDIT : plus de 40% des picks avec le même bet_type. Vise 2-3 types différents minimum.`
+  : `Best Pick DÉSACTIVÉ : répartis les picks équitablement entre les types disponibles.`
 }
 ${bestInstr}
 ${valInstr}
@@ -1233,10 +1259,11 @@ RÈGLES STRICTES:
 - Cote estimée = (1/probabilité) × 1.08
 - Sois concis dans "reason" (max 15 mots)
 - JSON compact sans espaces superflus
-- INTERDIT : deux picks avec exactement le même match ET le même bet_type
-- INTERDIT : générer plus de sélections que le nombre demandé (${selCount} maximum)
-- Si un match apparaît plusieurs fois dans le ticket, les bet_type DOIVENT être différents
-- Les ${selCount} picks doivent couvrir au maximum les matchs fournis (idéalement 1 pick par match)
+- RÈGLE FONDAMENTALE : 1 PICK PAR MATCH MAXIMUM — chaque match ne peut apparaître qu'UNE SEULE FOIS dans le ticket
+- INTERDIT ABSOLU : un même match (ex: "Bologna vs Roma") apparaître 2 fois ou plus dans le ticket, même avec des bet_type différents
+- Le nombre de sélections = exactement le nombre de matchs fournis (${matches.length} matchs = ${matches.length} picks maximum)
+- INTERDIT : générer plus de ${matches.length} sélections
+- Si tu dois choisir, préfère les matchs avec les meilleures données et probabilités — ignore les matchs insuffisants plutôt que de répéter
 
 Réponds UNIQUEMENT avec ce JSON valide, sans texte autour, sans backticks:
 {"ticket":[{"num":1,"match":"PSG vs Monaco","league":"Ligue 1","home":"PSG","away":"Monaco","bet_type":"result","bet_label":"RÉSULTAT","bet_value":"Victoire PSG","probability":72,"cote":1.45,"confidence":"high","reason":"Forme WWWDW, ML 72%, Monaco sans Golovin","tag_type":"result","is_value_bet":false,"value_edge":0,"reliability_score":82,"reliability_label":"Très fiable","is_trap":false,"trap_reason":null,"real_data":{"form_home":"WWWDW","form_away":"DWLWL","h2h":"4V-2N-1D","rank_home":"1er","rank_away":"3ème","ml_home":72,"ml_draw":18,"ml_away":10,"injuries":null}}],"summary":{"total":1,"avg_prob":72,"total_cote":1.45,"high_conf":1,"value_bets":0}}`;
@@ -1322,6 +1349,11 @@ Output ONLY the JSON. Start immediately with {. Nothing before {, nothing after 
 
     curTicket = result;
     saveHist(result, matches);
+    // Mémoriser les équipes pour éviter répétitions au prochain ticket
+    const _newTeams = result.ticket.flatMap(t => [t.home, t.away]).filter(Boolean);
+    _prevTeams = [...new Set([..._newTeams, ..._prevTeams])].slice(0, 20); // max 20 équipes mémorisées
+    sSetJSON('betai_prev_teams', _prevTeams);
+    updPrevTeamsLbl();
     renderTicket(result, matches.length);
 
   } catch(e) {
