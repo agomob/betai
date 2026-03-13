@@ -498,6 +498,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
         <button class="opt" data-t="first_goal" onclick="togOpt(this)">🥇 1ère équipe à marquer</button>
         <button class="opt" data-t="btts_goals" onclick="togOpt(this)">🎯⚽ BTTS + Over/Under</button>
         <button class="opt" data-t="equipe_gagne_mt" onclick="togOpt(this)" style="grid-column:span 2;">🏅 Une équipe gagne une mi-temps</button>
+        <button class="opt" data-t="nul_mt" onclick="togOpt(this)" style="grid-column:span 2;">🤝 Nul dans une mi-temps</button>
       </div>
     </div>
 
@@ -1385,7 +1386,8 @@ TYPES DE PARIS DISPONIBLES:
 - winbtts: Victoire + Les 2 marquent ex "PSG Victoire + BTTS OUI"
 - double_btts: Double chance + BTTS ex "1X + BTTS OUI" ou "12 + BTTS OUI"
 - result_goals: Résultat + buts ex "PSG Victoire + Plus de 2.5 buts"
-- equipe_gagne_mt: Une équipe gagne au moins une mi-temps ex "Une équipe gagne la MT1" ou "Une équipe gagne la MT2" — pari que l'une des deux équipes (peu importe laquelle) gagne une des deux mi-temps
+- equipe_gagne_mt: Nomme L'ÉQUIPE PRÉCISE qui va gagner UNE mi-temps spécifique. Analyse les stats (attaque, forme, H2H, style) et choisis : soit "PSG gagne la MT1", soit "Bayern gagne la MT2", soit "Arsenal gagne une MT". INTERDIT d'écrire "Une équipe gagne MT1/MT2" de façon générique — tu dois nommer l'équipe et la mi-temps selon les données réelles.
+- nul_mt: Prédit qu'une mi-temps précise se terminera sur un score nul (0-0, 1-1, 2-2...). Choisis la mi-temps la plus probable selon le style défensif et le H2H. Ex: "Nul à la MT1", "Nul à la MT2". Justifie ton choix avec les données : équipes défensives, peu de buts en début/fin de match, H2H serré.
 
 RÈGLES STRICTES:
 - Cote estimée = (1/probabilité) × 1.08
@@ -1513,7 +1515,8 @@ const tagMap  = {
   cards:'t-cards', fouls:'t-cards',
   htft:'t-other', asian:'t-other', euro_hdc:'t-other', cleansheet:'t-result',
   winbtts:'t-combo', double_btts:'t-combo', result_goals:'t-combo',
-  equipe_gagne_mt:'t-goals'
+  equipe_gagne_mt:'t-goals',
+  nul_mt:'t-other'
 };
 
 function renderTicket(data, totalMatches) {
@@ -1732,7 +1735,8 @@ const TYPE_LABELS = {
   first_goal:'1ère équipe à marquer', corners:'Corners', corners_ht:'Corners MT1',
   cards:'Cartons', fouls:'Fautes', winbtts:'Win & BTTS', double_btts:'Double chance + BTTS',
   result_goals:'Résultat + Buts',
-  equipe_gagne_mt:'Équipe gagne une MT'
+  equipe_gagne_mt:'Équipe gagne une MT',
+  nul_mt:'Nul dans une MT'
 };
 
 function getPickId(ticketId, pickIdx) { return `${ticketId}_${pickIdx}`; }
