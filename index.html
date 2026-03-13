@@ -497,6 +497,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
         <button class="opt" data-t="goals_st" onclick="togOpt(this)">⏱️ Buts 2ème mi-temps</button>
         <button class="opt" data-t="first_goal" onclick="togOpt(this)">🥇 1ère équipe à marquer</button>
         <button class="opt" data-t="btts_goals" onclick="togOpt(this)">🎯⚽ BTTS + Over/Under</button>
+        <button class="opt" data-t="equipe_gagne_mt" onclick="togOpt(this)" style="grid-column:span 2;">🏅 Une équipe gagne une mi-temps</button>
       </div>
     </div>
 
@@ -1384,6 +1385,7 @@ TYPES DE PARIS DISPONIBLES:
 - winbtts: Victoire + Les 2 marquent ex "PSG Victoire + BTTS OUI"
 - double_btts: Double chance + BTTS ex "1X + BTTS OUI" ou "12 + BTTS OUI"
 - result_goals: Résultat + buts ex "PSG Victoire + Plus de 2.5 buts"
+- equipe_gagne_mt: Une équipe gagne au moins une mi-temps ex "Une équipe gagne la MT1" ou "Une équipe gagne la MT2" — pari que l'une des deux équipes (peu importe laquelle) gagne une des deux mi-temps
 
 RÈGLES STRICTES:
 - Cote estimée = (1/probabilité) × 1.08
@@ -1510,7 +1512,8 @@ const tagMap  = {
   corners:'t-corners', corners_ht:'t-corners',
   cards:'t-cards', fouls:'t-cards',
   htft:'t-other', asian:'t-other', euro_hdc:'t-other', cleansheet:'t-result',
-  winbtts:'t-combo', double_btts:'t-combo', result_goals:'t-combo'
+  winbtts:'t-combo', double_btts:'t-combo', result_goals:'t-combo',
+  equipe_gagne_mt:'t-goals'
 };
 
 function renderTicket(data, totalMatches) {
@@ -1728,7 +1731,8 @@ const TYPE_LABELS = {
   btts_goals:'BTTS + Over/Under', goals_ht:'Buts 1ère MT', goals_st:'Buts 2ème MT',
   first_goal:'1ère équipe à marquer', corners:'Corners', corners_ht:'Corners MT1',
   cards:'Cartons', fouls:'Fautes', winbtts:'Win & BTTS', double_btts:'Double chance + BTTS',
-  result_goals:'Résultat + Buts'
+  result_goals:'Résultat + Buts',
+  equipe_gagne_mt:'Équipe gagne une MT'
 };
 
 function getPickId(ticketId, pickIdx) { return `${ticketId}_${pickIdx}`; }
