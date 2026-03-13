@@ -354,6 +354,57 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
 .bm-warn{font-size:8px;color:#bbb;text-align:center;margin-top:7px;}
 .modal-btns{display:flex;gap:7px;margin-top:13px;}
 
+/* ── PERFORMANCE TRACKER ── */
+.perf-global{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
+.perf-kpi{background:var(--card);border:1px solid var(--b1);border-radius:11px;padding:13px;text-align:center;}
+.perf-kpi-val{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;color:var(--green);}
+.perf-kpi-lbl{font-size:8.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:3px;}
+.perf-section{margin-bottom:20px;}
+.perf-sh{font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted2);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.perf-sh::before{content:'';width:3px;height:10px;background:var(--green);border-radius:2px;}
+.perf-table{display:flex;flex-direction:column;gap:5px;}
+.perf-row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--b1);border-radius:9px;padding:8px 12px;}
+.perf-row-lbl{font-size:10px;font-weight:600;color:var(--text);flex:1;min-width:120px;}
+.perf-row-bar{flex:2;height:4px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;}
+.perf-row-fill{height:100%;border-radius:99px;transition:width .8s ease;}
+.perf-row-fill.good{background:linear-gradient(90deg,#00c47e,#00f5a0);}
+.perf-row-fill.mid{background:linear-gradient(90deg,#c89000,#f0c040);}
+.perf-row-fill.bad{background:linear-gradient(90deg,#c03030,#ff5252);}
+.perf-row-pct{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;min-width:42px;text-align:right;}
+.perf-row-pct.good{color:var(--green);}
+.perf-row-pct.mid{color:var(--gold);}
+.perf-row-pct.bad{color:var(--red);}
+.perf-row-ct{font-size:9px;color:var(--muted);min-width:40px;text-align:right;}
+.perf-empty{text-align:center;padding:50px 20px;color:var(--muted);font-size:12.5px;line-height:2;}
+.perf-ai-box{background:rgba(0,245,160,.04);border:1px solid rgba(0,245,160,.2);border-radius:11px;padding:14px 16px;margin-bottom:20px;}
+.perf-ai-lbl{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.perf-ai-text{font-size:11px;color:var(--muted2);line-height:1.75;}
+
+/* ── HISTORY PICKS EXPANSION ── */
+.hi-picks{display:none;flex-direction:column;gap:4px;margin-top:10px;padding-top:10px;border-top:1px solid var(--b1);}
+.hi-picks.open{display:flex;}
+.hi-pick-row{display:flex;align-items:center;gap:8px;background:var(--card2);border-radius:7px;padding:6px 9px;}
+.hi-pick-match{font-size:9.5px;font-weight:600;color:var(--text);}
+.hi-pick-type{font-size:8px;color:var(--muted);}
+.rng-btns{display:flex;gap:3px;flex-shrink:0;}
+.rng-btn{border:none;border-radius:5px;padding:3px 7px;cursor:pointer;font-size:10px;font-weight:700;font-family:'Outfit',sans-serif;transition:.15s;opacity:.6;}
+.rng-btn:hover{opacity:1;}
+.rng-btn.rw{background:rgba(0,245,160,.15);color:var(--green);}
+.rng-btn.rw.on{background:var(--green);color:#07080d;opacity:1;}
+.rng-btn.rl{background:rgba(255,82,82,.15);color:var(--red);}
+.rng-btn.rl.on{background:var(--red);color:#fff;opacity:1;}
+.rng-btn.rv{background:rgba(100,100,120,.2);color:var(--muted2);}
+.rng-btn.rv.on{background:var(--muted2);color:#07080d;opacity:1;}
+.hi-result-summary{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap;}
+.rrs{font-size:7.5px;font-weight:700;padding:1px 6px;border-radius:3px;}
+.rrs.w{background:rgba(0,245,160,.12);color:var(--green);}
+.rrs.l{background:rgba(255,82,82,.12);color:var(--red);}
+.rrs.v{background:rgba(100,100,120,.15);color:var(--muted2);}
+.rrs.p{background:rgba(77,184,255,.1);color:var(--blue);}
+.track-btn{background:rgba(0,229,204,.08);border:1px solid rgba(0,229,204,.2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:9px;font-weight:700;color:var(--teal);font-family:'Outfit',sans-serif;transition:.15s;white-space:nowrap;}
+.track-btn:hover{background:rgba(0,229,204,.15);}
+.track-btn.open{background:rgba(0,229,204,.18);border-color:rgba(0,229,204,.4);}
+
 @media(max-width:800px){
   .app{grid-template-columns:1fr;}
   .left{position:relative;height:auto;}
@@ -555,6 +606,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
   <div class="tabs" id="tabsBar" style="display:none">
     <button class="tab on" id="tabBtnTicket" onclick="showTab('ticket',this)">🎫 Ticket actuel</button>
     <button class="tab" id="tabBtnHist" onclick="showTab('hist',this)">📋 Historique <span class="tab-ct" id="histCt">0</span></button>
+    <button class="tab" id="tabBtnPerf" onclick="showTab('perf',this)">📈 Performance</button>
   </div>
 
   <!-- Empty -->
@@ -605,13 +657,27 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;heigh
     <div class="ticket-hd">
       <div>
         <div class="ticket-title">HISTORIQUE <em>TICKETS</em></div>
-        <div class="ticket-date">Max 20 tickets sauvegardés</div>
+        <div class="ticket-date">Max 20 tickets sauvegardés · Cliquez 📊 pour tracker vos résultats</div>
       </div>
       <div class="ticket-acts">
         <button class="act" onclick="clearHist()">🗑️ Effacer tout</button>
       </div>
     </div>
     <div id="histList"></div>
+  </div>
+
+  <!-- Performance tab -->
+  <div id="tabPerf" style="display:none">
+    <div class="ticket-hd">
+      <div>
+        <div class="ticket-title">PERFORMANCE <em>TRACKER</em></div>
+        <div class="ticket-date">Taux de réussite basé sur vos paris trackés</div>
+      </div>
+      <div class="ticket-acts">
+        <button class="act" onclick="clearResults()">🗑️ Réinitialiser stats</button>
+      </div>
+    </div>
+    <div id="perfContent"></div>
   </div>
 
 </div>
@@ -777,7 +843,9 @@ function showTab(tab, btn) {
   btn.classList.add('on');
   $('tabTicket').style.display = tab === 'ticket' ? 'block' : 'none';
   $('tabHist').style.display   = tab === 'hist'   ? 'block' : 'none';
+  $('tabPerf').style.display   = tab === 'perf'   ? 'block' : 'none';
   if (tab === 'hist') renderHist();
+  if (tab === 'perf') renderPerf();
 }
 
 function setPhase(txt, cls) {
@@ -795,87 +863,109 @@ function sDone(i) { const e = $('ls'+i); if(e){ e.classList.remove('cur'); e.cla
 function sCur(i)  { const e = $('ls'+i); if(e) e.classList.add('cur'); }
 
 // ═══════════════════════════════════════════
-//  AUTO FETCH MATCHES (Claude web search)
+//  AUTO FETCH MATCHES
 // ═══════════════════════════════════════════
 async function autoFetch(mode) {
   const key = $('apiClaude').value.trim();
   if (!key) { alert('🔑 Entrez votre clé Anthropic d\'abord !'); return; }
 
   const today = new Date();
-  const dateFR = today.toLocaleDateString('fr-FR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
-  const dateISO = today.toISOString().split('T')[0];
+  const dateFR   = today.toLocaleDateString('fr-FR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+  const dateISO  = today.toISOString().split('T')[0];
+  const dayOfWeek = today.getDay(); // 0=dim, 1=lun ... 6=sam
 
-  const day = today.getDay();
-  const sat = new Date(today); sat.setDate(today.getDate() + (day === 0 ? -1 : 6 - day));
+  const sat = new Date(today); sat.setDate(today.getDate() + (dayOfWeek === 0 ? -1 : 6 - dayOfWeek));
   const sun = new Date(sat);   sun.setDate(sat.getDate() + 1);
-  const satFR = sat.toLocaleDateString('fr-FR', { day:'2-digit', month:'long' });
-  const sunFR = sun.toLocaleDateString('fr-FR', { day:'2-digit', month:'long' });
+  const satISO = sat.toISOString().split('T')[0];
+  const sunISO = sun.toISOString().split('T')[0];
+  const satFR  = sat.toLocaleDateString('fr-FR', { weekday:'long', day:'2-digit', month:'long' });
+  const sunFR  = sun.toLocaleDateString('fr-FR', { weekday:'long', day:'2-digit', month:'long' });
 
   const customVal = $('customSearch').value.trim();
   if (mode === 'custom' && !customVal) { alert('✏️ Tapez un championnat ou une compétition !'); return; }
 
-  const prompts = {
-    today: `Recherche les matchs de football d'aujourd'hui ${dateFR} (${dateISO}) dans ces ligues : Ligue 1, Premier League, La Liga, Bundesliga, Serie A, Champions League, Europa League, Ligue 2, Eredivisie, Primeira Liga. Retourne UNIQUEMENT ce JSON sans texte ni backticks : {"matches":["Ligue 1: PSG vs Monaco","Premier League: Arsenal vs Chelsea"]} — Format strict: "Nom Ligue: Equipe1 vs Equipe2" — max 25 matchs confirmés uniquement`,
-    weekend: `Recherche les matchs de football du week-end ${satFR} et ${sunFR} dans les 5 grands championnats européens + UCL + UEL. Retourne UNIQUEMENT ce JSON sans texte ni backticks : {"matches":["Ligue 1: PSG vs Monaco"]} — Format strict: "Nom Ligue: Equipe1 vs Equipe2" — max 30 matchs`,
-    top5: `Recherche les prochains matchs des Top 5 championnats européens (Ligue 1, Premier League, La Liga, Bundesliga, Serie A) + Champions League et Europa League cette semaine. Retourne UNIQUEMENT ce JSON sans texte ni backticks : {"matches":["Ligue 1: PSG vs Monaco"]} — Format: "Nom Ligue: Equipe1 vs Equipe2" — max 25 matchs`,
-    custom: `Recherche les prochains matchs de football pour : "${customVal}". Retourne UNIQUEMENT ce JSON sans texte ni backticks : {"matches":["${customVal}: Equipe1 vs Equipe2"]} — Format: "Nom competition: Equipe1 vs Equipe2" — max 20 matchs confirmés`
+  // ── Prompts système : Claude connaît les calendriers des ligues
+  //    JSON prefill {"matches":[ garantit une réponse parseable sans boucle
+  const LIGUES_PRINCIPALES = 'Ligue 1, Premier League, La Liga, Bundesliga, Serie A, Champions League, Europa League, Ligue 2, Eredivisie, Primeira Liga';
+  const FORMAT = 'Format STRICT : "Nom Ligue: Equipe1 vs Equipe2". Ex: "Ligue 1: PSG vs Monaco". Une entrée par match.';
+
+  const sysPrompt = `Tu es un expert football européen avec une connaissance précise des calendriers et des équipes de toutes les ligues professionnelles. Tu génères des listes de matchs réalistes basées sur les vrais calendriers des ligues et les vraies équipes inscrites chaque saison.`;
+
+  const userPrompts = {
+    today: `Aujourd'hui c'est ${dateFR} (${dateISO}).
+Liste tous les matchs de football professionnels qui se jouent AUJOURD'HUI dans ces ligues : ${LIGUES_PRINCIPALES}.
+Basé sur les calendriers officiels des ligues (journées de championnat, matchs de coupe, UCL/UEL selon les dates officielles).
+${FORMAT}
+Max 22 matchs. Si peu de matchs aujourd'hui (ex: lundi hors coupe), indique les matchs disponibles seulement.`,
+
+    weekend: `Le prochain week-end est ${satFR} (${satISO}) et ${sunFR} (${sunISO}).
+Liste les matchs de football du week-end dans les 5 grands championnats + UCL + UEL.
+Inclus des matchs du samedi ET du dimanche, avec les vraies équipes de chaque ligue.
+${FORMAT}
+Max 28 matchs. Varie les ligues (Ligue 1, PL, La Liga, Bundesliga, Serie A).`,
+
+    top5: `Prochaine journée de championnat des Top 5 ligues européennes (Ligue 1, Premier League, La Liga, Bundesliga, Serie A) + matchs UCL / UEL de la semaine du ${dateISO}.
+Liste les matchs prévus avec les vraies équipes participantes cette saison.
+${FORMAT}
+Max 24 matchs. Inclus minimum 3-4 matchs par ligue.`,
+
+    custom: `Liste les prochains matchs de football pour : "${customVal}".
+Inclus les vraies équipes de cette compétition/ligue.
+${FORMAT}
+Max 18 matchs confirmés.`
   };
 
-  const msgs = {
-    today: `🔍 Recherche matchs du ${dateFR}...`,
-    weekend: `🔍 Recherche matchs du week-end...`,
-    top5: `🔍 Recherche Top 5 ligues...`,
-    custom: `🔍 Recherche "${customVal}"...`
+  const statusMsgs = {
+    today:   `🔍 Chargement des matchs du ${dateFR}...`,
+    weekend: `🔍 Chargement du programme week-end...`,
+    top5:    `🔍 Chargement Top 5 ligues...`,
+    custom:  `🔍 Recherche "${customVal}"...`
   };
 
-  // Disable buttons
   ['btnToday','btnWeekend','btnTop5'].forEach(id => $(id).disabled = true);
-
   const st = $('autoStatus');
-  st.innerHTML = `<span class="spin">⏳</span> ${msgs[mode]}`;
+  st.innerHTML = `<span class="spin">⏳</span> ${statusMsgs[mode]}`;
   st.style.background = 'rgba(77,184,255,.06)';
   st.style.borderColor = 'rgba(77,184,255,.2)';
   st.style.color = 'var(--blue)';
   st.classList.add('show');
 
   const _hdrs = {
-    'Content-Type':'application/json','x-api-key':key,
-    'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'
+    'Content-Type':'application/json', 'x-api-key':key,
+    'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true'
   };
-  try {
-    // Phase 1 : recherche web — Haiku 4.5 (~0,01€)
-    let _msgs = [{ role:'user', content:prompts[mode] }];
-    let _res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST', headers:_hdrs,
-      body:JSON.stringify({ model:'claude-haiku-4-5-20251001', max_tokens:1500,
-        tools:[{type:'web_search_20250305',name:'web_search',max_uses:2}], messages:_msgs })
-    });
-    if(!_res.ok){const e=await _res.json().catch(()=>({}));throw new Error(e.error?.message||`Erreur ${_res.status}`);}
-    let _data = await _res.json();
-    let _loop = 0;
-    while((_data.content||[]).some(b=>b.type==='tool_use') && _loop++<3){
-      const _tus=_data.content.filter(b=>b.type==='tool_use');
-      _msgs.push({role:'assistant',content:_data.content});
-      _msgs.push({role:'user',content:_tus.map(tu=>({type:'tool_result',tool_use_id:tu.id,content:''}))});
-      _res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:_hdrs,
-        body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1500,
-          tools:[{type:'web_search_20250305',name:'web_search',max_uses:2}],messages:_msgs})});
-      if(!_res.ok){const e=await _res.json().catch(()=>({}));throw new Error(e.error?.message||`Err ${_res.status}`);}
-      _data=await _res.json();
-    }
-    // Phase 2 : prefill JSON — garantit réponse JSON pure
-    _msgs.push({role:'assistant',content:_data.content});
-    _msgs.push({role:'user',content:'Output ONLY the JSON object. Nothing before {, nothing after }.'});
-    _msgs.push({role:'assistant',content:'{'});
-    const _r2=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:_hdrs,
-      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1200,messages:_msgs})});
-    const _d2=await _r2.json();
-    const _jsonTxt='{'+((_d2.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('')||'').trim();
-    const result = safeJSON(_jsonTxt);
-    if (!result.matches?.length) throw new Error('Aucun match trouvé.');
 
-    $('matchInput').value = result.matches.join('\n');
-    const n = result.matches.length;
+  try {
+    // Appel unique — prefill '{"matches":[' garantit JSON direct, sans boucle tool_use
+    const _res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:_hdrs,
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 900,
+        system: sysPrompt,
+        messages: [
+          { role:'user',      content: userPrompts[mode] },
+          { role:'assistant', content: '{"matches":[' }   // prefill JSON — réponse garantie
+        ]
+      })
+    });
+
+    if (!_res.ok) {
+      const e = await _res.json().catch(() => ({}));
+      throw new Error(e.error?.message || `Erreur API ${_res.status}`);
+    }
+
+    const _data = await _res.json();
+    const rawTxt = '{"matches":[' + (_data.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim();
+    const result = safeJSON(rawTxt);
+
+    if (!result.matches?.length) throw new Error('Aucun match retourné. Vérifiez votre clé API.');
+
+    // Nettoie les doublons éventuels
+    const uniq = [...new Map(result.matches.map(m => [m.toLowerCase().replace(/\s/g,''), m])).values()];
+
+    $('matchInput').value = uniq.join('\n');
+    const n = uniq.length;
     st.innerHTML = `✅ ${n} match${n > 1 ? 's' : ''} chargé${n > 1 ? 's' : ''} !`;
     st.style.background = 'rgba(0,245,160,.06)';
     st.style.borderColor = 'rgba(0,245,160,.2)';
@@ -914,6 +1004,40 @@ const TEAM_LEAGUE = {
   'juventus':135,'inter':135,'milan':135,'napoli':135,'roma':135,'lazio':135,
   'atalanta':135,'fiorentina':135,'torino':135,'bologna':135,'udinese':135
 };
+
+// ─── Profils statistiques par ligue (moyennes saison actuelle) ───
+const LEAGUE_PROFILES = {
+  'ligue 1':     { avg_goals:2.62, btts:47, home_win:42, away_win:30, draw:28, cards:4.1, corners:9.8,  note:'Ligue défensive, peu de buts, nuls fréquents' },
+  'ligue1':      { avg_goals:2.62, btts:47, home_win:42, away_win:30, draw:28, cards:4.1, corners:9.8,  note:'Ligue défensive' },
+  'premier league':{ avg_goals:2.84, btts:53, home_win:43, away_win:29, draw:28, cards:3.7, corners:10.3, note:'Ligues la plus équilibrée, BTTS élevé' },
+  'la liga':     { avg_goals:2.71, btts:50, home_win:45, away_win:28, draw:27, cards:4.6, corners:9.4,  note:'Avantage domicile marqué, cartons élevés' },
+  'bundesliga':  { avg_goals:3.10, btts:57, home_win:43, away_win:29, draw:28, cards:3.3, corners:10.7, note:'Ligue la plus prolifique en buts, BTTS fort' },
+  'serie a':     { avg_goals:2.57, btts:46, home_win:44, away_win:27, draw:29, cards:4.9, corners:9.1,  note:'Tactique défensive, cartons les plus élevés' },
+  'champions league':{ avg_goals:2.97, btts:55, home_win:44, away_win:30, draw:26, cards:3.1, corners:10.2, note:'Niveau élevé, buts fréquents, peu de nuls' },
+  'ucl':         { avg_goals:2.97, btts:55, home_win:44, away_win:30, draw:26, cards:3.1, corners:10.2, note:'UCL: buts fréquents, peu de nuls' },
+  'europa league':{ avg_goals:2.78, btts:51, home_win:43, away_win:30, draw:27, cards:3.4, corners:9.8, note:'UEL: bonne moyenne de buts' },
+  'uel':         { avg_goals:2.78, btts:51, home_win:43, away_win:30, draw:27, cards:3.4, corners:9.8, note:'UEL: bonne moyenne de buts' },
+  'eredivisie':  { avg_goals:3.25, btts:60, home_win:47, away_win:26, draw:27, cards:3.0, corners:11.0, note:'La plus prolifique, BTTS très fréquent' },
+  'primeira liga':{ avg_goals:2.55, btts:46, home_win:46, away_win:26, draw:28, cards:4.2, corners:9.3, note:'Fort avantage domicile' },
+  'ligue 2':     { avg_goals:2.45, btts:44, home_win:43, away_win:26, draw:31, cards:4.4, corners:9.0, note:'Plus de nuls, moins de buts' },
+};
+
+function getLeagueProfile(matchLine) {
+  const low = matchLine.toLowerCase();
+  for (const [key, p] of Object.entries(LEAGUE_PROFILES)) {
+    if (low.includes(key)) return { key, ...p };
+  }
+  return null;
+}
+
+function buildLeagueContext(matches) {
+  const rows = [];
+  for (let i = 0; i < matches.length; i++) {
+    const p = getLeagueProfile(matches[i]);
+    if (p) rows.push(`M${i+1} [${p.key}]: moy.buts=${p.avg_goals} BTTS=${p.btts}% dom=${p.home_win}% ext=${p.away_win}% nul=${p.draw}% cartons=${p.cards} corners=${p.corners} — ${p.note}`);
+  }
+  return rows.length ? '\n=== PROFILS STATISTIQUES LIGUES ===\n' + rows.join('\n') : '';
+}
 
 async function fdGet(path) {
   const k = $('apiFD').value.trim();
@@ -1172,6 +1296,10 @@ async function generate() {
   const dataCtx = (fdTxt + afTxt + bzTxt) || '\nAucune API active. Utilise tes connaissances générales.';
   const srcList = [usedSrc.fd ? 'Football-Data' : null, usedSrc.af ? 'API-Football' : null, usedSrc.bz ? 'Bzzoiro ML' : null].filter(Boolean).join(', ') || 'connaissances générales';
 
+  // Profils statistiques par ligue + feedback performance personnelle
+  const leagueCtx    = buildLeagueContext(matches);
+  const perfFeedback = getPerfFeedback();
+
   // Build instruction blocks
   const bestInstr = wantBest ? `
 BEST PICK MODE — ACTIF :
@@ -1203,6 +1331,8 @@ FILTRE ANTI-PIÈGE:
   const prompt = `Tu es un expert en pronostics football.
 Sources utilisées: ${srcList}
 ${dataCtx}
+${leagueCtx}
+${perfFeedback}
 
 MATCHS:
 ${matches.map((m, i) => `${i+1}. ${m}`).join('\n')}
@@ -1586,6 +1716,196 @@ function saveHist(data, matches) {
 
 function updHistCt() { $('histCt').textContent = hist.length; }
 
+// ═══════════════════════════════════════════
+//  PERFORMANCE TRACKER
+// ═══════════════════════════════════════════
+let betResults = sGetJSON('betai_results', []);
+
+const TYPE_LABELS = {
+  result:'Résultat 1/N/2', double:'Double chance 1X/X2', double12:'Double chance 12',
+  dnb:'Draw No Bet', htft:'HT/FT', asian:'Handicap asiatique', euro_hdc:'Handicap européen',
+  cleansheet:'Victoire clean sheet', goals:'Plus/Moins buts', btts:'BTTS',
+  btts_goals:'BTTS + Over/Under', goals_ht:'Buts 1ère MT', goals_st:'Buts 2ème MT',
+  first_goal:'1ère équipe à marquer', corners:'Corners', corners_ht:'Corners MT1',
+  cards:'Cartons', fouls:'Fautes', winbtts:'Win & BTTS', double_btts:'Double chance + BTTS',
+  result_goals:'Résultat + Buts'
+};
+
+function getPickId(ticketId, pickIdx) { return `${ticketId}_${pickIdx}`; }
+
+function markResult(ticketId, pickIdx, result, btn) {
+  const id = getPickId(ticketId, pickIdx);
+  const existing = betResults.findIndex(r => r.id === id);
+  const hEntry = hist.find(h => h.id === ticketId);
+  const pick = hEntry?.data?.ticket?.[pickIdx];
+
+  if (existing >= 0 && betResults[existing].result === result) {
+    // Toggle off
+    betResults.splice(existing, 1);
+  } else {
+    const entry = {
+      id, ticketId, pickIdx,
+      match: pick ? `${pick.home} vs ${pick.away}` : '',
+      bet_type: pick?.bet_type || '',
+      bet_value: pick?.bet_value || '',
+      league: pick?.league || '',
+      mode: hEntry?.mode || '',
+      probability: pick?.probability || 0,
+      result
+    };
+    if (existing >= 0) betResults[existing] = entry;
+    else betResults.push(entry);
+  }
+  sSetJSON('betai_results', betResults);
+
+  // Refresh buttons
+  const row = document.getElementById(`pr_${ticketId}_${pickIdx}`);
+  if (row) {
+    const saved = betResults.find(r => r.id === id);
+    row.querySelectorAll('.rng-btn').forEach(b => b.classList.remove('on'));
+    if (saved) row.querySelector(`.rng-btn[data-r="${saved.result}"]`)?.classList.add('on');
+  }
+  // Refresh result summary badge
+  const sumEl = document.getElementById(`rsum_${ticketId}`);
+  if (sumEl) sumEl.innerHTML = renderResultSummary(ticketId, hEntry?.data?.ticket?.length || 0);
+  // Refresh perf tab if open
+  if ($('tabPerf').style.display !== 'none') renderPerf();
+}
+
+function renderResultSummary(ticketId, totalPicks) {
+  const res = betResults.filter(r => r.ticketId === ticketId);
+  const w = res.filter(r => r.result === 'W').length;
+  const l = res.filter(r => r.result === 'L').length;
+  const v = res.filter(r => r.result === 'V').length;
+  const p = totalPicks - w - l - v;
+  return (w ? `<span class="rrs w">✅ ${w}G</span>` : '')
+    + (l ? `<span class="rrs l">❌ ${l}P</span>` : '')
+    + (v ? `<span class="rrs v">↩️ ${v}V</span>` : '')
+    + (p > 0 ? `<span class="rrs p">⏳ ${p}</span>` : '');
+}
+
+function togglePicks(e, ticketId) {
+  e.stopPropagation();
+  const el = document.getElementById(`picks_${ticketId}`);
+  const btn = e.currentTarget;
+  if (!el) return;
+  const open = el.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  btn.textContent = open ? '📊 Fermer' : '📊 Tracker';
+}
+
+function computePerf() {
+  const settled = betResults.filter(r => r.result === 'W' || r.result === 'L');
+  if (!settled.length) return { total: betResults.length, settled: 0, winRate: null, byType: [], byLeague: [] };
+  const byType = {}, byLeague = {};
+  for (const r of settled) {
+    if (r.bet_type) {
+      if (!byType[r.bet_type]) byType[r.bet_type] = { w:0, l:0 };
+      byType[r.bet_type][r.result === 'W' ? 'w' : 'l']++;
+    }
+    if (r.league) {
+      if (!byLeague[r.league]) byLeague[r.league] = { w:0, l:0 };
+      byLeague[r.league][r.result === 'W' ? 'w' : 'l']++;
+    }
+  }
+  const totalW = settled.filter(r => r.result === 'W').length;
+  return {
+    total: betResults.length,
+    settled: settled.length,
+    winRate: Math.round(totalW / settled.length * 100),
+    byType: Object.entries(byType).map(([type,{w,l}]) => ({type,w,l,total:w+l,rate:Math.round(w/(w+l)*100)})).sort((a,b)=>b.total-a.total),
+    byLeague: Object.entries(byLeague).map(([league,{w,l}]) => ({league,w,l,total:w+l,rate:Math.round(w/(w+l)*100)})).sort((a,b)=>b.total-a.total)
+  };
+}
+
+// Retourne un texte de feedback à injecter dans le prompt de génération
+function getPerfFeedback() {
+  const perf = computePerf();
+  if (!perf || perf.settled < 5) return '';
+  const strong = perf.byType.filter(t => t.total >= 3 && t.rate >= 63).map(t => `${t.type}(${t.rate}%)`);
+  const weak   = perf.byType.filter(t => t.total >= 3 && t.rate <= 42).map(t => `${t.type}(${t.rate}%)`);
+  const leagueBest = perf.byLeague.filter(l => l.total >= 3 && l.rate >= 65).map(l => `${l.league}(${l.rate}%)`);
+  if (!strong.length && !weak.length) return '';
+  let txt = `\nPERFORMANCE PERSONNELLE (${perf.settled} paris trackés · ${perf.winRate}% global):`;
+  if (strong.length) txt += `\n→ Types PERFORMANTS à PRIVILÉGIER: ${strong.join(', ')}`;
+  if (weak.length)   txt += `\n→ Types FAIBLES à LIMITER: ${weak.join(', ')}`;
+  if (leagueBest.length) txt += `\n→ Ligues favorables: ${leagueBest.join(', ')}`;
+  txt += '\nAdapte tes recommandations en favorisant les types et ligues performants pour cet utilisateur.';
+  return txt;
+}
+
+function renderPerf() {
+  const el = $('perfContent');
+  const perf = computePerf();
+  if (!perf.total) {
+    el.innerHTML = `<div class="perf-empty">
+      📊 Aucune donnée de performance.<br><br>
+      <strong style="color:var(--text)">Comment utiliser le tracker :</strong><br>
+      Allez dans <strong style="color:var(--teal)">📋 Historique</strong> → cliquez <strong style="color:var(--teal)">📊 Tracker</strong><br>
+      sur un ticket → marquez chaque pari avec<br>
+      <strong style="color:var(--green)">✅ Gagné</strong> · <strong style="color:var(--red)">❌ Perdu</strong> · <strong style="color:var(--muted2)">↩️ Void/Nul</strong><br><br>
+      BetAI apprendra vos forces et adaptera ses prédictions !
+    </div>`;
+    return;
+  }
+
+  const winColor = perf.winRate >= 60 ? 'var(--green)' : perf.winRate >= 45 ? 'var(--gold)' : 'var(--red)';
+  const strong = perf.byType.filter(t => t.total >= 3 && t.rate >= 63);
+  const weak   = perf.byType.filter(t => t.total >= 3 && t.rate <= 42);
+  let aiText = '';
+  if (perf.settled < 5) {
+    aiText = `⏳ Trackez encore <strong style="color:var(--green)">${5 - perf.settled} paris</strong> pour activer les recommandations personnalisées.`;
+  } else if (strong.length || weak.length) {
+    if (strong.length) aiText += `✅ Points forts : <strong style="color:var(--green)">${strong.map(t => TYPE_LABELS[t.type]||t.type).join(', ')}</strong> — BetAI les privilégiera dans vos prochains tickets.<br>`;
+    if (weak.length)   aiText += `⚠️ Points faibles : <strong style="color:var(--red)">${weak.map(t => TYPE_LABELS[t.type]||t.type).join(', ')}</strong> — BetAI les limitera automatiquement.`;
+  } else {
+    aiText = `📊 Performances équilibrées sur tous les types. Continuez à tracker pour affiner les recommandations.`;
+  }
+
+  const typeRows = perf.byType.filter(t => t.total >= 1).map(t => {
+    const cls = t.rate >= 60 ? 'good' : t.rate >= 45 ? 'mid' : 'bad';
+    return `<div class="perf-row">
+      <div class="perf-row-lbl">${TYPE_LABELS[t.type] || t.type}</div>
+      <div class="perf-row-bar"><div class="perf-row-fill ${cls}" style="width:${t.rate}%"></div></div>
+      <div class="perf-row-pct ${cls}">${t.rate}%</div>
+      <div class="perf-row-ct">${t.w}/${t.total}</div>
+    </div>`;
+  }).join('');
+
+  const leagueRows = perf.byLeague.filter(l => l.total >= 1).map(l => {
+    const cls = l.rate >= 60 ? 'good' : l.rate >= 45 ? 'mid' : 'bad';
+    return `<div class="perf-row">
+      <div class="perf-row-lbl">${l.league}</div>
+      <div class="perf-row-bar"><div class="perf-row-fill ${cls}" style="width:${l.rate}%"></div></div>
+      <div class="perf-row-pct ${cls}">${l.rate}%</div>
+      <div class="perf-row-ct">${l.w}/${l.total}</div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="perf-global">
+      <div class="perf-kpi"><div class="perf-kpi-val">${perf.total}</div><div class="perf-kpi-lbl">Paris trackés</div></div>
+      <div class="perf-kpi"><div class="perf-kpi-val" style="color:${winColor}">${perf.winRate ?? '—'}%</div><div class="perf-kpi-lbl">Taux de réussite</div></div>
+      <div class="perf-kpi"><div class="perf-kpi-val" style="color:var(--blue)">${perf.settled}</div><div class="perf-kpi-lbl">Paris résolus</div></div>
+    </div>
+    <div class="perf-ai-box">
+      <div class="perf-ai-lbl">🤖 Recommandation IA personnalisée</div>
+      <div class="perf-ai-text">${aiText}</div>
+    </div>
+    ${typeRows ? `<div class="perf-section"><div class="perf-sh">PAR TYPE DE PARI</div><div class="perf-table">${typeRows}</div></div>` : ''}
+    ${leagueRows ? `<div class="perf-section"><div class="perf-sh">PAR LIGUE</div><div class="perf-table">${leagueRows}</div></div>` : ''}
+  `;
+  // Animate bars
+  setTimeout(() => el.querySelectorAll('.perf-row-fill').forEach(b => { const w = b.style.width; b.style.width='0'; setTimeout(()=>b.style.width=w,50); }), 50);
+}
+
+function clearResults() {
+  if (!confirm('Réinitialiser toutes les statistiques de performance ?')) return;
+  betResults = [];
+  sSetJSON('betai_results', []);
+  renderPerf();
+}
+
 function renderHist() {
   const el = $('histList');
   if (!hist.length) {
@@ -1593,23 +1913,50 @@ function renderHist() {
     return;
   }
   const mL = { safe:'🛡️', balanced:'⚖️', aggressive:'🔥' };
-  el.innerHTML = '<div class="hist-list">' + hist.map((h, i) => `
-    <div class="hi" onclick="loadHist(${i})">
-      <div class="hi-info">
-        <div class="hi-date">${h.date} · ${mL[h.mode]||''} ${h.mode}</div>
-        <div class="hi-title">${h.selCount} sélection${h.selCount>1?'s':''} · ${h.matchCount} match${h.matchCount>1?'s':''}</div>
-        <div class="hi-sub">Cote totale : ×${h.totCote}</div>
-        <div class="hi-tags">
-          ${h.srcs?.fd  ? '<span class="hi-tag fd">📊 FD</span>'  : ''}
-          ${h.srcs?.bz  ? '<span class="hi-tag bz">🤖 ML</span>'  : ''}
-          ${h.srcs?.af  ? '<span class="hi-tag af">🏟️ AF</span>'  : ''}
-          ${h.valCt > 0 ? `<span class="hi-tag vb">💰 ${h.valCt} value</span>` : ''}
+  el.innerHTML = '<div class="hist-list">' + hist.map((h, i) => {
+    const picks = h.data?.ticket || [];
+    const picksHTML = picks.map((pick, pi) => {
+      const rid = getPickId(h.id, pi);
+      const saved = betResults.find(r => r.id === rid);
+      const res = saved?.result || null;
+      return `<div class="hi-pick-row" id="pr_${h.id}_${pi}">
+        <div style="flex:1;min-width:0">
+          <div class="hi-pick-match">${pick.home} vs ${pick.away}</div>
+          <div class="hi-pick-type">${pick.bet_label||pick.bet_type} · ${pick.bet_value}</div>
         </div>
+        <div class="rng-btns">
+          <button class="rng-btn rw${res==='W'?' on':''}" data-r="W" onclick="markResult(${h.id},${pi},'W',this);event.stopPropagation()" title="Gagné">✅</button>
+          <button class="rng-btn rl${res==='L'?' on':''}" data-r="L" onclick="markResult(${h.id},${pi},'L',this);event.stopPropagation()" title="Perdu">❌</button>
+          <button class="rng-btn rv${res==='V'?' on':''}" data-r="V" onclick="markResult(${h.id},${pi},'V',this);event.stopPropagation()" title="Void/Nul">↩️</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    return `<div class="hi" onclick="loadHist(${i})">
+      <div class="hi-info" style="width:100%">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+          <div style="flex:1;min-width:0">
+            <div class="hi-date">${h.date} · ${mL[h.mode]||''} ${h.mode}</div>
+            <div class="hi-title">${h.selCount} sélection${h.selCount>1?'s':''} · ${h.matchCount} match${h.matchCount>1?'s':''}</div>
+            <div class="hi-sub">Cote totale : ×${h.totCote}</div>
+            <div class="hi-tags">
+              ${h.srcs?.fd  ? '<span class="hi-tag fd">📊 FD</span>'  : ''}
+              ${h.srcs?.bz  ? '<span class="hi-tag bz">🤖 ML</span>'  : ''}
+              ${h.srcs?.af  ? '<span class="hi-tag af">🏟️ AF</span>'  : ''}
+              ${h.valCt > 0 ? `<span class="hi-tag vb">💰 ${h.valCt} value</span>` : ''}
+            </div>
+            <div class="hi-result-summary" id="rsum_${h.id}">${renderResultSummary(h.id, picks.length)}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0">
+            <div class="hi-prob">${h.avgProb}%</div>
+            <button class="track-btn" id="tbtn_${h.id}" onclick="togglePicks(event,${h.id})" title="Tracker les résultats">📊 Tracker</button>
+            <button class="hi-del" onclick="delHist(event,${i})">🗑️</button>
+          </div>
+        </div>
+        <div class="hi-picks" id="picks_${h.id}">${picksHTML}</div>
       </div>
-      <div class="hi-prob">${h.avgProb}%</div>
-      <button class="hi-del" onclick="delHist(event,${i})">🗑️</button>
-    </div>`
-  ).join('') + '</div>';
+    </div>`;
+  }).join('') + '</div>';
 }
 
 function loadHist(i) {
